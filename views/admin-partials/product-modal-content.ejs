@@ -1,0 +1,94 @@
+<!-- Form for editing product details -->
+<form enctype="multipart/form-data" id="editProductForm<%= item._id %>">
+    <!-- Hidden field for _id -->
+    <input type="hidden" id="productId" name="productId" value="<%= item._id %>">
+
+    <div class="form-group mb-3">
+        <label for="editProductName">Product Name</label>
+        <span id="editNameError" class="text-red"></span>
+        <input type="text" class="form-control" id="editProductName" name="productName"
+            value="<%= item.productName %>">
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductDescription">Description</label>
+        <span id="editDescriptionError" class="text-red"></span>
+        <textarea class="form-control" id="editProductDescription"
+            name="description"><%= item.description %></textarea>
+    </div>
+    <div class="form-group mb-3">
+        <label for="editMainImage">Main Image (Upload one file)</label>
+        <span id="editImageError" class="text-red"></span>
+        <input type="file" class="form-control-file" id="editMainImage" name="image" accept="image/*">
+        <img src="" id="editShowImage" style="width: auto; height: 300px; margin-top: 10px; display: block;" alt="">
+        <button type="button" class="btn btn-primary p-2 px-5" id="editUpdateImage"
+            style="display: none;">Save</button>
+        <div class="mt-2">
+            <% if (item.image) { %>
+            <img src="/<%= item.image %>" alt="<%= item.productName %> Image"
+                style="max-width: 100%; height: 50px;">
+            <% } else { %>
+            <img src="/placeholder-image.png" alt="No Image"
+                style="max-width: 100%; height: auto;">
+            <% } %>
+        </div>
+    </div>
+    <div class="form-group mb-3">
+        <label for="editAdditionalImages">Additional Images (Upload multiple files)</label>
+        <span id="editImagesError" class="text-red"></span>
+        <input type="file" class="form-control-file" id="editAdditionalImages" name="images"accept="image/*" multiple>
+        <div id="editImagePreviews"style="max-height: 300px; overflow-y: auto;"></div>
+        <button type="button" class="btn btn-primary p-2 px-5" id="editUpdateImages"
+            style="display: none;">Save</button>
+        <% if (item.images && item.images.length > 0) { %>
+        <div class="row">
+            <% item.images.forEach((image,i) => {%>
+            <div class="col-md-3">
+                <img src="/<%= image %>" alt="Additional Image" id="imagesUpdate<%= i %>"
+                    style="max-width: 100%; height: 50px;">
+                <button type="button" class="imgremove btn-danger" id="btnRemove<%= i %>"
+                    onclick="removeImage('<%= i %>','<%= item._id %>')">Remove</button>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <p>No additional images available.</p>
+        <% } %>
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductBrand">Brand</label>
+        <span id="editBrandError" class="text-red"></span>
+        <input type="text" class="form-control" id="editProductBrand" name="brand"
+            value="<%= item.brand %>">
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductCountInStock">Count in Stock</label>
+        <span id="editStockError" class="text-red"></span>
+        <input type="number" class="form-control" id="editProductCountInStock" name="countInStock"
+            value="<%= item.countInStock %>">
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductCategory">Category</label>
+        <span id="editCategoryError" class="text-red"></span>
+        <select class="form-control" id="editProductCategory" name="category">
+            <% categories.forEach(category => { %>
+            <option value="<%= category._id %>"
+                <%= item.category && category._id.toString() === item.category._id.toString() ? 'selected' : '' %>>
+                <%= category.name %>
+            </option>
+            <% }) %>
+        </select>
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductPrice">Original Price</label>
+        <span id="editPriceError" class="text-red"></span>
+        <input type="number" class="form-control" id="editProductPrice" name="price"
+            value="<%= item.price %>">
+    </div>
+    <div class="form-group mb-3">
+        <label for="editProductDiscountPrice">Discount Price</label>
+        <span id="editDiscountPriceError" class="text-red"></span>
+        <input type="number" class="form-control" id="editProductDiscountPrice"
+            name="discountPrice" value="<%= item.discountPrice %>">
+    </div>
+    <button type="submit" class="btn btn-primary" id="editProductBtn">Save Changes</button>
+</form>

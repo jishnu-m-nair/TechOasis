@@ -1,0 +1,9 @@
+.env
+node_modules/
+config.env
+check.txt
+newapp.js
+productcontroller2.js
+sample.ejs
+productSchema2.js
+non-used-files/
