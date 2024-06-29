@@ -12,7 +12,7 @@ const { categoryUpload } = require('../config/multerConfig'); // Import category
 
 
 router.get('/admin',AdminLogSession,(req,res) => {
-    res.render('admin-index')
+    res.render('admin/admin-index')
 })
 
 // router.get('/admin/signup',(req,res)=> {

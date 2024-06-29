@@ -37,7 +37,7 @@ const productManagementGet = async (req, res) => {
             // Calculate the total number of pages
             const totalPages = Math.ceil(totalProducts / perPage);
 
-            res.render('products', {
+            res.render('admin/products', {
                 products,
                 categories,
                 selectedCategory,
@@ -556,7 +556,7 @@ let productSearch = async (req, res) => {
         // Calculate the total number of pages
         const totalPages = Math.ceil(totalProducts / perPage);
         
-        res.render('products', { products,categories,selectedCategory, pagetitle: 'Products',currentPage: page,perPage,totalPages });
+        res.render('admin/products', { products,categories,selectedCategory, pagetitle: 'Products',currentPage: page,perPage,totalPages });
      
     } catch (error) {
         console.log(error.message);

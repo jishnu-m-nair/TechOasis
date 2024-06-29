@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const UserModel = require("../model/userSchema");
 const ProductModel = require("../model/productSchema");
 const categoryModel = require("../model/categorySchema");
+const AddressModel = require("../model/addressSchema");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { sentOtp } = require('../config/nodeMailer');
@@ -24,7 +25,7 @@ const passport = require('passport');
 //   req.session.email = user.email;
 
 //   // Redirect to the protected route
-//   res.redirect('/dashboard'); // Redirect to dashboard after successful login
+//   res.redirect('/home'); // Redirect to dashboard after successful login
 // };
 
 // // const googleAuthFailure = async (req, res, next) => {
@@ -56,7 +57,7 @@ const googleAuthCallback = (req, res) => {
   req.session.email = user.email;
   console.log('Session userId set:', req.session.userId);
 
-  res.redirect('/dashboard');
+  res.redirect('/home');
 };
 
 const googleAuthFailure = async (req, res) => {
@@ -134,7 +135,7 @@ const securePassword = async (password) => {
         let userData = await UserModel.findOne({email: req.session.email})
   
         if (!userData.isBlocked) {
-          res.render("index", {
+          res.render("user/index", {
             item,
             products,
             category,
@@ -148,7 +149,7 @@ const securePassword = async (password) => {
           return res.redirect('/login');
         }
       } else {
-        res.render("index", {
+        res.render("user/index", {
           item,
           products,
           category,
@@ -190,7 +191,7 @@ const loginpage = async (req, res) => {
         req.session.user = false;
         req.session.isBlocked = false;
         errorMessage = "Sorry user blocked";
-        res.render("login", {
+        res.render("user/login", {
           err: errorMessage,
           data,
           errorMessage
@@ -198,7 +199,7 @@ const loginpage = async (req, res) => {
       } else if (req.session.passwordIncorrect) {
         req.session.passwordIncorrect = false;
         errorMessage = "Incorrect Password";
-        res.render("login", {
+        res.render("user/login", {
           err: errorMessage,
           data,
           errorMessage
@@ -206,7 +207,7 @@ const loginpage = async (req, res) => {
       } else if (req.session.noUser) {
         req.session.noUser = false;
         errorMessage = "Incorrect email or password";
-        res.render("login", {
+        res.render("user/login", {
           err: errorMessage,
           data,
           errorMessage
@@ -216,7 +217,7 @@ const loginpage = async (req, res) => {
       //   res.redirect("/");
       // } 
       else {
-        res.render("login", {
+        res.render("user/login", {
           err: "",
           data,
           errorMessage
@@ -258,7 +259,7 @@ const loginpage = async (req, res) => {
             };
             req.session.email = req.body.email;
             req.session.userId = userData._id
-            res.redirect("/dashboard");
+            res.redirect("/home");
           }
         } else {
           // Password does not match
@@ -290,14 +291,14 @@ const loginpage = async (req, res) => {
     if (req.session.data) {
       data = req.session.data;
   
-      res.render("register", {
+      res.render("user/register", {
         error: req.flash("error"),
         data,
         errorMessage:"",
         formData: req.body
       });
     } else {
-      res.render("register", {
+      res.render("user/register", {
         error: req.flash("error"),
         data,
         errorMessage:"",
@@ -322,9 +323,9 @@ const postRegister = async (req, res, next) => {
 
     if (existingUser) {
       if (existingUser.email === email && existingUser.phone == phone) {
-        res.render('register',{errorMessage:"Email and phone number is already registered",formData: req.body});
+        res.render('user/register',{errorMessage:"Email and phone number is already registered",formData: req.body});
       } else if (existingUser.email === email) {
-        res.render('register',{errorMessage:"Email is already registered!",formData: req.body});
+        res.render('user/register',{errorMessage:"Email is already registered!",formData: req.body});
       }
     } else {
       let passwordHash = await securePassword(password);
@@ -360,7 +361,7 @@ const postVerifyOtp = async (req, res) => {
       return res.status(400).json({ message: "User session not found." });
     }
 
-    if (otpRegister !== otp || user.otpExpiry < Date.now()) {
+    if (otpRegister !== otp || otpExpiry < Date.now()) {
     // if (otpRegister !== otp ) {
       return res.status(401).json({ message: "Invalid OTP." });
       // return res.render('otp',{err:"Invalid or expired OTP."});
@@ -372,11 +373,14 @@ const postVerifyOtp = async (req, res) => {
       user.otp = null;
     }
 
-    // await user.save(); // Persist user updates
+    await user.save(); // Persist user updates
 
-    req.session.destroy(); // Destroy session (optional)
+    req.session.email = user.email;
 
+    // req.session.destroy(); // Destroy session (optional)
+    
     res.status(200).json({ message: "OTP verification successful." }); // Success message
+    // res.redirect('/home');
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred during verification." });
@@ -395,7 +399,7 @@ const loadOTP = async (req, res) => {
 
     const errorMessage = hasError ? (req.session.otpExpired ? "OTP expired. Please request a new one." : "Incorrect OTP") : "";
 
-    res.render("otp", { err: errorMessage }); // Render OTP page with error message (if any)
+    res.render("user/otp", { err: errorMessage }); // Render OTP page with error message (if any)
   } catch (error) {
     console.error(error.message); // Log the error for debugging
     res.status(500).send("An error occurred loading the OTP page.");
@@ -589,7 +593,7 @@ const userShop = async (req, res) => {
     //   products = req.session.filterProduct
     // }
 
-    res.render("shop", {
+    res.render("user/shop", {
       products,
       newProducts: latestProducts,
       category,
@@ -631,7 +635,7 @@ const productDetails = async (req, res) => {
       _id: { $ne: product._id } // Exclude the current product
     });
     // Render a template to display the product details
-    res.render("user-product-detailed", {
+    res.render("user/user-product-detailed", {
       product,
       category,
       relatedProducts
@@ -644,6 +648,176 @@ const productDetails = async (req, res) => {
     });
   }
 };
+
+// profile
+const profile = async(req,res)=>{
+  try {
+    const userId = req.session.userId;
+    const userinfo = await UserModel.findById(userId);
+    // const addresses = await AddressModel.findOne({user:userId})
+    // Fetch addresses for the user
+    const addressDocument = await AddressModel.findOne({ user: userId });
+
+    // Extract the nested addresses array
+    const addresses = addressDocument ? addressDocument.addresses : [];
+    res.render('user/user-account',{userinfo,addresses});
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const editProfile = async(req,res)=>{
+  try {
+    const userId = req.session.userId;
+    const userinfo = await UserModel.findById(userId);
+    res.render('user/editprofile',{userinfo});
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const patchEditProfile = async (req, res) => {
+  const { fullname, phone } = req.body;
+  const userId = req.session.userId; // Assume user ID is available from authentication middleware
+
+  try {
+      // Find the user and update their info
+      const user = await UserModel.findByIdAndUpdate(
+          userId,
+          { fullname, phone },
+          { new: true }
+      );
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.status(200).json({ message: 'Profile updated successfully', redirectUrl: '/profile'});
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getAddAddress = (req, res) => {
+    try {
+      const userId = req.session.userId;
+      res.render('user/addAddress',{userId})
+    } catch (error) {
+      console.error(error);
+      res.status(500).json("Internal Server Error");
+    }
+  };
+
+const addAddressPost = async (req, res) => {
+  try {
+      const { userId, addressType, houseNo, street, landmark, pincode, city, district, state, country } = req.body;
+
+      // Fetch the user's existing addresses
+      let addressRecord = await AddressModel.findOne({ user: userId });
+
+      if (!addressRecord) {
+          // If no address record exists, create a new one
+          addressRecord = new AddressModel({ user: userId, addresses: [] });
+      }
+
+      if (addressRecord.addresses.length >= 3) {
+          return res.status(400).json({ message: 'You can only have up to 3 addresses.' });
+      }
+
+      // Add the new address
+      const newAddress = {
+          addressType,
+          houseNo,
+          street,
+          landmark,
+          pincode,
+          city,
+          district,
+          state,
+          country
+      };
+
+      addressRecord.addresses.push(newAddress);
+      await addressRecord.save();
+
+      res.status(200).json({ message: 'Address added successfully', redirectUrl: '/profile' });
+  } catch (error) {
+      console.error('Error adding address:', error);
+      res.status(500).json({ message: 'An error occurred while adding the address.' });
+  }
+};
+
+// change password
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  // console.log(req.body);
+  console.log('currentPassword'+currentPassword)
+  console.log('newPassword'+newPassword)
+  console.log('confirmPassword'+confirmPassword)
+
+  // Check if all fields are provided
+  if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'New password and confirm password do not match.' });
+  }
+
+  if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'New password must be at least 8 characters long.' });
+  }
+
+  try {
+      const userId = req.session.userId;
+      const userData = await UserModel.findOne({ _id: userId });
+        if (!userData) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+      // const userData = await UserModel.findOne(userId);
+
+      console.log(userData);
+
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        userData.password
+      );
+      if (!isCurrentPasswordValid) {
+          return res.status(400).json({ message: 'Current password is incorrect.' });
+      }
+      let newPasswordHash = await securePassword(newPassword);
+
+      // Update the user's password in the database (assuming `updateUserPassword` updates the password)
+      // await updateUserPassword(userId, newPasswordHash); // Replace with actual function to update user password
+
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { _id: userData._id }, // Use the actual user ID field for update
+        { password: newPasswordHash },
+        { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(500).json({ message: 'An error occurred while updating the password. 1' });
+  }
+
+      // Respond with a success message
+      return res.status(200).json({message: 'User password updated',redirectUrl: '/profile'});
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'An error occurred while changing the password.' });
+  }
+};
+
+const getChangePassword = async (req,res) => {
+  try {
+    const userId = req.session.userId;
+  res.render('user/changepassword',{userId})
+  } catch (error) {
+    console.error(error);
+  }
+  
+}
 
 module.exports = {
   googleAuth,
@@ -660,5 +834,13 @@ module.exports = {
   resendOtp,
   userlogout,
   userShop,
-  productDetails
+  productDetails,
+  profile,
+  editProfile,
+  patchEditProfile,
+  getAddAddress,
+  addAddressPost,
+  changePassword,
+  getChangePassword
+  
 }

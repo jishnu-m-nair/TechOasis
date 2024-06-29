@@ -8,7 +8,7 @@ const isLoggedIn = (req, res, next) => {
     } else {
         errorMessage = "User not logged in!"
         console.error("User not logged in!");
-        res.render('login',{
+        res.render('user/login',{
             err: errorMessage,
             data,
             errorMessage
@@ -22,7 +22,7 @@ const isLoggedOut = (req, res, next) => {
        next();
    } else {
        console.error("User already logged in:");
-       res.redirect("/dashboard"); // Redirect to home or any other page you want
+       res.redirect("/home"); // Redirect to home or any other page you want
    }
 };
 
@@ -57,7 +57,7 @@ const isBlockedUser = async (req, res, next) => {
             // Handle case where user data not found (e.g., log error or redirect)
             errorMessage = "User is blocked";
             console.error("User is blocked");
-            return res.render('login',{
+            return res.render('user/login',{
                 err: errorMessage,
                 data,
                 errorMessage
@@ -78,7 +78,7 @@ const isBlockedUser = async (req, res, next) => {
         next();
     } catch (error) {
         errorMessage = "Error checking user block status";
-        res.render('login',{
+        res.render('user/login',{
             err: errorMessage,
             data,
             errorMessage

@@ -44,7 +44,7 @@ let adminlogin = async (req, res) => {
         res.redirect("/admin");
       } else {
         const errorMessage = "Incorrect Email or Password";
-        res.render("admin-login", {
+        res.render("admin/admin-login", {
           err: errorMessage,
           adminData,
           pagetitle: 'User Management'
@@ -85,7 +85,7 @@ let adminloginpost = async (req, res) => {
           req.session.admin = true;
           return res.redirect("/admin");
       } else {
-          return res.render("admin-login", {
+          return res.render("admin/admin-login", {
               message: "Invalid Password",
               adminData: req.session.adminData,
               pagetitle: 'User Management'
@@ -166,7 +166,7 @@ let adminloginpost = async (req, res) => {
   
       const totalPages = Math.ceil(totalUsers / perPage);
   
-      res.render("user-management", {
+      res.render("admin/user-management", {
         userdetails,
         currentPage: page,
         totalPages,

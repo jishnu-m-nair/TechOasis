@@ -17,7 +17,7 @@ require('../middlewares/authenticate');
 
 //user home
 router.get('/contact',(req,res) => {
-    res.render('contact-us')
+    res.render('user/contact-us')
 });
 
 // Google OAuth routes
@@ -32,7 +32,7 @@ router.get('/contact',(req,res) => {
 //   req.session.email = user.email;
 
 //   // Redirect to the protected route
-//   res.redirect('/dashboard'); // Redirect to dashboard after successful login
+//   res.redirect('/home'); // Redirect to dashboard after successful login
 // });
 
 // Define routes using the controller
@@ -45,11 +45,10 @@ router.get('/auth/google/callback', isLoggedOut,
 // Define a route for handling Google authentication failures
 router.get('/auth/google/failure', user.googleAuthFailure);
 
-router.get('/dashboard',isLoggedIn,user.home);
+// router.get('/dashboard',isLoggedIn,user.home);
+router.get('/home',isLoggedIn,user.home);
 
-router.get('/myaccount',(req,res)=>{
-  res.render('user-account');
-})
+
 
 router.get('/',user.loginpage);
 
@@ -79,5 +78,21 @@ router.post('/resendOtp',isLoggedOut,user.resendOtp);
 //product routers
 router.get('/shop',isLoggedIn, user.userShop)
 router.get('/productdetails/:productId',isLoggedIn, user.productDetails)
+
+// profile
+router.get('/profile',user.profile)
+router.get('/editprofile',user.editProfile)
+router.patch('/editprofile',user.patchEditProfile);
+
+
+// router.get('/add-address',(req,res) => {
+//   res.render('user/addAddress')
+// });
+
+router.get('/add-address',user.getAddAddress);
+router.post('/add-address',user.addAddressPost);
+router.get('/change-password',user.getChangePassword);
+router.post('/change-password',user.changePassword);
+
 
 module.exports = router;

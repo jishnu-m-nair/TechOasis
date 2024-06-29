@@ -16,27 +16,27 @@ const categoryManagementGet = async (req, res) => {
       // log(req.session.editCategory)
       if (req.session.categoryData === true) {
         req.session.categoryData = false;
-        res.render("category", {
+        res.render("admin/category", {
           pagetitle: "Category",
           categories: categories,
           error: "Category name already exists", // Pass the categories to the view
         });
       } else if (req.session.newCategory===true) {
         req.session.newCategory = false
-        res.render("category", {
+        res.render("admin/category", {
           pagetitle: "Category",
           categories: categories,
           error: "New Category added succesfully",
         });
       } else if (req.session.editCategory === true) {
         req.session.editCategory = false
-        res.render('category', {
+        res.render('admin/category', {
             pagetitle: 'Category',
             categories: categories,
             error:'Category edited succesfully'
         })
       } else {
-        res.render("category", {
+        res.render("admin/category", {
           pagetitle: "Category",
           categories: categories,
           error: "",

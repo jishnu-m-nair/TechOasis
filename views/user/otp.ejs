@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="/userassets/css/vendor/vendor.min.css">
     <link rel="stylesheet" href="/userassets/css/plugins/plugins.min.css">
     <link rel="stylesheet" href="/userassets/css/style.min.css">
+    <link rel="stylesheet" href="/userassets/css/customstyle.css">
 
     <style>
         .form-background{
@@ -206,7 +207,7 @@
                         <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
                             <nav aria-label="breadcrumb">
                                 <ul>
-                                    <li><a href="/dashboard">Home</a></li>
+                                    <li><a href="/home">Home</a></li>
                                     <li class="active" aria-current="page">Signup</li>
                                 </ul>
                             </nav>
@@ -584,7 +585,8 @@
                     const result = await response.json();
         
                     if (response.ok) {
-                        displaySuccess(result.message || 'OTP verified successfully!');
+                        // displaySuccess(result.message || 'OTP verified successfully!');
+                        window.location.href = '/home';
                         // Optionally redirect or perform other actions on success
                     } else {
                         displayError(result.message || 'Failed to verify OTP.');

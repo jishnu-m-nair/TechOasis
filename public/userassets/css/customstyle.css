@@ -1,0 +1,106 @@
+.breadcrumb-wrapper {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+@media (min-width: 768px) {
+    .breadcrumb-wrapper {
+        margin-bottom: 20px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+}
+@media (min-width: 992px) {
+    .breadcrumb-wrapper {
+        margin-bottom: 20px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+}
+
+.breadcrumb-title {
+    text-transform: uppercase;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+@media (min-width: 768px) {
+    .breadcrumb-title {
+        font-size: 34px;
+    }
+}
+@media (min-width: 992px) {
+    .breadcrumb-title {
+        font-size: 38px;
+    }
+}
+@media (min-width: 1200px) {
+    .breadcrumb-title {
+        font-size: 42px;
+    }
+}
+
+
+/*****************************
+* Pages - Log In
+*****************************/
+.account_form.register {
+    margin-top: 60px;
+}
+@media (min-width: 768px) {
+    .account_form.register {
+        margin-top: 0;
+    }
+}
+.account_form h3, .account_form .h3 {
+    font-size: 28px;
+    text-transform: capitalize;
+    font-weight: 500;
+    line-height: 22px;
+    margin-bottom: 30px;
+}
+.account_form form {
+    border: 1px solid #ededed;
+    padding: 23px 20px 29px;
+    border-radius: 5px;
+}
+
+.login_submit * {
+    display: block;
+}
+
+/*****************************
+* Dashboard - Add Address
+*****************************/
+.account_form.profile {
+    margin-top: 60px;
+}
+@media (min-width: 768px) {
+    .account_form.profile {
+        margin-top: 0;
+    }
+}
+.account_form h3, .account_form .h3 {
+    font-size: 28px;
+    text-transform: capitalize;
+    font-weight: 500;
+    line-height: 22px;
+    margin-bottom: 30px;
+}
+.account_form form {
+    border: 1px solid #ededed;
+    padding: 23px 20px 29px;
+    border-radius: 5px;
+}
+
+.login_submit * {
+    display: block;
+}
+
+.default-form-box input{
+    border: 1px solid #ccc !important;
+}
+
+.text-red{
+    color: red !important;
+}

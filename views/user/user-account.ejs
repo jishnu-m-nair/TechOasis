@@ -7,10 +7,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Product details</title>
+    <title>User Account</title>
 
     <!-- ::::::::::::::Favicon icon::::::::::::::-->
     <link rel="shortcut icon" href="/userassets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- ::::::::::::::All CSS Files here :::::::::::::: -->
     <!-- Vendor CSS -->
@@ -34,10 +35,110 @@
     <link rel="stylesheet" href="/userassets/css/vendor/vendor.min.css">
     <link rel="stylesheet" href="/userassets/css/plugins/plugins.min.css">
     <link rel="stylesheet" href="/userassets/css/style.min.css">
+    <link rel="stylesheet" href="/userassets/css/customstyle.css">
+
     <style>
-        .text-red{
-            color: #ff0000 !important;
+        .dashboard-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: white; /* White background */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
         }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333; /* Dark text */
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .d-flex span {
+            font-weight: bold;
+            padding-right: 15px;
+            color: #555; /* Slightly darker for emphasis */
+        }
+
+        .d-flex p {
+            margin: 0;
+            color: #333; /* Dark text */
+        }
+
+        .view i {
+            margin-right: 5px; /* Space between icon and text */
+        }
+        .no-userinfo {
+            padding: 20px;
+            text-align: center;
+            color: #ff0000; /* Red color for error or notice */
+            background-color: #fff3f3; /* Light red background */
+            border: 1px solid #ff0000; /* Red border */
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        address {
+            font-style: normal;
+            line-height: 1.5;
+        }
+        .address-container {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .address-title {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .address-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .address-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .address-item:last-child {
+            border-bottom: none;
+        }
+
+        .new-address-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff; /* Primary button color */
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .new-address-button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+
+        .new-address-button:active {
+            background-color: #00408d; /* Even darker shade on active click */
+        }
+
     </style>
 
 </head>
@@ -53,7 +154,7 @@
                             <!-- Start Header Logo -->
                             <div class="header-logo">
                                 <div class="logo">
-                                    <a href="/dashboard"><img src="/assets/imgs/theme/techoasis_logo.png" alt=""></a>
+                                    <a href="/home"><img src="/userassets/images/techoasis_logo.png" alt="logo"></a>
                                 </div>
                             </div>
                             <!-- End Header Logo -->
@@ -63,17 +164,15 @@
                                 <nav>
                                     <ul>
                                         <li>
-                                            <a href="/dashboard">Home</a>                                                                           
+                                            <a href="/home">Home</a>
                                         </li>
-
                                         <li>
                                             <a href="/shop">Shop</a>
                                         </li>
-
+                                        
                                         <li>
                                             <a href="#">About Us</a>
                                         </li>
-
                                         <li>
                                             <a href="#">Contact Us</a>
                                         </li>
@@ -102,6 +201,11 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a href="/logout">
+                                        <i class="icon-power"></i>
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="#offcanvas-about" class="offacnvas offside-about offcanvas-toggle">
                                         <i class="icon-menu"></i>
                                     </a>
@@ -125,9 +229,9 @@
                     <div class="mobile-header-left">
                         <ul class="mobile-menu-logo">
                             <li>
-                                <a href="/dashboard">
+                                <a href="/home">
                                     <div class="logo">
-                                        <img src="/assets/imgs/theme/techoasis_logo.png" alt="company-logo">
+                                        <img src="/userassets/images/techoasis_logo.png" alt="">
                                     </div>
                                 </a>
                             </li>
@@ -182,16 +286,11 @@
                 <!-- Start Mobile Menu Nav -->
                 <div class="offcanvas-menu">
                     <ul>
-                        <li>
-                            <a href="/dashboard"><span>Home</span></a>
-                            
-                        </li>
-                        <li>
-                            <a href="/shop"><span>Shop</span></a>
-                        </li>
-
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="/home">HOME</a></li> 
+                        <li><a href="/shop">SHOP</a></li> 
+                        <li><a href="#">ABOUT US</a></li>
+                        <li><a href="#">CONTACT</a></li>
+                        <li><a href="/logout">LOGOUT</a></li>
                     </ul>
                 </div> <!-- End Mobile Menu Nav -->
             </div> <!-- End Mobile Menu -->
@@ -199,7 +298,7 @@
             <!-- Start Mobile contact Info -->
             <div class="mobile-contact-info">
                 <div class="logo">
-                    <a href="/dashboard"><img src="/assets/imgs/theme/techoasis_logo.png" alt="company-logo"></a>
+                    <a href="/home"><img src="/userassets/images/techoasis_logo.png" alt="company-logo"></a>
                 </div>
 
                 <address class="address">
@@ -236,7 +335,7 @@
         <!-- Start Mobile contact Info -->
         <div class="mobile-contact-info">
             <div class="logo">
-                <a href="/dashboard"><img src="/assets/imgs/theme/techoasis_logo.png" alt="company-logo"></a>
+                <a href="/home"><img src="/userassets/images/techoasis_logo.png" alt="logo"></a>
             </div>
 
             <address class="address">
@@ -431,13 +530,13 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="breadcrumb-title">Product Details</h3>
+                        <h3 class="breadcrumb-title">My Account</h3>
                         <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
                             <nav aria-label="breadcrumb">
                                 <ul>
-                                    <li><a href="/dashboard">Home</a></li>
+                                    <li><a href="/home">Home</a></li>
                                     <li><a href="/shop">Shop</a></li>
-                                    <li class="active" aria-current="page">Product Details</li>
+                                    <li class="active" aria-current="page">My Account</li>
                                 </ul>
                             </nav>
                         </div>
@@ -447,496 +546,233 @@
         </div>
     </div> <!-- ...:::: End Breadcrumb Section:::... -->
 
-    <!-- Start Product Details Section -->
-    <div class="product-details-section">
+    <!-- ...:::: Start Account Dashboard Section:::... -->
+    <div class="account-dashboard">
         <div class="container">
             <div class="row">
-                <div class="col-xl-5 col-lg-6">
-                    <div class="product-details-gallery-area" data-aos="fade-up" data-aos-delay="0">
-                        <!-- Start Large Image -->
-                        <div class="product-large-image product-large-image-horaizontal swiper-container">
-                            <div class="swiper-wrapper">
-                                <% product.images.forEach(image => { %>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/<%= image %>" alt="no image">
-                                </div>
-                                <% }); %>
-                                 <!-- <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-2.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-3.jpg" alt="">
-                                </div> -->
-                                <!-- <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-4.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-5.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-6.jpg" alt="">
-                                </div> -->
-                            </div>
-                        </div>
-                        <!-- End Large Image -->
-                        <!-- Start Thumbnail Image -->
-                        <div
-                            class="product-image-thumb product-image-thumb-horizontal swiper-container pos-relative mt-5">
-                            <div class="swiper-wrapper">
-                                <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-1.jpg"
-                                        alt="">
-                                </div> -->
-                                <% product.images.forEach(image => { %>
-                                    <div class="product-image-large-image swiper-slide">
-                                        <img class="img-fluid" src="/<%= image %>" alt="no image">
-                                    </div>
-                                <% }); %>
-                                 <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-2.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-3.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-4.jpg"
-                                        alt="">
-                                </div> -->
-                                <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-5.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-6.jpg"
-                                        alt="">
-                                </div> -->
-                            </div>
-                            <!-- Add Arrows -->
-                            <div class="gallery-thumb-arrow swiper-button-next"></div>
-                            <div class="gallery-thumb-arrow swiper-button-prev"></div>
-                        </div>
-                        <!-- End Thumbnail Image -->
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <!-- Nav tabs -->
+                    <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
+                        <ul role="tablist" class="nav flex-column dashboard-list">
+                            <li><a href="#dashboard" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover active">Dashboard</a>
+                            </li>
+                            <!-- <li><a href="#account-details" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Account details</a>
+                            </li>
+                            <li> <a href="#orders" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Orders</a></li> -->
+                            <!-- <li><a href="#downloads" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Downloads</a></li> -->
+                            <li><a href="#address" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a></li>
+                            
+                            <li><a href="/logout"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">logout</a></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-xl-7 col-lg-6">
-                    <div class="product-details-content-area product-details--golden" data-aos="fade-up"
-                        data-aos-delay="200">
-                        <!-- Start  Product Details Text Area-->
-                        <div class="product-details-text">
-                            <h4 class="title"><%= product.productName %></h4>
-                            <div class="d-flex align-items-center">
-                                <!-- <ul class="review-star">
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="empty"><i class="ion-android-star"></i></li>
-                                </ul> -->
-                                <ul class="review-star">
-                                    <% for (let i = 1; i <= 5; i++) { %>
-                                        <% if (i <= product.rating) { %>
-                                            <li class="fill"><i class="ion-android-star"></i></li>
-                                        <% } else { %>
-                                            <li class="empty"><i class="ion-android-star"></i></li>
-                                        <% } %>
-                                    <% } %>
-                                </ul>
-                                <!-- <a href="#" class="customer-review ml-2">(customer review )</a> -->
-                            </div>
-                            <div class="price">
-                                <% if (product.discountPrice > 0) { %>
-                                    <del><span class="original-price">₹<%= product.price %></span></del>
-                                    <span class="discount-price">₹<%= product.afterDiscount %></span>
-                                    <br>
-                                    <span class="text-red"><%= product.discountPrice %>% Off</span>
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <!-- Tab panes -->
+                    <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
+                        <div class="tab-pane fade show active" id="dashboard">
+                            <div class="dashboard-container">
+                                <div class="dashboard-header">
+                                    <h1>User Dashboard</h1>
+                                </div>
+                                <% if (userinfo) { %>
+                                    <div class="user-info">
+                                        <div class="d-flex">
+                                            <span>Full Name:</span>
+                                            <p id="fullName"><%= userinfo.fullname %></p>
+                                        </div>
+                                        <div class="d-flex">
+                                            <span>Email:</span>
+                                            <p id="email"><%= userinfo.email %></p>
+                                        </div>
+                                        <div class="d-flex">
+                                            <span>Mobile:</span>
+                                            <p id="mobile"><%= userinfo.phone %></p>
+                                        </div>
+                                        <div class="d-flex">
+                                            <a href="/editprofile" class="view">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        </div>
+                                        <div class="d-flex">
+                                            <a href="/change-password" class="view">
+                                                <i class="fas fa-edit"></i> Change Password
+                                            </a>
+                                        </div>
+                                    </div>
                                 <% } else { %>
-                                    ₹<%= product.price %>
+                                    <div class="no-userinfo">
+                                        <p>User information is not available.</p>
+                                    </div>
+                                <% } %>
+                                
+                            </div>
+                            <!-- <h4>Dashboard </h4>
+                            <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent
+                                    orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a
+                                    href="#">Edit your password and account details.</a></p> -->
+                        </div>
+                        <div class="tab-pane fade" id="account-details">
+                            <h3>Account details </h3>
+                            <div class="login">
+                                <div class="login_form_container">
+                                    <div class="account_login_form">
+                                        <form action="#">
+                                            <!-- <p>Already have an account? <a href="#">Log in instead!</a></p> -->
+                                            <!-- <div class="input-radio">
+                                                <span class="custom-radio"><input type="radio" value="1"
+                                                        name="id_gender"> Mr.</span>
+                                                <span class="custom-radio"><input type="radio" value="1"
+                                                        name="id_gender"> Mrs.</span>
+                                            </div> <br> -->
+                                            <div class="default-form-box mb-20">
+                                                <label>Full Name</label>
+                                                <input type="text" name="fullname">
+                                            </div>
+                                            <div class="default-form-box mb-20">
+                                                <label>Email</label>
+                                                <input type="text" name="email">
+                                            </div>
+                                            <div class="default-form-box mb-20">
+                                                <label>Mobile</label>
+                                                <input type="text" name="mobile">
+                                            </div>
+                                            <div class="default-form-box mb-20">
+                                                <label>Password</label>
+                                                <input type="password" name="user-password">
+                                            </div>
+                                            <!-- <div class="default-form-box mb-20">
+                                                <label>Birthdate</label>
+                                                <input type="date" name="birthday">
+                                            </div> -->
+                                            <!-- <span class="example">
+                                                (E.g.: 05/31/1970)
+                                            </span> -->
+                                            <!-- <br>
+                                            <label class="checkbox-default" for="offer">
+                                                <input type="checkbox" id="offer">
+                                                <span>Receive offers from our partners</span>
+                                            </label>
+                                            <br>
+                                            <label class="checkbox-default checkbox-default-more-text" for="newsletter">
+                                                <input type="checkbox" id="newsletter">
+                                                <span>Sign up for our newsletter<br><em>You may unsubscribe at any
+                                                        moment. For that purpose, please find our contact info in the
+                                                        legal notice.</em></span>
+                                            </label> -->
+                                            <div class="save_button mt-3">
+                                                <button class="btn btn-md btn-black-default-hover"
+                                                    type="submit">Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="orders">
+                            <h4>Orders</h4>
+                            <div class="table_page table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Order</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>May 10, 2018</td>
+                                            <td><span class="success">Completed</span></td>
+                                            <td>$25.00 for 1 item </td>
+                                            <td><a href="cart.html" class="view">view</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>May 10, 2018</td>
+                                            <td>Processing</td>
+                                            <td>$17.00 for 1 item </td>
+                                            <td><a href="cart.html" class="view">view</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- <div class="tab-pane fade" id="downloads">
+                            <h4>Downloads</h4>
+                            <div class="table_page table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Downloads</th>
+                                            <th>Expires</th>
+                                            <th>Download</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Shopnovilla - Free Real Estate PSD Template</td>
+                                            <td>May 10, 2018</td>
+                                            <td><span class="danger">Expired</span></td>
+                                            <td><a href="#" class="view">Click Here To Download Your File</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Organic - ecommerce html template</td>
+                                            <td>Sep 11, 2018</td>
+                                            <td>Never</td>
+                                            <td><a href="#" class="view">Click Here To Download Your File</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> -->
+                        <div class="tab-pane" id="address">
+                            <div class="address-container">
+                                <div class="d-flex justify-content-between">
+                                    <h2>My Addresses</h2>
+                                    <a class="new-address-button" href="/add-address">Add Newaddress</a>
+                                </div>
+                                
+
+                                <% if (addresses && addresses.length > 0) { %>
+                                    <ul class="address-list">
+                                        <% addresses.forEach(address => { %>
+                                            <li class="address-item">
+                                                <h5 class="address-title"><%= address.addressType %> Address</h5>
+                                                <address>
+                                                    <strong>House No:</strong> <%= address.houseNo %>, 
+                                                    <strong>Street:</strong> <%= address.street %>, 
+                                                    <strong>Landmark:</strong> <%= address.landmark || 'N/A' %>, 
+                                                    <strong>City:</strong> <%= address.city %>, 
+                                                    <strong>District:</strong> <%= address.district %>, 
+                                                    <strong>State:</strong> <%= address.state %>, 
+                                                    <strong>Pincode:</strong> <%= address.pincode %>, 
+                                                    <strong>Country:</strong> <%= address.country %>
+                                                </address>
+                                                <a href="/edit-address/<%= address._id %>" class="view">Edit</a>
+                                            </li>
+                                        <% }) %>
+                                    </ul>
+                                <% } else { %>
+                                    <p>No addresses available. Please add a new address.</p>
                                 <% } %>
                             </div>
-                            <p><%= product.description %></p>
-                        </div> <!-- End  Product Details Text Area-->
-                        <!-- Start Product Variable Area -->
-                        <div class="product-details-variable">
-                            <!-- <h4 class="title">Available Options</h4> -->
-                            <!-- Product Variable Single Item -->
-                            <div class="variable-single-item">
-                                <div class="product-stock"> <span class="product-stock-in"><i
-                                            class="ion-checkmark-circled"></i></span> <%= product.countInStock %> IN STOCK</div>
-                            </div>
-                            <!-- Product Variable Single Item -->
-                            <div class="d-flex align-items-center ">
-                                <div class="variable-single-item ">
-                                    <span>Quantity</span>
-                                    <div class="product-variable-quantity">
-                                        <input min="1" max="100" value="1" type="number">
-                                    </div>
-                                </div>
-
-                                <div class="product-add-to-cart-btn">
-                                    <a href="#" class="btn btn-block btn-lg btn-black-default-hover"
-                                        data-bs-toggle="modal" data-bs-target="#">+ Add To Cart</a>
-                                </div>
-                            </div>
-                            <!-- Start  Product Details Meta Area-->
-                            <div class="product-details-meta mb-20">
-                                <a href="#" class="icon-space-right">
-                                    <i class="icon-heart"></i>Add to wishlist
-                                </a>
-                                <a href="#" class="icon-space-right"><i class="icon-refresh"></i>Compare</a>
-                            </div> <!-- End  Product Details Meta Area-->
-                        </div> <!-- End Product Variable Area -->
-
-                        <!-- Start  Product Details Catagories Area-->
-                        <div class="product-details-catagory mb-2">
-                            <span class="title">CATEGORIES:</span>
-                            <ul>
-                                <li><a href="#"><%= product.category.name %></a></li>
-                                <!-- <li><a href="#">KITCHEN UTENSILS</a></li>
-                                <li><a href="#">TENNIS</a></li> -->
-                            </ul>
-                        </div> <!-- End  Product Details Catagories Area-->
-                        <!-- Start  Product Details Social Area-->
-                        <div class="product-details-social">
-                            <span class="title">SHARE THIS PRODUCT:</span>
-                            <ul>
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            </ul>
-                        </div> <!-- End  Product Details Social Area-->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- End Product Details Section -->
-
-    <!-- Start Product Content Tab Section -->
-    <div class="product-details-content-tab-section section-top-gap-100">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="product-details-content-tab-wrapper" data-aos="fade-up" data-aos-delay="0">
-
-                        <!-- Start Product Details Tab Button -->
-                        <ul class="nav tablist product-details-content-tab-btn d-flex justify-content-center">
-                            <li><a class="nav-link active" data-bs-toggle="tab" href="#description">
-                                    Description
-                                </a></li>
-                            <!-- <li><a class="nav-link" data-bs-toggle="tab" href="#specification">
-                                    Specification
-                                </a></li>-->
-                            <li><a class="nav-link" data-bs-toggle="tab" href="#review">
-                                    Reviews
-                                </a></li> 
-                        </ul> <!-- End Product Details Tab Button -->
-
-                        <!-- Start Product Details Tab Content -->
-                        <div class="product-details-content-tab">
-                            <div class="tab-content">
-                                <!-- Start Product Details Tab Content Singel -->
-                                <div class="tab-pane active show" id="description">
-                                    <div class="single-tab-content-item">
-                                        <p><%= product.description %></p>
-                                    </div>
-                                </div> <!-- End Product Details Tab Content Singel -->
-                                <!-- Start Product Details Tab Content Singel -->
-                                <div class="tab-pane" id="specification">
-                                    <div class="single-tab-content-item">
-                                        <table class="table table-bordered mb-20">
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row">Compositions</th>
-                                                    <td>Polyester</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Styles</th>
-                                                    <td>Girly</td>
-                                                <tr>
-                                                    <th scope="row">Properties</th>
-                                                    <td>Short Dress</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <p>Fashion has been creating well-designed collections since 2010. The brand
-                                            offers feminine designs delivering stylish separates and statement dresses
-                                            which have since evolved into a full ready-to-wear collection in which every
-                                            item is a vital part of a woman's wardrobe. The result? Cool, easy, chic
-                                            looks with youthful elegance and unmistakable signature style. All the
-                                            beautiful pieces are made in Italy and manufactured with the greatest
-                                            attention. Now Fashion extends to a range of accessories including shoes,
-                                            hats, belts and more!</p>
-                                    </div>
-                                </div> <!-- End Product Details Tab Content Singel -->
-                                <!-- Start Product Details Tab Content Singel -->
-                                <div class="tab-pane" id="review">
-                                    <div class="single-tab-content-item">
-                                        <!-- Start - Review Comment -->
-                                        <ul class="comment text-center">
-                                            <h3>No Reviews....</h3>
-                                            <!-- Start - Review Comment list-->
-                                            <!-- <li class="comment-list">
-                                                <div class="comment-wrapper">
-                                                    <div class="comment-img">
-                                                        <img src="/userassets/images/user/image-1.png" alt="">
-                                                    </div>
-                                                    <div class="comment-content">
-                                                        <div class="comment-content-top">
-                                                            <div class="comment-content-left">
-                                                                <h6 class="comment-name">Kaedyn Fraser</h6>
-                                                                <ul class="review-star">
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="empty"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="comment-content-right">
-                                                                <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="para-content">
-                                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                                                Tempora inventore dolorem a unde modi iste odio amet,
-                                                                fugit fuga aliquam, voluptatem maiores animi dolor nulla
-                                                                magnam ea! Dignissimos aspernatur cumque nam quod sint
-                                                                provident modi alias culpa, inventore deserunt
-                                                                accusantium amet earum soluta consequatur quasi eum eius
-                                                                laboriosam, maiores praesentium explicabo enim dolores
-                                                                quaerat! Voluptas ad ullam quia odio sint sunt. Ipsam
-                                                                officia, saepe repellat. </p>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
-                                                <!-- Start - Review Comment Reply-->
-                                                <!-- <ul class="comment-reply">
-                                                    <li class="comment-reply-list">
-                                                        <div class="comment-wrapper">
-                                                            <div class="comment-img">
-                                                                <img src="/userassets/images/user/image-2.png" alt="">
-                                                            </div>
-                                                            <div class="comment-content">
-                                                                <div class="comment-content-top">
-                                                                    <div class="comment-content-left">
-                                                                        <h6 class="comment-name">Oaklee Odom</h6>
-                                                                    </div>
-                                                                    <div class="comment-content-right">
-                                                                        <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="para-content">
-                                                                    <p>Lorem ipsum dolor sit amet, consectetur
-                                                                        adipisicing elit. Tempora inventore dolorem a
-                                                                        unde modi iste odio amet, fugit fuga aliquam,
-                                                                        voluptatem maiores animi dolor nulla magnam ea!
-                                                                        Dignissimos aspernatur cumque nam quod sint
-                                                                        provident modi alias culpa, inventore deserunt
-                                                                        accusantium amet earum soluta consequatur quasi
-                                                                        eum eius laboriosam, maiores praesentium
-                                                                        explicabo enim dolores quaerat! Voluptas ad
-                                                                        ullam quia odio sint sunt. Ipsam officia, saepe
-                                                                        repellat. </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>  -->
-                                                <!-- End - Review Comment Reply-->
-                                            <!-- </li>  -->
-                                            <!-- End - Review Comment list-->
-                                            <!-- Start - Review Comment list-->
-                                            <!-- <li class="comment-list">
-                                                <div class="comment-wrapper">
-                                                    <div class="comment-img">
-                                                        <img src="/userassets/images/user/image-3.png" alt="">
-                                                    </div>
-                                                    <div class="comment-content">
-                                                        <div class="comment-content-top">
-                                                            <div class="comment-content-left">
-                                                                <h6 class="comment-name">Jaydin Jones</h6>
-                                                                <ul class="review-star">
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="empty"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="comment-content-right">
-                                                                <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="para-content">
-                                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                                                Tempora inventore dolorem a unde modi iste odio amet,
-                                                                fugit fuga aliquam, voluptatem maiores animi dolor nulla
-                                                                magnam ea! Dignissimos aspernatur cumque nam quod sint
-                                                                provident modi alias culpa, inventore deserunt
-                                                                accusantium amet earum soluta consequatur quasi eum eius
-                                                                laboriosam, maiores praesentium explicabo enim dolores
-                                                                quaerat! Voluptas ad ullam quia odio sint sunt. Ipsam
-                                                                officia, saepe repellat. </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>  -->
-                                            <!-- End - Review Comment list-->
-                                        </ul> <!-- End - Review Comment -->
-                                        <div class="review-form">
-                                            <div class="review-form-text-top">
-                                                <h5>ADD A REVIEW</h5>
-                                                <p>Your email address will not be published. Required fields are marked
-                                                    <span class="text-red">*</span></p>
-                                            </div>
-
-                                            <form action="#" method="post">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="default-form-box">
-                                                            <label for="comment-name">Your name <span class="text-red">*</span></label>
-                                                            <input id="comment-name" type="text"
-                                                                placeholder="Enter your name" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="default-form-box">
-                                                            <label for="comment-email">Your Email <span class="text-red">*</span></label>
-                                                            <input id="comment-email" type="email"
-                                                                placeholder="Enter your email" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <div class="default-form-box">
-                                                            <label for="comment-review-text">Your review
-                                                                <span class="text-red">*</span></label>
-                                                            <textarea id="comment-review-text"
-                                                                placeholder="Write a review" required></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <button class="btn btn-md btn-black-default-hover"
-                                                            type="submit">Submit</button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div> <!-- End Product Details Tab Content Singel -->
-                            </div>
-                        </div> <!-- End Product Details Tab Content -->
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- End Product Content Tab Section -->
-
-    <!-- Start Product Default Slider Section -->
-    <div class="product-default-slider-section section-top-gap-100 section-fluid">
-        <!-- Start Section Content Text Area -->
-        <div class="section-title-wrapper" data-aos="fade-up" data-aos-delay="0">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="section-content-gap">
-                            <div class="secton-content">
-                                <h3 class="section-title">RELATED PRODUCTS</h3>
-                                <p>Browse the collection of our related products.</p>
-                            </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Start Section Content Text Area -->
-        <div class="product-wrapper" data-aos="fade-up" data-aos-delay="0">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="product-slider-default-1row default-slider-nav-arrow">
-                            <!-- Slider main container -->
-                            <div class="swiper-container product-default-slider-4grid-1row">
-                                <!-- Additional required wrapper -->
-                                <div class="swiper-wrapper">
-                                    <!-- Start Product Default Single Item -->
-                                    <% relatedProducts.forEach(product => { %>
-                                    <div class="product-default-single-item product-color--golden swiper-slide">
-                                        <div class="image-box">
-                                            <a href="/productdetails/<%= product.id %>" class="image-link">
-                                                <img src="/<%= product.image %>" alt="">
-                                                <!-- <img src="/userassets/images/product/default/home-1/default-10.jpg" alt=""> -->
-                                            </a>
-                                            <div class="action-link">
-                                                <div class="action-link-left">
-                                                    <a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#">Add to Cart</a>
-                                                </div>
-                                                <div class="action-link-right">
-                                                    <a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#"><i
-                                                            class="icon-magnifier"></i></a>
-                                                    <a href="#"><i class="icon-heart"></i></a>
-                                                    <a href="#"><i class="icon-shuffle"></i></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="content">
-                                            <div class="content-left">
-                                                <h6 class="title"><a href="/productdetails/<%= product.id %>"><%= product.productName %></a></h6>
-                                                <ul class="review-star">
-                                                    <% for (let i = 1; i <= 5; i++) { %>
-                                                        <% if (i <= product.rating) { %>
-                                                            <li class="fill"><i class="ion-android-star"></i></li>
-                                                        <% } else { %>
-                                                            <li class="empty"><i class="ion-android-star"></i></li>
-                                                        <% } %>
-                                                    <% } %>
-                                                </ul>
-                                            </div>
-                                            <div class="content-right">
-                                                <span class="price">
-                                                    <% if (product.discountPrice > 0) { %>
-                                                        <del><span class="original-price">₹<%= product.price %></span></del>
-                                                        <span class="discount-price">₹<%= product.afterDiscount %></span>
-                                                    <% } else { %>
-                                                        $<%= product.price %>
-                                                    <% } %>
-                                                </span>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <% }); %>
-                                    <!-- End Product Default Single Item -->
-                                </div>
-                            </div>
-                            <!-- If we need navigation buttons -->
-                            <div class="swiper-button-prev"></div>
-                            <div class="swiper-button-next"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Product Default Slider Section -->
+    </div> <!-- ...:::: End Account Dashboard Section:::... -->
 
     <!-- Start Footer Section -->
     <footer class="footer-section footer-bg section-top-gap-100">
@@ -965,9 +801,9 @@
                                 data-aos-delay="400">
                                 <h5 class="title">CATEGORIES</h5>
                                 <ul class="footer-nav">
-                                    <li><a href="/dashboard">Gaming Laptops</a></li>
-                                    <li><a href="/dashboard">Business Laptops</a></li>
-                                    <li><a href="/dashboard">Ultrabooks</a></li>
+                                    <li><a href="/home">Gaming Laptops</a></li>
+                                    <li><a href="/home">Business Laptops</a></li>
+                                    <li><a href="/home">Ultrabooks</a></li>
                                 </ul>
                             </div>
                             <!-- End Footer Single Item -->
@@ -1005,10 +841,10 @@
                             <div class="footer-social" data-aos="fade-up" data-aos-delay="0">
                                 <h4 class="title">FOLLOW US</h4>
                                 <ul class="footer-social-link">
-                                    <li><a href="/dashboard"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="/dashboard"><i class="fa fa-twitter"></i></a></li>
-                                    <li><a href="/dashboard"><i class="fa fa-instagram"></i></a></li>
-                                    <li><a href="/dashboard"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a href="/home"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="/home"><i class="fa fa-twitter"></i></a></li>
+                                    <li><a href="/home"><i class="fa fa-instagram"></i></a></li>
+                                    <li><a href="/home"><i class="fa fa-linkedin"></i></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -1040,7 +876,7 @@
                                 <p class="copyright-text">
                                     <script>
                                         document.write(new Date().getFullYear())
-                                        </script> © <a href="/dashboard">Techoasis</a> 
+                                        </script> © <a href="/home">Techoasis</a> 
                                 </p>
 
                             </div>
@@ -1307,6 +1143,5 @@
     <!-- Main JS -->
     <script src="/userassets/js/main.js"></script>
 </body>
-
 
 </html>

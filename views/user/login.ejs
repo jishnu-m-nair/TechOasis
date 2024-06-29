@@ -7,14 +7,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>User Registration</title>
+    <title>Login</title>
 
     <!-- ::::::::::::::Favicon icon::::::::::::::-->
     <link rel="shortcut icon" href="/userassets/images/favicon.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <!-- ::::::::::::::All CSS Files here :::::::::::::: -->
     <!-- Vendor CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- <link rel="stylesheet" href="/userassets/css/vendor/font-awesome.min.css">
     <link rel="stylesheet" href="/userassets/css/vendor/ionicons.css">
     <link rel="stylesheet" href="/userassets/css/vendor/simple-line-icons.css">
@@ -29,13 +30,14 @@
     <link rel="stylesheet" href="/userassets/css/plugins/aos.min.css"> -->
 
     <!-- Main CSS -->
-    <!-- <link rel="stylesheet" href="/userassets/sass/style.css"> -->
+    <!-- <link rel="stylesheet" href="assets/sass/style.css"> -->
 
     <!-- Use the minified version files listed below for better performance and remove the files listed above -->
     <link rel="stylesheet" href="/userassets/css/vendor/vendor.min.css">
     <link rel="stylesheet" href="/userassets/css/plugins/plugins.min.css">
     <link rel="stylesheet" href="/userassets/css/style.min.css">
-
+    <link rel="stylesheet" href="/userassets/css/customstyle.css">
+    
     <style>
         .password-input {
             position: relative;
@@ -76,14 +78,6 @@
         .form-background{
             background-color:#dfdad3;
         }
-
-        .text-red {
-            color: red !important;
-        }
-
-
-
-        
     </style>
 
 </head>
@@ -99,7 +93,7 @@
                             <!-- Start Header Logo -->
                             <div class="header-logo">
                                 <div class="logo">
-                                    <a href="/signup"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis logo"></a>
+                                    <a href="/login"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis logo"></a>
                                 </div>
                             </div>
                             <!-- End Header Logo -->
@@ -134,7 +128,7 @@
                     <div class="mobile-header-left">
                         <ul class="mobile-menu-logo">
                             <li>
-                                <a href="/signup">
+                                <a href="/login">
                                     <div class="logo">
                                         <img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis logo">
                                     </div>
@@ -178,7 +172,7 @@
             <!-- Start Mobile contact Info -->
             <div class="mobile-contact-info">
                 <div class="logo">
-                    <a href="/signup"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis logo"></a>
+                    <a href="/login"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis logo"></a>
                 </div>
                 <address class="address">
                     <span>Address: 41/353,Basement 1,Oberon mall, NH Bypass,Edappally, Kochi, Kerala 682024, India</span>
@@ -187,10 +181,10 @@
                 </address>
 
                 <ul class="social-link">
-                    <li><a href="/signup"><i class="fa fa-facebook"></i></a></li>
-                    <li><a href="/signup"><i class="fa fa-twitter"></i></a></li>
-                    <li><a href="/signup"><i class="fa fa-instagram"></i></a></li>
-                    <li><a href="/signup"><i class="fa fa-linkedin"></i></a></li>
+                    <li><a href="/login"><i class="fa fa-facebook"></i></a></li>
+                    <li><a href="/login"><i class="fa fa-twitter"></i></a></li>
+                    <li><a href="/login"><i class="fa fa-instagram"></i></a></li>
+                    <li><a href="/login"><i class="fa fa-linkedin"></i></a></li>
                 </ul>
             </div>
             <!-- End Mobile contact Info -->
@@ -208,7 +202,7 @@
         <!-- Start Mobile contact Info -->
         <div class="mobile-contact-info">
             <div class="logo">
-                <a href="/signup"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis Logo"></a>
+                <a href="/login"><img src="/assets/imgs/theme/techoasis_logo.png" alt="Techoasis Logo"></a>
             </div>
 
             <address class="address">
@@ -218,10 +212,10 @@
             </address>
 
             <ul class="social-link">
-                <li><a href="/signup"><i class="fa fa-facebook"></i></a></li>
-                <li><a href="/signup"><i class="fa fa-twitter"></i></a></li>
-                <li><a href="/signup"><i class="fa fa-instagram"></i></a></li>
-                <li><a href="/signup"><i class="fa fa-linkedin"></i></a></li>
+                <li><a href="/login"><i class="fa fa-facebook"></i></a></li>
+                <li><a href="/login"><i class="fa fa-twitter"></i></a></li>
+                <li><a href="/login"><i class="fa fa-instagram"></i></a></li>
+                <li><a href="/login"><i class="fa fa-linkedin"></i></a></li>
             </ul>
         </div>
         <!-- End Mobile contact Info -->
@@ -230,19 +224,19 @@
     <!-- Offcanvas Overlay -->
     <div class="offcanvas-overlay"></div>
 
-
     <!-- ...:::: Start Breadcrumb Section:::... -->
     <!-- <div class="breadcrumb-section breadcrumb-bg-color--golden">
         <div class="breadcrumb-wrapper">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="breadcrumb-title">Register</h3>
+                        <h3 class="breadcrumb-title">Login</h3>
                         <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
                             <nav aria-label="breadcrumb">
                                 <ul>
-                                    <li><a href="/dashboard">Home</a></li>
-                                    <li class="active" aria-current="page">Signup</li>
+                                    <li><a href="index.html">Home</a></li>
+                                    <li><a href="shop-grid-sidebar-left.html">Shop</a></li>
+                                    <li class="active" aria-current="page">Login</li>
                                 </ul>
                             </nav>
                         </div>
@@ -257,15 +251,13 @@
     <div class="customer-login">
         <div class="container">
             <div class="row justify-content-center">
-                
-                <!--register area start-->
+                <!--login area start-->
                 <div class="col-lg-4 col-md-4 form-background pt-2 pb-2">
-                    <div class="account_form register" data-aos="fade-up" data-aos-delay="200">
-                        <h3>Register</h3>
+                    <div class="account_form" data-aos="fade-up" data-aos-delay="0">
+                        <h3>login</h3>
                         <div class="login_link">
-                            <p>Already have an account? <a href="/login" style="text-decoration: underline;">Login</a></p>
+                            <p>Don't have an account? <a href="/signup" style="text-decoration: underline;">Signup</a></p>
                         </div>
-
                         <div class="d-flex justify-content-center">
                             <button class="google-sign-in">
                                 <a href="/auth/google">Sign in / Signup with Google</a>
@@ -275,54 +267,43 @@
                         <div class="d-flex justify-content-center">
                             OR
                         </div>
-                        <form id="registrationForm" action="/signup" method="POST">
+                        <% if (errorMessage) { %>
+                            <p class="error-message" style="color: red;"><%= errorMessage %></p>
+                        <% } %>
+                        <% if (successMessage) { %>
+                            <p class="success-message"><%= successMessage %></p>
+                        <% } %>
+                        <form id="signInForm" action="/login" method="POST">
                             <div class="default-form-box">
-                                <label> Full Name <span class="text-red">*</span></label>
-                                <span id="nameError" class="text-red"></span>
-                                <input type="text" placeholder="Your full name" name="fullname" id="fullname" value="<%= formData ? formData.fullname : '' %>" maxlength="50" required style="border: 1px solid #000!important;">
+                                <label>Email <span style="color: red;">*</span></label>
+                                <input type="text" placeholder="Registered email" name="email" id="email" required style="border: 1px solid #000!important;">
+                                <span id="emailError" style="color: red;"></span>
                             </div>
                             <div class="default-form-box">
-                                <label>Mobile <span class="text-red">*</span></label>
-                                <span id="phoneError" class="text-red"></span>
-                                <input type="text" placeholder="Your mobile phone number" name="phone" id="phone" value="<%= formData ? formData.phone : '' %>" maxlength="10" required style="border: 1px solid #000!important;">
-                            </div>
-                            <div class="default-form-box">
-                                <label>Email address <span class="text-red">*</span></label>
-                                <span id="emailError" class="text-red"></span>
-                                <input type="email" placeholder="Your email" name="email" id="email" value="<%= formData ? formData.email : '' %>" maxlength="50" required style="border: 1px solid #000!important;">
-                            </div>
-                            <div class="default-form-box">
-                                <label>Password <span class="text-red">*</span></label>
-                                <span id="passwordMessage" class="text-danger"></span>
+                                <label>Password <span style="color: red;">*</span></label>
                                 <div class="password-input">
                                     <input type="password" placeholder="Password" name="password" id="password" maxlength="20" required style="border: 1px solid #000!important;">
                                     <span class="password-toggle-button" onclick="togglePasswordVisibility(this)">
                                         <i class="fas fa-eye"></i>
                                     </span>
                                 </div>
-                            </div>
-                            <div class="default-form-box">
-                                <label>Confirm Password <span class="text-red">*</span></label>
-                                <span id="passwordMatchMessage" class="text-red"></span>
-                                <div class="password-input">
-                                    <input type="password" placeholder="Confirm Password" name="password1" id="password1" maxlength="20" required style="border: 1px solid #000!important;">
-                                    <span class="password-toggle-button" onclick="toggleConfirmPasswordVisibility(this)">
-                                        <i class="fas fa-eye"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="text-red"><%= errorMessage %></span>
+                                <span id="passwordError" class="text-danger"></span>                               
                             </div>
                             <div class="login_submit">
-                                <button id="submitBtn" class="btn btn-md btn-black-default-hover" type="submit">Register</button>
-                            </div>  
+                                <button id="submitBtn" class="btn btn-md btn-black-default-hover mb-4" type="submit">Login</button>
+                                <!-- <label class="checkbox-default mb-4" for="offer">
+                                    <input type="checkbox" id="offer">
+                                    <span>Remember me</span>
+                                </label> -->
+                                <a href="#">Forgot Password?</a>
+                            </div>
                         </form>
-
                         
+                        
+
                     </div>
                 </div>
-                <!--register area end-->
+                <!--login area start-->
             </div>
         </div>
     </div> <!-- ...:::: End Customer Login Section :::... -->
@@ -354,9 +335,9 @@
                                 data-aos-delay="400">
                                 <h5 class="title">CATEGORIES</h5>
                                 <ul class="footer-nav">
-                                    <li><a href="/signup">Gaming Laptops</a></li>
-                                    <li><a href="/signup">Business Laptops</a></li>
-                                    <li><a href="/signup">Ultrabooks</a></li>
+                                    <li><a href="/login">Gaming Laptops</a></li>
+                                    <li><a href="/login">Business Laptops</a></li>
+                                    <li><a href="/login">Ultrabooks</a></li>
                                 </ul>
                             </div>
                             <!-- End Footer Single Item -->
@@ -394,10 +375,10 @@
                             <div class="footer-social" data-aos="fade-up" data-aos-delay="0">
                                 <h4 class="title">FOLLOW US</h4>
                                 <ul class="footer-social-link">
-                                    <li><a href="/signup"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="/signup"><i class="fa fa-twitter"></i></a></li>
-                                    <li><a href="/signup"><i class="fa fa-instagram"></i></a></li>
-                                    <li><a href="/signup"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a href="/login"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="/login"><i class="fa fa-twitter"></i></a></li>
+                                    <li><a href="/login"><i class="fa fa-instagram"></i></a></li>
+                                    <li><a href="/login"><i class="fa fa-linkedin"></i></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -429,7 +410,7 @@
                                 <p class="copyright-text">
                                     <script>
                                         document.write(new Date().getFullYear())
-                                        </script> © <a href="/signup">Techoasis</a> 
+                                        </script> © <a href="/login">Techoasis</a> 
                                 </p>
 
                             </div>
@@ -448,193 +429,73 @@
         </div>
     </footer>
     <!-- End Footer Section -->
+    
 
     <!-- material-scrolltop button -->
     <button class="material-scrolltop" type="button"></button>
 
-    <!-- custom script for the validation of register form -->
-
-
+    <!-- custom script -->
     <script>
+        const form = document.getElementById('signInForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+
+        form.addEventListener('input', validateForm);
+        form.addEventListener('blur', validateForm, true);
+        form.addEventListener('change', validateForm, true);
+
+        function validateForm() {
+            let isValid = true;
+
+            // Email validation
+            const emailValue = email.value.trim();
+            if (!emailValue) {
+                emailError.textContent = 'Email cannot be empty';
+                email.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                emailError.textContent = '';
+                email.style.borderColor = 'green';
+            }
+
+            // Password validation
+            const passwordValue = password.value.trim();
+            if (!passwordValue) {
+                passwordError.textContent = 'Password cannot be empty';
+                password.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                passwordError.textContent = '';
+                password.style.borderColor = 'green';
+            }
+
+            // Enable or disable submit button
+            submitBtn.disabled = !isValid;
+        }
+
+        form.addEventListener('submit', function(event) {
+            if (submitBtn.disabled) {
+                event.preventDefault();
+            }
+        });
+
         function togglePasswordVisibility(button) {
-            const passwordInput = button.parentElement.querySelector('input[name="password"]');
+            const passwordInput = button.parentElement.querySelector('input[name="adminPassword"]');
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
-                button.innerHTML = '<i class="fas fa-eye-slash"></i>'; // Show the "eye-slash" icon
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
             } else {
                 passwordInput.type = "password";
-                button.innerHTML = '<i class="fas fa-eye"></i>'; // Show the "eye" icon
-            }
-        }
-        function toggleConfirmPasswordVisibility(button) {
-            const passwordInput1 = button.parentElement.querySelector('input[name="password1"]');
-            if (passwordInput1.type === "password") {
-                passwordInput1.type = "text";
-                button.innerHTML = '<i class="fas fa-eye-slash"></i>'; // Show the "eye-slash" icon
-            } else {
-                passwordInput1.type = "password";
-                button.innerHTML = '<i class="fas fa-eye"></i>'; // Show the "eye" icon
+                button.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
     </script>
-
-
-<script>
-    const form = document.getElementById('registrationForm');
-    const submitBtn = document.getElementById('submitBtn');
-
-    const fullname = document.getElementById('fullname');
-    const phone = document.getElementById('phone');
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('password1');
-
-    const nameError = document.getElementById('nameError');
-    const phoneError = document.getElementById('phoneError');
-    const emailError = document.getElementById('emailError');
-    const passwordMessage = document.getElementById('passwordMessage');
-    const passwordMatchMessage = document.getElementById('passwordMatchMessage');
-
-    // Add touched class on focus
-    form.addEventListener('focus', function(event) {
-        event.target.classList.add('touched');
-    }, true);
-
-    // Validate on input change if field is touched
-    form.addEventListener('input', function(event) {
-        if (event.target.classList.contains('touched')) {
-            validateField(event.target);
-        }
-    });
-
-    form.addEventListener('submit', function(event) {
-        if (!isFormValid()) {
-            event.preventDefault();
-        }
-    });
-
-    function validateField(field) {
-        switch (field.id) {
-            case 'fullname':
-                validateFullname();
-                break;
-            case 'phone':
-                validatePhone();
-                break;
-            case 'email':
-                validateEmail();
-                break;
-            case 'password':
-                validatePassword();
-                validateConfirmPassword();
-                break;
-            case 'password1':
-                validateConfirmPassword();
-                break;
-        }
-
-        // Enable or disable submit button
-        // submitBtn.disabled = !isFormValid();
-    }
-
-    function validateFullname() {
-        const fullNameValue = fullname.value.trim();
-        if (!fullNameValue) {
-            nameError.textContent = 'Name cannot be empty';
-            fullname.style.borderColor = 'red';
-            return false;
-        } else if (!/^[a-zA-Z\s]+$/.test(fullNameValue)) {
-            nameError.textContent = 'Name must contain only alphabets';
-            fullname.style.borderColor = 'red';
-            return false;
-        } else if (fullNameValue.length < 3) {
-            nameError.textContent = 'Name must be at least 3 characters';
-            fullname.style.borderColor = 'red';
-            return false;
-        } else {
-            nameError.textContent = '';
-            fullname.style.borderColor = 'green';
-            return true;
-        }
-    }
-
-    function validatePhone() {
-        const phoneValue = phone.value.trim();
-        if (!phoneValue) {
-            phoneError.textContent = 'Mobile number cannot be empty';
-            phone.style.borderColor = 'red';
-            return false;
-        } else if (!/^\d+$/.test(phoneValue)) {
-            phoneError.textContent = 'Only numbers are allowed';
-            phone.style.borderColor = 'red';
-            return false;
-        } else if (phoneValue.length !== 10) {
-            phoneError.textContent = 'Mobile number must be 10 digits';
-            phone.style.borderColor = 'red';
-            return false;
-        } else {
-            phoneError.textContent = '';
-            phone.style.borderColor = 'green';
-            return true;
-        }
-    }
-
-    function validateEmail() {
-        const emailValue = email.value.trim();
-        if (!emailValue) {
-            emailError.textContent = 'Email cannot be empty';
-            email.style.borderColor = 'red';
-            return false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-            emailError.textContent = 'Enter a valid email address';
-            email.style.borderColor = 'red';
-            return false;
-        } else if (emailValue.length < 10) {
-            emailError.textContent = 'Email must be at least 10 characters';
-            email.style.borderColor = 'red';
-            return false;
-        } else {
-            emailError.textContent = '';
-            email.style.borderColor = 'green';
-            return true;
-        }
-    }
-
-    function validatePassword() {
-        const passwordValue = password.value.trim();
-        if (!passwordValue) {
-            passwordMessage.textContent = 'Password cannot be empty';
-            password.style.borderColor = 'red';
-            return false;
-        } else if (passwordValue.length < 8) {
-            passwordMessage.textContent = 'Password must be at least 8 characters';
-            password.style.borderColor = 'red';
-            return false;
-        } else {
-            passwordMessage.textContent = '';
-            password.style.borderColor = 'green';
-            return true;
-        }
-    }
-
-    function validateConfirmPassword() {
-        const confirmPasswordValue = confirmPassword.value.trim();
-        const passwordValue = password.value.trim();
-        if (confirmPasswordValue !== passwordValue) {
-            passwordMatchMessage.textContent = 'Passwords do not match';
-            confirmPassword.style.borderColor = 'red';
-            return false;
-        } else {
-            passwordMatchMessage.textContent = '';
-            confirmPassword.style.borderColor = 'green';
-            return true;
-        }
-    }
-
-    function isFormValid() {
-        return validateFullname() && validatePhone() && validateEmail() && validatePassword() && validateConfirmPassword();
-    }
-</script>
+    
     
 
     <!-- ::::::::::::::All JS Files here :::::::::::::: -->
