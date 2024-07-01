@@ -1,9 +1,9 @@
-const categoryModel = require("../model/categorySchema");
-const userModel = require("../model/userSchema");
-const productModel = require("../model/productSchema");
+const categoryModel = require("../../model/category-model");
+const userModel = require("../../model/user-model");
+const productModel = require("../../model/product-model");
 const mongoose = require("mongoose");
 const { log } = require("console");
-const { categoryUpload } = require('../config/multerConfig'); // Import the category upload middleware
+const { categoryUpload } = require('../../config/multerConfig'); // Import the category upload middleware
 const path = require('path')
 
 

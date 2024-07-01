@@ -1,0 +1,178 @@
+    <!-- Start Header Area -->
+    <%- include('user-partials/header.ejs') %>
+    <!-- End Header Area -->
+
+    <!-- Start Navbar Area -->
+    <%- include('user-partials/navbar.ejs') %>
+    <!-- End Navbar Area -->
+    
+
+    <!-- ...:::: Start Breadcrumb Section:::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--golden">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="breadcrumb-title">My Account</h3>
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="/home">Home</a></li>
+                                    <li><a href="/shop">Shop</a></li>
+                                    <li><a href="/profile">Profile</a></li>
+                                    <li class="active" aria-current="page">Add Address</li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- ...:::: End Breadcrumb Section:::... -->
+
+    <!-- ...:::: Start Account Dashboard Section:::... -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-4 form-background pt-2 pb-2">
+                <div class="account_form profile" data-aos="fade-up" data-aos-delay="200">
+                    <h2>Add New Address</h2>
+                    <form id="addressForm">
+                        <div class="default-form-box">
+                            <label>Address Type <span class="text-red">*</span></label>
+                            <select id="addressType" name="addressType" required>
+                                <option value="" disabled selected>Select address type</option>
+                                <option value="home">Home</option>
+                                <option value="work">Work</option>
+                            </select>
+                            <span id="typeError" class="text-red"></span>
+                        </div>
+                        <br><br>
+        
+                        <div class="default-form-box">
+                            <label>House No <span class="text-red">*</span></label>
+                            <input type="text" id="houseNo" name="houseNo" required>
+                            <span id="houseError" class="text-red"></span>
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>Street</label>
+                            <input type="text" id="street" name="street">
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>Landmark</label>
+                            <input type="text" id="landmark" name="landmark">
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>Pincode <span class="text-red">*</span></label>
+                            <input type="number" id="pincode" name="pincode" required>
+                            <span id="pincodeError" class="text-red"></span>
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>City <span class="text-red">*</span></label>
+                            <input type="text" id="city" name="city" required>
+                            <span id="cityError" class="text-red"></span>
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>District <span class="text-red">*</span></label>
+                            <input type="text" id="district" name="district" required>
+                            <span id="districtError" class="text-red"></span>
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>State <span class="text-red">*</span></label>
+                            <input type="text" id="state" name="state" required>
+                            <span id="stateError" class="text-red"></span>
+                        </div>
+        
+                        <div class="default-form-box">
+                            <label>Country <span class="text-red">*</span></label>
+                            <input type="text" id="country" name="country" required>
+                            <span id="countryError" class="text-red"></span>
+                        </div>
+        
+                        <div class="submit-box">
+                            <button type="submit" class="btn btn-md btn-black-default-hover">Save Address</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Account Dashboard Section:::... -->
+
+    <!-- Start Footer Section -->
+    <%- include('user-partials/footer.ejs') %>
+    <!-- End Footer Section -->
+
+    
+
+
+    <!-- custom scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addressForm = document.getElementById('addressForm');
+        
+            addressForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+        
+                // Clear any previous errors
+                document.querySelectorAll('.text-red').forEach(element => element.textContent = '');
+        
+                // Gather form data
+                const addressType = document.getElementById('addressType').value;
+                const houseNo = document.getElementById('houseNo').value;
+                const street = document.getElementById('street').value;
+                const landmark = document.getElementById('landmark').value;
+                const pincode = document.getElementById('pincode').value;
+                const city = document.getElementById('city').value;
+                const district = document.getElementById('district').value;
+                const state = document.getElementById('state').value;
+                const country = document.getElementById('country').value;
+        
+                // Perform client-side validation
+                if (!addressType || !houseNo || !pincode || !city || !district || !state || !country) {
+                    document.getElementById('typeError').textContent = 'Please fill in all required fields.';
+                    return;
+                }
+        
+                try {
+                    const response = await fetch('/add-address', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: '<%= userId %>', // Replace with your actual user ID
+                            addressType,
+                            houseNo,
+                            street,
+                            landmark,
+                            pincode,
+                            city,
+                            district,
+                            state,
+                            country
+                        })
+                    });
+        
+                    const data = await response.json();
+        
+                    if (response.ok) {
+                        alert(data.message);
+                        window.location.href = data.redirectUrl; // Redirect to profile
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding the address.');
+                }
+            });
+        });
+    </script>
+
+<%- include('user-partials/scripts.ejs') %>

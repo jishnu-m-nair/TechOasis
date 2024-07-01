@@ -1,4 +1,4 @@
-const user = require("../model/userSchema");
+const user = require("../model/user-model");
 
 const isLoggedIn = (req, res, next) => {
     let errorMessage = "";
@@ -55,7 +55,7 @@ const isBlockedUser = async (req, res, next) => {
 
         if (!foundUser) {
             // Handle case where user data not found (e.g., log error or redirect)
-            errorMessage = "User is blocked";
+            errorMessage = "User not found";
             console.error("User is blocked");
             return res.render('user/login',{
                 err: errorMessage,

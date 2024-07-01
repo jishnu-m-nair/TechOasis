@@ -2,9 +2,9 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
-const ProductModel = require('../model/productSchema');
-const CategoryModel = require('../model/categorySchema')
-const UserModel = require('../model/userSchema');
+const ProductModel = require('../../model/product-model');
+const CategoryModel = require('../../model/category-model')
+const UserModel = require('../../model/user-model');
 const { log } = require('console');
 
 const productManagementGet = async (req, res) => {

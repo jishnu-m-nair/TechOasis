@@ -26,22 +26,6 @@ const userSchema = new mongoose.Schema({
       type: String,
    },
 
-   //profile format//
-
-   address: {
-      street: String,
-      city: String,
-      state: String,
-      postalCode: String,
-      country: String,
-   },
-   stateOrCity: {
-      type: String,
-   },
-   pincodeOrZip: {
-      type: Number,
-   },
-
    //Timestamps//
    createdAt: {
       type: Date,

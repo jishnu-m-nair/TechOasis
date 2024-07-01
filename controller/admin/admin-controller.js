@@ -1,30 +1,8 @@
 // const ProductModel = require("../model/productSchema");
-const UserModel = require("../model/userSchema");
-const AdminModel = require("../model/adminSchema");
+const UserModel = require("../../model/user-model");
+const AdminModel = require("../../model/admin-model");
 const bcrypt = require("bcryptjs");
 // const fs = require('fs');
-
-// dashboard
-// let dashboard = async (req, res) => {
-//     if (req.session.admin) {
-//       req.session.admn = true;
-  
-//       let orders = await orderModel.find().sort({ createdAt: -1 }).limit(10).populate('user', 'fullname')
-  
-//       let daily = await salesReport(1)
-//       let weekly = await salesReport(7);
-//       let monthly = await salesReport(30);
-//       let yearly = await salesReport(365)
-  
-//       console.log("D:",daily,"W:",weekly,"M:",monthly,"Y:",yearly)
-//       let allProductsCount = await ProductModel.countDocuments();
-  
-//       res.render("admin-dashboard",{daily,weekly,monthly,yearly,orders,allProductsCount});
-//     } else {
-//       res.redirect("/admin/login");
-//     }
-//   };
-
 
 //admin login controllers
 let adminlogin = async (req, res) => {

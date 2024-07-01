@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const admin = require('../controller/admin-controller')
+const admin = require('../controller/admin/admin-controller')
+const product = require('../controller/admin/product-controller')
+const category = require('../controller/admin/category-controller')
 const {AdminLogSession} = require('../middlewares/auth')
 const {storage, upload, productUpload} = require('../config/multerConfig')
-const product = require('../controller/productController')
-const category = require('../controller/categoryController')
+
  // Import category creation controller
 const { categoryUpload } = require('../config/multerConfig'); // Import category upload middleware
 

@@ -9,8 +9,8 @@ const nocache = require('nocache');
 require('dotenv').config();
 
 const connectdb = require('./config/dbconnect');
-const userRouter = require('./routes/userRouter');
-const adminRouter = require('./routes/adminRouter');
+const userRouter = require('./routes/user-router');
+const adminRouter = require('./routes/admin-router');
 
 // Initialize Express app
 const app = express();
