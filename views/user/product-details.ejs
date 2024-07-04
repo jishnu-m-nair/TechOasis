@@ -48,21 +48,6 @@
                                     <img src="/<%= image %>" alt="no image">
                                 </div>
                                 <% }); %>
-                                 <!-- <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-2.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-3.jpg" alt="">
-                                </div> -->
-                                <!-- <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-4.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-5.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/userassets/images/product/default/home-1/default-6.jpg" alt="">
-                                </div> -->
                             </div>
                         </div>
                         <!-- End Large Image -->
@@ -70,35 +55,11 @@
                         <div
                             class="product-image-thumb product-image-thumb-horizontal swiper-container pos-relative mt-5">
                             <div class="swiper-wrapper">
-                                <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-1.jpg"
-                                        alt="">
-                                </div> -->
                                 <% product.images.forEach(image => { %>
                                     <div class="product-image-large-image swiper-slide">
                                         <img class="img-fluid" src="/<%= image %>" alt="no image">
                                     </div>
                                 <% }); %>
-                                 <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-2.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-3.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-4.jpg"
-                                        alt="">
-                                </div> -->
-                                <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-5.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/userassets/images/product/default/home-1/default-6.jpg"
-                                        alt="">
-                                </div> -->
                             </div>
                             <!-- Add Arrows -->
                             <div class="gallery-thumb-arrow swiper-button-next"></div>
@@ -157,13 +118,12 @@
                                 <div class="variable-single-item ">
                                     <span>Quantity</span>
                                     <div class="product-variable-quantity">
-                                        <input min="1" max="100" value="1" type="number">
+                                        <input min="1" max="5" value="1" type="number" id="quantity">
                                     </div>
                                 </div>
 
                                 <div class="product-add-to-cart-btn">
-                                    <a href="#" class="btn btn-block btn-lg btn-black-default-hover"
-                                        data-bs-toggle="modal" data-bs-target="#">+ Add To Cart</a>
+                                    <a onclick="addProductCart('<%= product._id %>')" class="btn btn-block btn-lg btn-black-default-hover">+ Add To Cart</a>
                                 </div>
                             </div>
                             <!-- Start  Product Details Meta Area-->
@@ -180,8 +140,6 @@
                             <span class="title">CATEGORIES:</span>
                             <ul>
                                 <li><a href="#"><%= product.category.name %></a></li>
-                                <!-- <li><a href="#">KITCHEN UTENSILS</a></li>
-                                <li><a href="#">TENNIS</a></li> -->
                             </ul>
                         </div> <!-- End  Product Details Catagories Area-->
                         <!-- Start  Product Details Social Area-->
@@ -472,8 +430,11 @@
                                             </a>
                                             <div class="action-link">
                                                 <div class="action-link-left">
-                                                    <a href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#">Add to Cart</a>
+                                                    <% if(product.countInStock === 0) { %>
+                                                        <a class="text-danger">Out Of Stock</a>
+                                                    <% } else { %>
+                                                        <a href='#' onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
+                                                    <% } %>
                                                 </div>
                                                 <div class="action-link-right">
                                                     <a href="#" data-bs-toggle="modal"
@@ -744,5 +705,98 @@
             </div>
         </div>
     </div> <!-- End Modal Quickview cart -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function addProductCart(productId) {
+        const quantityInput = document.getElementById("quantity");
+        const quantity = parseInt(quantityInput.value);
+        
+        if (quantity < 1 || quantity > 5) {
+            await Swal.fire({
+                title: 'Error',
+                text: 'Quantity must be between 1 and 5',
+                icon: 'error',
+                showConfirmButton: true
+            });
+            return;
+        }
+
+        try {
+            const res = await fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId, quantity })
+            });
+
+            const data = await res.json();
+
+            if (res.status === 400) {
+                await Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'Cannot add to cart. Check stock or maximum allowed quantity.',
+                    icon: 'error',
+                    showConfirmButton: true
+                });
+            } else if (res.status === 200) {
+                await Swal.fire({
+                    title: 'Success',
+                    text: 'Product added to cart successfully',
+                    icon: 'success',
+                    showConfirmButton: true
+                });
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+        }
+    }
+
+        async function cardAddToCart(productId) {
+            event.preventDefault();
+            try {
+                let res = await fetch("/add-to-cart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+    
+                if (res.status === 400) {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Product already in the Cart",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else if (res.status === 200) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "bottom",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: "black",
+                        color: "white",
+                        didOpen: (toast) => {
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
+    
+                    Toast.fire({
+                        icon: "success",
+                        title: "Added to cart",
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+            }
+        }
+</script>
     
     <%- include('user-partials/scripts.ejs') %>

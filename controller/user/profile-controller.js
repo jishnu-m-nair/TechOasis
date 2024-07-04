@@ -28,7 +28,7 @@ const profile = async(req,res)=>{
   
       // Extract the nested addresses array
       const addresses = addressDocument ? addressDocument.addresses : [];
-      res.render('user/profile',{userinfo,addresses,userId});
+      res.render('user/profile',{userinfo,addresses,userId,pageTitle: "Profile Page"});
     } catch (error) {
       console.log(error);
     }
@@ -39,7 +39,7 @@ const editProfile = async (req, res) => {
     try {
         const userId = req.session.userId;
         const userinfo = await UserModel.findById(userId);
-        res.render("user/edit-profile", { userinfo });
+        res.render("user/edit-profile", { userinfo, pageTitle: "Edit Profile Page"});
     } catch (error) {
         console.log(error);
     }
@@ -75,7 +75,7 @@ const editProfilePatch = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const userId = req.session.userId;
-        res.render("user/change-password", { userId });
+        res.render("user/change-password", { userId, pageTitle: "Change Password Page"});
     } catch (error) {
         console.error(error);
     }
@@ -158,7 +158,7 @@ const changePasswordPost = async (req, res) => {
 const addAddress = (req, res) => {
     try {
         const userId = req.session.userId;
-        res.render("user/add-address", { userId });
+        res.render("user/add-address", { userId, pageTitle: "Add Address Page"});
     } catch (error) {
         console.error(error);
         res.status(500).json("Internal Server Error");
@@ -214,21 +214,21 @@ const editAddress = async (req, res) => {
         const addressRecord = await AddressModel.findOne({ user: userId });
 
         if (!addressRecord) {
-            return res.status(404).render('error', { message: 'Address not found.' });
+            return res.status(404).render('error', { message: 'Address not found.', pageTitle: "Edit Address Page" });
         }
 
         // Find the specific address to edit
         const address = addressRecord.addresses.id(addressId);
 
         if (!address) {
-            return res.status(404).render('error', { message: 'Address not found.' });
+            return res.status(404).render('error', { message: 'Address not found.', pageTitle: "Edit Address Page" });
         }
 
         // Render the edit form with the current address data
-        res.render('user/edit-address', { address, userId, addressId});
+        res.render('user/edit-address', { address, userId, addressId, pageTitle: "Edit Address Page"});
     } catch (error) {
         console.error('Error fetching address:', error);
-        res.status(500).render('error', { message: 'An error occurred while fetching the address.' });
+        res.status(500).render('error', { message: 'An error occurred while fetching the address.', pageTitle: "Edit Address Page" });
     }
 };
 

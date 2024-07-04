@@ -1,0 +1,451 @@
+<%- include('admin-partials/header.ejs') %>
+
+
+<style>
+    .text-red {
+        color: red;
+    }
+    /* Set a fixed height for the cropper container */
+    #showimage, #imagePreviews img {
+        max-height: 300px; /* Set your desired height */
+        width: auto; /* Maintain aspect ratio */
+        display: block;
+        object-fit: cover; /* Ensures image fits within the defined area */
+        margin: 10px 0; /* Adds some margin for spacing */
+    }
+
+    /* Ensure the container div does not exceed a certain height */
+    #imagePreviews {
+        max-height: 300px; /* Set a maximum height */
+        overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    }
+
+    /* This CSS will explicitly set the text alignment of the labels to the left */
+    .modal-body label {
+        text-align: left;
+        display: block;
+        width: 100%;
+    }
+
+    /* Additional styling for better visual alignment */
+    .modal-body .form-group {
+        text-align: left;
+    }
+</style>
+
+
+
+
+<div class="screen-overlay"></div>
+
+
+
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="index.html" class="brand-wrap">
+            <img src="/assets/imgs/theme/techoasis_logo.png" class="logo" alt="inloop Dashboard">
+        </a>
+        <div>
+            <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
+            </button>
+        </div>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/usermanagement"> <i class="icon material-icons md-person"></i>
+                    <span class="text">User Management</span>
+                </a>
+            </li>
+            <li class="menu-item active">
+                <a class="menu-link" href="/admin/product-management"> <i
+                        class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Product Management</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/category-management"> <i class="icon material-icons md-category "></i>
+
+                    <span class="text">Category Management</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/order-management"> <i
+                        class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Order Management</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/coupon-management"> <i
+                        class="icon material-icons md-redeem coupon-icon"></i>
+                    <span class="text">Coupon Management</span>
+                </a>
+            </li>
+            
+        </ul>
+        
+        <br>
+        <br>
+    </nav>
+</aside>
+
+<!-- <div class="main-container"> -->
+<main class="main-wrap">
+    <header class="main-header navbar">
+        <div class="col-search">
+            <form method="get" class="searchform" action="/admin/product-search">
+                <div class="input-group">
+                    <input list="search_terms" name="search" type="text" class="form-control" placeholder="Search term">
+                    <button class="btn btn-light bg" type="submit"> <i class="material-icons md-search"></i></button>
+                </div>
+                <!-- <datalist id="search_terms">
+                    <option value="Products">
+                    <option value="New orders">
+                    <option value="Apple iphone">
+                    <option value="Ahmed Hassan">
+                </datalist> -->
+            </form>
+        </div>
+        <div class="col-nav ms-auto">
+            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
+                    class="material-icons md-apps"></i> </button>
+            <ul class="nav">
+                <!-- <li class="nav-item">
+                    <a class="nav-link btn-icon" href="#">
+                        <i class="material-icons md-notifications animation-shake"></i>
+                        <span class="badge rounded-pill">3</span>
+                    </a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                </li> -->
+                <li class="dropdown nav-item">
+                    <a class="dropdown-item text-danger" href="/admin/logout"><i
+                            class="material-icons md-exit_to_app"></i>Logout</a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Product Management</h2>
+            </div>
+            <!-- Dropdown to select a category for sorting -->
+            <div class="btn-group me-2">
+                <form action="product-management" method="GET">
+                    <div class="input-group">
+                        <select class="form-select" name="category" id="category-filter">
+                            <option value="">All Categories</option>
+                            <% categories.forEach(category => { %>
+                            <option value="random catagory"
+                                <%= category._id.toString() === selectedCategory ? 'selected' : '' %>>
+                                <%= category.name %>
+                            </option>
+                            <% }) %>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm rounded me-2"
+                            id="filter-button">Filter</button>
+                    </div>
+                </form>
+
+                <button type="button" class="btn btn-primary btn-sm rounded" data-bs-toggle="modal"
+                    data-bs-target="#createProductModal">Add Product</button>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Modal for adding new products -->
+            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+            <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+            <div class="container mt-2">
+                <table class="table table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <!-- <th>Description</th> -->
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Discount(%)</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center align-middle">
+                        <% products.forEach((item,index) => { %>
+                        <tr>
+                            <td class="align-middle"><%= (currentPage - 1) * perPage + index + 1 %></td>
+                            <td class="align-middle">
+                                <!-- Add class "align-middle" to vertically center content -->
+                                <img src="/<%= item.image %>" alt="<%= item.productName %> Image"
+                                    style="max-width: 60px; max-height: 60px;">
+                            </td>
+                            <td class="align-middle" style="width: 250px;"><%= item.productName %></td>
+                            <!-- <td class="align-middle"><%= item.description %></td> -->
+                            <td class="align-middle"><%= item.brand %></td>
+                            <td class="align-middle">₹<%= item.price %></td>
+                            <td class="align-middle"><%= item.discountPrice %>%</td>
+                            <td class="align-middle"><%= item.category ? item.category.name : 'N/A' %></td>
+                            <td class="align-middle">
+                                <span class="badge <%= item.isFeatured ? 'bg-success' : 'bg-danger' %>">
+                                    <%= item.isFeatured ? 'Published' : 'Not Published' %>
+                                </span>
+                            </td>
+                            <td class="align-middle">
+                                <span class="<%= item.countInStock === 0 ? 'text-danger' : 'text-success' %>">
+                                    <%= item.countInStock %>
+                                    <%= item.countInStock === 0 ? ' (Out of Stock)' : '' %>
+                                </span>
+                            </td>
+                            <td class="d-flex justify-content-center mt-3">
+                                <!-- Add "align-middle" here as well -->
+                                <div class="pe-2">
+                                    <button onclick="listUser('<%= item._id %>')" id="listButton_<%= item._id %>"
+                                        data-product-id="<%= item._id %>" data-is-featured="<%= item.isFeatured %>"
+                                        class="btn btn-sm publish-button <%= item.isFeatured ? 'btn-danger' : 'btn-success' %>"
+                                        data-bs-toggle="modal" data-bs-target="#publishModal">
+                                        <%= item.isFeatured ? 'Unpublish' : 'Publish' %>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm text-light" style="background-color: #088178;"
+                                        data-bs-toggle="modal" data-bs-target="#editModal<%= item._id %>" type="button"
+                                        
+                                        data-category-id="<%= item._id %>">Edit
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>  
+            </div>
+            <% }) %>
+            </tbody>
+            </table>
+            <!-- pagination -->
+            <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>"><i
+                                    class="material-icons md-chevron_left"></i></a>
+                        </li>
+                        <% } %>
+
+                        <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(currentPage + 2, totalPages); i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                        <% } %>
+
+                        <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>"><i
+                                    class="material-icons md-chevron_right"></i></a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+            <br>
+            <!-- More content here if needed -->
+
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <!-- image crop  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js" crossorigin="anonymous">
+    </script>
+    <script src="/js/admin-product.js"></script>
+    
+    <script>
+
+
+        async function listUser(id) {
+            let result = await Swal.fire({
+                title: 'Do you want to save the changes?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                denyButtonText: `Don't save`,
+            })
+            if (result.isConfirmed) {
+                let response = await fetch('/admin/product-management/featuredProduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id
+                    })
+                })
+                if (response.status === 200) {
+                    await Swal.fire('Saved!', 'Product Unpublished', 'success')
+                } else if (response.status === 201) {
+                    await Swal.fire('Saved!', 'Product Published', 'success')
+                }
+
+                window.location.reload();
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        }
+
+
+        const confirmationModal = document.getElementById('confirmationModal');
+        //  confirmationModal.style.display = 'block'; 
+        function deleteProduct(productId) {
+            // Show the custom confirmation modal
+            $('#confirmationModal').show('modal')
+
+            // Store the productId in a data attribute for later use
+            confirmationModal.dataset.productId = productId;
+        }
+
+        function confirmDelete() {
+            const productId = confirmationModal.dataset.productId;
+
+            // Close the custom confirmation modal
+            confirmationModal.style.display = 'none';
+
+            // Send a DELETE request to delete the product
+            fetch('product-management/delete-product/' + productId, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Product was successfully deleted
+                        // Reload the page to update the list of products
+                        alert('Successfully deleted');
+                        window.location.reload();
+                    } else {
+                        // Handle error
+                        alert('An error occurred while deleting the product.');
+                    }
+                });
+        }
+
+        function cancelDelete() {
+            confirmationModal.style.display = 'none';
+            window.location.reload();
+        }
+
+
+
+        $(document).ready(function () {
+            // Fetch categories from the backend API
+            $.ajax({
+                url: 'product-management/getCategories', // Adjust the URL as needed
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Iterate over the categories and add options to the select boxes
+                    data.forEach(function (category) {
+                        $('.product-category-select').each(function () {
+                            const productId = $(this).data('product-id');
+                            if ($(this).attr('id') ===
+                                `productCategory${productId}`) {
+                                $(this).append($('<option>', {
+                                    value: category._id,
+                                    text: category.name
+                                }));
+                            }
+                        });
+                    });
+                },
+                error: function (error) {
+                    console.error(error);
+                    //This is For Edit Product
+
+                }
+            });
+        });
+
+
+        $(document).ready(function () {
+            // Fetch categories from the backend API
+            $.ajax({
+                url: 'product-management/getCategories', // Adjust the URL as needed
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Iterate over the categories and add options to the select box
+                    data.forEach(function (category) {
+                        $('#productCategory').append($('<option>', {
+                            value: category._id,
+                            text: category.name
+                        }));
+                    });
+                },
+                error: function (error) {
+                    console.error(error);
+                    // this is for add new product
+                    // Handle the error appropriately (e.g., display an error message)
+
+                }
+            });
+        });
+
+        // Function to handle the Publish button click event
+
+        function handlePublishButtonClick(productId, isFeatured) {
+            const newIsFeatured = !isFeatured; // Toggle the isFeatured value
+            const requestData = {
+                isFeatured: newIsFeatured
+            };
+            alert("recieved")
+            // Make an AJAX request to update the isFeatured status
+            $.ajax({
+                url: `product-management/updateProduct/${productId}`, // Adjust the URL as needed
+                method: 'PUT',
+                data: requestData,
+                success: function (response) {
+                    // Update the button text
+                    const buttonText = newIsFeatured ? 'Unpublish' : 'Publish';
+                    $(`button[data-product-id="${productId}"]`).text(buttonText);
+
+                    // Update the data-is-featured attribute
+                    $(`button[data-product-id="${productId}"]`).data('is-featured', newIsFeatured);
+
+                    // Handle any other UI updates or notifications
+                    window.location.reload();
+                },
+                error: function (error) {
+                    // Handle error
+                    console.error(error);
+                    // Display an error message or take appropriate action
+                    // ...
+                }
+            });
+        }
+
+        // Attach a click event listener to the Publish buttons
+
+        $('.publish-button').click(function () {
+            const productId = $(this).data('product-id');
+            const isFeatured = $(this).data('is-featured');
+            handlePublishButtonClick(productId, isFeatured);
+        });
+    </script>
+
+    <%- include('admin-partials/footer.ejs') %>

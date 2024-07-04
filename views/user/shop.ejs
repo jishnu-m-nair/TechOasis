@@ -103,8 +103,11 @@
                                                             </a>
                                                             <div class="action-link">
                                                                 <div class="action-link-left">
-                                                                    <a href="#" data-bs-toggle="modal"
-                                                                        data-bs-target="#">Add to Cart</a>
+                                                                    <% if(product.countInStock === 0) { %>
+                                                                        <a class="text-danger">Out Of Stock</a>
+                                                                    <% } else { %>
+                                                                        <a href='#' onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
+                                                                    <% } %>
                                                                 </div>
                                                                 <div class="action-link-right">
                                                                     <a href="#" data-bs-toggle="modal"
@@ -408,5 +411,55 @@
             </div>
         </div>
     </div> <!-- End Modal Quickview cart -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        async function addProductCart(productId) {
+            event.preventDefault();
+            try {
+                let res = await fetch("/add-to-cart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+    
+                if (res.status === 400) {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Product already in the Cart",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else if (res.status === 200) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "bottom",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: "black",
+                        color: "white",
+                        didOpen: (toast) => {
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
+    
+                    Toast.fire({
+                        icon: "success",
+                        title: "Added to cart",
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+            }
+        }
+    </script>
+    
 
     <%- include('user-partials/scripts.ejs') %>

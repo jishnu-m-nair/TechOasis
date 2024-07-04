@@ -77,7 +77,7 @@ const googleAuthFailure = async (req, res) => {
 
 const securePassword = async (password) => {
     try {
-        const passwordHash = await bcrypt.hash(password, 10); // Add await here
+        const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
         console.log(error.message);
@@ -134,6 +134,7 @@ const home = async (req, res) => {
                     bannerProduct1,
                     bannerProduct2,
                     gamingProducts,
+                    pageTitle: "Home Page"
                 });
             } else {
                 req.session.isBlocked = true;
@@ -148,6 +149,7 @@ const home = async (req, res) => {
                 bannerProduct1,
                 bannerProduct2,
                 gamingProducts,
+                pageTitle: "Home Page"
             });
         }
     } catch (error) {
@@ -179,6 +181,7 @@ const login = async (req, res) => {
                 err: errorMessage,
                 data,
                 errorMessage,
+                pageTitle: "Login Page"
             });
         } else if (req.session.passwordIncorrect) {
             req.session.passwordIncorrect = false;
@@ -187,6 +190,7 @@ const login = async (req, res) => {
                 err: errorMessage,
                 data,
                 errorMessage,
+                pageTitle: "Login Page"
             });
         } else if (req.session.noUser) {
             req.session.noUser = false;
@@ -195,6 +199,7 @@ const login = async (req, res) => {
                 err: errorMessage,
                 data,
                 errorMessage,
+                pageTitle: "Login Page"
             });
         }
         // else if (req.session.user) {
@@ -205,6 +210,7 @@ const login = async (req, res) => {
                 err: "",
                 data,
                 errorMessage,
+                pageTitle: "Login Page"
             });
         }
     } catch (error) {
@@ -277,6 +283,7 @@ let signup = (req, res) => {
             data,
             errorMessage: "",
             formData: req.body,
+            pageTitle: "Signup Page"
         });
     } else {
         res.render("user/signup", {
@@ -284,6 +291,7 @@ let signup = (req, res) => {
             data,
             errorMessage: "",
             formData: req.body,
+            pageTitle: "Signup Page"
         });
     }
 };
@@ -304,11 +312,13 @@ const signupPost = async (req, res, next) => {
                     errorMessage:
                         "Email and phone number is already registered",
                     formData: req.body,
+                    pageTitle: "Signup Page"
                 });
             } else if (existingUser.email === email) {
                 res.render("user/signup", {
                     errorMessage: "Email is already registered!",
                     formData: req.body,
+                    pageTitle: "Signup Page"
                 });
             }
         } else {
@@ -385,7 +395,7 @@ const signupOtp = async (req, res) => {
                 : "Incorrect OTP"
             : "";
 
-        res.render("user/signup-otp", { err: errorMessage }); // Render OTP page with error message (if any)
+        res.render("user/signup-otp", { err: errorMessage, pageTitle: "Signup Otp" }); // Render OTP page with error message (if any)
     } catch (error) {
         console.error(error.message); // Log the error for debugging
         res.status(500).send("An error occurred loading the OTP page.");
@@ -544,6 +554,7 @@ const userShop = async (req, res) => {
             selectedCategory: selectedCategory,
             searchQuery: searchQuery,
             totalProducts,
+            pageTitle: "Shop Page"
         });
     } catch (err) {
         console.error(err);
@@ -583,6 +594,7 @@ const productDetails = async (req, res) => {
             product,
             category,
             relatedProducts,
+            pageTitle: "Product Detailed Page"
         });
     } catch (error) {
         console.error(error);

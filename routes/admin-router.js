@@ -40,7 +40,7 @@ router.get('/admin/product',(req,res)=>{
 
 //admin product management
 router.get('/admin/product-management',AdminLogSession,product.productManagementGet)
-router.post('/admin/product-management/newProduct',productUpload.fields( [{ name: 'images' }]),product.productManagementCreate)
+// router.post('/admin/product-management/newProduct',productUpload.fields( [{ name: 'images' }]),product.productManagementCreate)
 router.get('/admin/product-management/getCategories',AdminLogSession,product.productCategories);
 router.post('/admin/product-management/editProduct/:Id',upload.fields([{ name: 'image', maxCount: 1 }, { name: 'images' }]),product.productManagementEdit);
 router.delete('/admin/product-management/delete-product/:productId',product.productManagementDelete);
@@ -48,6 +48,10 @@ router.post('/admin/product-management/featuredProduct',product.productManagemen
 // router.get('/admin/product-management/removeimg',AdminLogSession,product.removeProductImg);
 router.post('/admin/product-management/removeimg',AdminLogSession,product.removeProductImg);
 // router.get('/admin/product-management/getProductDetails/:id', product.getProductDetails);
+router.get('/admin/product-management/newProduct',product.addProduct)
+router.post('/admin/product-management/newProduct',productUpload.fields( [{ name: 'images' }]),product.addProductPost)
+router.get('/admin/product-management/editProduct/:Id',product.editProduct)
+router.post('/admin/product-management/editProduct/:Id',upload.fields([{ name: 'image', maxCount: 1 }, { name: 'images' }]),product.productManagementEdit);
 
 // router.get('/admin/product-search',AdminLogSession,product.productSearch)
 

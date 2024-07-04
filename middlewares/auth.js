@@ -11,7 +11,8 @@ const isLoggedIn = (req, res, next) => {
         res.render('user/login',{
             err: errorMessage,
             data,
-            errorMessage
+            errorMessage,
+            pageTitle: "Login Page"
         })
         // res.redirect("/login");
     }
@@ -60,7 +61,8 @@ const isBlockedUser = async (req, res, next) => {
             return res.render('user/login',{
                 err: errorMessage,
                 data,
-                errorMessage
+                errorMessage,
+                pageTitle: "Login Page"
             }); // Or handle differently based on your application logic
         }
 
@@ -81,7 +83,8 @@ const isBlockedUser = async (req, res, next) => {
         res.render('user/login',{
             err: errorMessage,
             data,
-            errorMessage
+            errorMessage,
+            pageTitle: "Login Page"
         })
         console.error("Error checking user block status:", error);
         // Handle errors gracefully, e.g., redirect to an error page or return an error response

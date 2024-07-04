@@ -1,0 +1,451 @@
+<!-- Start Header Area -->
+<%- include('user-partials/header.ejs') %>
+<!-- End Header Area -->
+
+<!-- Start Navbar Area -->
+<%- include('user-partials/navbar.ejs') %>
+<!-- End Navbar Area -->
+
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--golden">
+    <div class="breadcrumb-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="breadcrumb-title">Cart</h3>
+                    <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                        <nav aria-label="breadcrumb">
+                            <ul>
+                                <li><a href="/home">Home</a></li>
+                                <li class="active" aria-current="page">Cart</li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ...:::: End Breadcrumb Section:::... -->
+
+<!-- ...:::: Start Cart Section:::... -->
+<div class="cart-section">
+    <!-- Start Cart Table -->
+    <div class="cart-table-wrapper" data-aos="fade-up" data-aos-delay="0">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table_desc">
+                        <div class="table_page table-responsive">
+                            <table>
+                                <!-- Start Cart Table Head -->
+                                <thead>
+                                    <tr>
+                                        <th class="product_remove">Delete</th>
+                                        <th class="product_thumb">Image</th>
+                                        <th class="product_name">Product</th>
+                                        <th class="product-price">Price</th>
+                                        <th class="product_quantity">Stocks left</th>
+                                        <th class="product_quantity">Quantity</th>
+                                        <th class="product_total">Total</th>
+                                    </tr>
+                                </thead>
+                                <!-- End Cart Table Head -->
+                                <tbody>
+                                    <!-- Start Cart Single Item-->
+                                    <% if (cart && cart.items.length > 0) { %>
+                                    <% for (let i = 0; i < cart.items.length;
+                                    i++) { %>
+                                    <tr data-product-id="<%= cart.items[i].productId._id %>">
+                                        <td class="product_remove">
+                                            <button type="button" onclick="removeProductCart('<%= cart.items[i].productId._id %>')">
+                                                <i class="fa fa-trash-o"></i>
+                                            </button>
+                                        </td>
+                                        <td class="product_thumb">
+                                            <a href="/product-details/<%= cart.items[i].productId._id %>">
+                                                <img src="/<%= cart.items[i].productId.image %>" alt="">
+                                            </a>
+                                            <div id="stock-<%= cart.items[i].productId._id %>">
+                                                <% if (cart.items[i].productId.countInStock === 0) { %>
+                                                <p class="d-flex justify-content-center text-danger">
+                                                    Out of Stock
+                                                </p>
+                                                <% } %>
+                                            </div>
+                                        </td>
+                                        <td class="product_name">
+                                            <a href="/product-details/<%= cart.items[i].productId._id %>">
+                                                <%= cart.items[i].productId.productName %>
+                                            </a>
+                                        </td>
+                                        <td class="product-price">
+                                            <span>
+                                                Rs.<%=
+                                                cart.items[i].productId.price
+                                                %>.00
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="detail-qty radius m-auto">
+                                                <span class="qty-val me-3" id="stock-left-<%= cart.items[i].productId._id %>" data-stock="<%= cart.items[i].productId.countInStock %>">
+                                                    <%= cart.items[i].productId.countInStock %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div
+                                                class="detail-qty radius m-auto">
+                                                <button class="qty-down" id="qty-down<%= cart.items[i].productId._id %>"
+                                                    onclick="updateQuantity('<%= cart.items[i].productId._id %>', '<%= cart.items[i].productId.countInStock %>', '<%= cart.items[i].quantity %>', 'sub')">
+                                                    <i class="fa-solid fa-angle-down"></i>
+                                                </button>
+                                                <span class="qty-val me-3" id="qty-<%= cart.items[i].productId._id %>" data-stock="<%= cart.items[i].productId.countInStock %>">
+                                                    <%= cart.items[i].quantity %>
+                                                </span>
+                                                <button class="qty-up" id="qty-up<%= cart.items[i].productId._id %>"
+                                                    onclick="updateQuantity('<%= cart.items[i].productId._id %>', '<%= cart.items[i].productId.countInStock %>', '<%= cart.items[i].quantity %>', 'sum')">
+                                                    <i class="fa-solid fa-angle-up"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td class="product_total">
+                                            <span
+                                                id="carttotal-<%= cart.items[i].productId._id %>">Rs.<%= cart.items[i].price %>.00</span>
+                                        </td>
+                                    </tr>
+                                    <% } %> <% } %>
+                                    <!-- End Cart Single Item-->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Cart Table -->
+
+    <!-- Start Coupon Start -->
+    <div class="coupon_area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div
+                        class="coupon_code left"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <h3>Coupon</h3>
+                        <div class="coupon_inner">
+                            <p>Enter your coupon code if you have one.</p>
+                            <input
+                                class="mb-2"
+                                placeholder="Coupon code"
+                                type="text"
+                            />
+                            <button type="submit" class="btn btn-md btn-golden">
+                                Apply coupon
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="coupon_code right" data-aos="fade-up" data-aos-delay="400">
+                        <h3>Cart Totals</h3>
+                        <div class="coupon_inner">
+                            <div class="cart_subtotal">
+                                <p>Subtotal</p>
+                                <% if (cart) { %>
+                                <p class="cart_amount" id="carttotal2">
+                                    Rs.<%= cart.billTotal %>.00
+                                </p>
+                                <% } %>
+                            </div>
+
+                            <div class="cart_subtotal">
+                                <p>Total</p>
+                                <% if (cart) { %>
+                                <p class="cart_amount" id="carttotal3">
+                                    Rs.<%= cart.billTotal %>.00
+                                </p>
+                                <% } %>
+                            </div>
+
+                            <div class="cart-summary">
+                                <div class="checkout_btn">
+                                    <button class="btn btn-md btn-golden" onclick="goTocheckout()">
+                                        Proceed to Checkout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Coupon Start -->
+</div>
+<!-- ...:::: End Cart Section:::... -->
+
+<!-- Start Footer Section -->
+<%- include('user-partials/footer.ejs') %>
+<!-- End Footer Section -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function goTocheckout() {
+        try {
+            // Fetch the latest cart data from the server
+            const response = await fetch("/latest-cart", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch latest cart data");
+            }
+
+            const latestCartData = await response.json();
+
+            // Check if any item in the cart exceeds available stock
+            const outOfStockItems = latestCartData.items.filter(
+                (item) => item.quantity > item.productId.countInStock
+            );
+
+            if (outOfStockItems.length > 0) {
+                // If there are out-of-stock items, show an error message
+                const itemsList = outOfStockItems
+                    .map(
+                        (item) =>
+                            `${item.productId.productName} (In cart: ${item.quantity}, Available: ${item.productId.countInStock})`
+                    )
+                    .join("\n");
+
+                await Swal.fire({
+                    title: "Stock Update",
+                    html: `Some items in your cart are no longer available in the requested quantity:<br><br>${itemsList.replace(
+                        /\n/g,
+                        "<br>"
+                    )}`,
+                    icon: "warning",
+                    confirmButtonText: "Update Cart",
+                });
+
+                // Refresh the page to update the cart display
+                window.location.reload();
+            } else {
+                // If all items are in stock, proceed to checkout
+                window.location.href = "/checkout";
+            }
+        } catch (error) {
+            console.error("Error checking stock:", error);
+            await Swal.fire({
+                title: "Error",
+                text: "There was an error processing your request. Please try again.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        }
+    }
+
+    async function removeProductCart(productId) {
+        swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to remove this product from your cart?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/cart-delete", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            const error = new Error(
+                                "Network response was not ok."
+                            );
+                            Swal.fire({
+                                title: "Error",
+                                text: error.message,
+                                icon: "error",
+                                showConfirmButton: true,
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        swal.fire({
+                            title: "Product Removed",
+                            icon: "success",
+                            timer: 1500,
+                            timerProgressBar: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                    .catch((error) => {
+                        swal.fire(
+                            "Error",
+                            "An error occurred while removing the product.",
+                            "error"
+                        );
+                        console.error("Fetch Error:", error);
+                    });
+            }
+        });
+    }
+
+    async function updateQuantity(productId, stock, qty, action) {
+        /// Check if the product is out of stock
+        if (stock <= 0) {
+            await Swal.fire({
+                title: "Error",
+                text: "This product is out of stock. Please remove it from your cart.",
+                icon: "error",
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        const isSubtraction = action === "sub";
+        const isAddition = action === "sum";
+        const newQty = isSubtraction ? qty - 1 : qty + 1;
+
+        // Prevent reducing quantity below 1
+        if (isSubtraction && qty <= 1) {
+            await Swal.fire({
+                title: "Error",
+                text: "Minimum quantity is 1.",
+                icon: "error",
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        // Prevent increasing quantity above stock or 5, whichever is lower
+        if (isAddition && qty >= Math.min(stock, 5)) {
+            await Swal.fire({
+                title: "Error",
+                text: "Maximum quantity reached.",
+                icon: "error",
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        try {
+            const res = await fetch("/update-cart-quantity", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ productId, need: action }),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(
+                    errorData.message || "Error updating quantity."
+                );
+            }
+
+            const data = await res.json();
+
+            // Update cart items
+            data.cart.items.forEach((item) => {
+                const qtyElement = document.getElementById(
+                    `qty-${item.productId._id}`
+                );
+                const totalElement = document.getElementById(
+                    `carttotal-${item.productId._id}`
+                );
+                const stockElement = document.getElementById(
+                    `stock-${item.productId._id}`
+                );
+
+                if (qtyElement && totalElement) {
+                    qtyElement.innerHTML = item.quantity;
+                    totalElement.innerHTML = `Rs.${item.price}.00`;
+
+                    // Update stock status
+                    if (stockElement) {
+                        if (item.productId.countInStock > 0) {
+                            stockElement.innerHTML = "";
+                        } else {
+                            stockElement.innerHTML =
+                                '<p class="text-danger">Out of Stock</p>';
+                        }
+                    }
+
+                    setupClickListeners(
+                        item.productId._id,
+                        item.productId.countInStock
+                    );
+                }
+            });
+
+            // Update totals
+            document.getElementById(
+                "carttotal2"
+            ).innerHTML = `Rs.${data.cart.billTotal}.00`;
+            document.getElementById(
+                "carttotal3"
+            ).innerHTML = `Rs.${data.cart.billTotal}.00`;
+
+        } catch (error) {
+            await Swal.fire({
+                title: "Error",
+                text: error.message,
+                icon: "error",
+                showConfirmButton: true,
+            });
+        }
+    }
+
+    function setupClickListeners(productId, stock) {
+        const qtyDownElement = document.getElementById(`qty-down${productId}`);
+        const qtyUpElement = document.getElementById(`qty-up${productId}`);
+        const qtyElement = document.getElementById(`qty-${productId}`);
+
+        if (qtyDownElement && qtyUpElement && qtyElement) {
+            const currentQty = parseInt(qtyElement.innerHTML, 10);
+            qtyDownElement.disabled = currentQty <= 1;
+            qtyUpElement.disabled =
+                currentQty >= Math.min(stock, 5) || stock <= 0;
+
+            qtyDownElement.onclick = () =>
+                updateQuantity(productId, stock, currentQty, "sub");
+            qtyUpElement.onclick = () =>
+                updateQuantity(productId, stock, currentQty, "sum");
+        } else {
+            console.error(`Elements for product ${productId} not found.`);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (cart && cart.items.length > 0) {
+            for (let i = 0; i < cart.items.length; i++) {
+                setupClickListeners(
+                    cart.items[i].productId._id,
+                    cart.items[i].productId.countInStock
+                );
+            }
+        }
+    });
+</script>
+
+<%- include('user-partials/scripts.ejs') %>

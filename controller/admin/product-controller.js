@@ -566,6 +566,122 @@ let productSearch = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+const addProduct = async (req,res)=>{
+    const categories = await CategoryModel.find().lean();
+    res.render('admin/add-product',{categories,pagetitle:"Add Product Page"});
+}
+
+
+
+  const addProductPost = async (req, res) => {
+    try {
+        console.log(req.body);
+        if (!req.files['images'] || req.files['images'].length === 0) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                errorMessage: 'Image data is missing or invalid'
+            });
+        }
+        const allImages = req.files['images'];
+        allImages.reverse();
+        const mainImage = allImages[0];
+        
+        // const additionalImages = allImages.slice(1);
+        // Check for existing product name
+        // const existingProduct = await ProductModel.findOne({ productName: req.body.productName });
+        const existingProduct = await ProductModel.findOne({
+            productName: { $regex: new RegExp('^' + req.body.productName + '$', 'i') }
+        });
+
+        if (existingProduct) {
+            // Path to be used for deleting files
+            // const basePath = path.join(__dirname, '..',);
+            
+            // // Delete uploaded images if product already exists
+            // await Promise.all(allImages.map(async file => {
+            //     const filePath = path.join(basePath, file.path);
+            //     try {
+            //         await fs.promises.unlink(filePath);
+            //         console.log(`Deleted file: ${filePath}`);
+            //     } catch (unlinkError) {
+            //         console.error(`Error deleting file ${filePath}:`, unlinkError);
+            //     }
+            // }));
+
+            return res.status(400).json({
+                error: 'Bad Request',
+                errorMessage: 'Product name already exists'
+            });
+        }
+        // Create new product
+            const product = new ProductModel({
+                productName: req.body.productName,
+                description: req.body.description,
+                image: mainImage.path.replace(/\\/g, '/').replace('public/', ''),
+                images: allImages.map(file => file.path.replace(/\\/g, '/').replace('public/', '')),
+                brand: req.body.brand,
+                countInStock: req.body.countInStock,
+                category: req.body.category,
+                price: req.body.price,
+                discountPrice: 0,
+                afterDiscount: Math.floor(parseInt(req.body.price))
+            });
+            console.log(product.images);
+            console.log(product);
+
+            // Save product to database
+            await product.save();
+            console.log('Product saved successfully.');
+            return res.status(201).json({ success: true, message: 'Product added successfully', redirectUrl: "/admin/product-management" });
+
+        // Further validation and saving logic...
+    } catch (error) {
+        console.error('Error adding product:', error);
+        // Delete uploaded images if an error occurs
+        // if (req.files['images']) {
+        //     // Path to be used for deleting files
+        //     const basePath = path.join(__dirname, '..',);
+            
+        //     // Delete uploaded images if product already exists
+        //     await Promise.all(allImages.map(async file => {
+        //         const filePath = path.join(basePath, file.path);
+        //         try {
+        //             await fs.promises.unlink(filePath);
+        //             console.log(`Deleted file: ${filePath}`);
+        //         } catch (unlinkError) {
+        //             console.error(`Error deleting file ${filePath}:`, unlinkError);
+        //         }
+        //     }));
+        // }
+
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            errorMessage: error.message
+        });
+    }
+};
+
+const editProduct = async (req,res)=>{
+    const products = await ProductModel.find(query)
+                .populate('category') // Populate the 'category' field
+                .skip(perPage * (page - 1))
+                .limit(perPage)
+                .sort({createdAt:-1})
+    const categories = await CategoryModel.find().lean();
+    console.log(categories);
+    res.render('admin/edit-product',{categories,products,pagetitle:"Edit Product Page"});
+}
+
 module.exports = {
     productManagementGet,
     productManagementCreate,
@@ -575,5 +691,8 @@ module.exports = {
     productManagementPublish,
     removeProductImg,
     productSearch,
-    getProductDetails
+    getProductDetails,
+    addProductPost,
+    addProduct,
+    editProduct
 }

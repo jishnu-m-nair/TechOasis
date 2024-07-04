@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const user = require('../controller/user/user-controller')
 const profile = require('../controller/user/profile-controller')
+const cart = require('../controller/user/cart-controller')
 const passport = require('passport');
 const {isLoggedIn,isLoggedOut,isBlockedUser} =  require('../middlewares/auth')
 require('dotenv').config()
@@ -11,7 +12,7 @@ require('../middlewares/authenticate');
 
 //user home
 router.get('/contact',(req,res) => {
-    res.render('user/contact-us')
+    res.render('user/contact-us',{ pageTitle: "Contact Page" })
 });
 
 // Google OAuth routes
@@ -53,7 +54,7 @@ router.post('/login',user.loginPost);
 router.get('/signup',isLoggedOut, user.signup);
 router.post('/signup',user.signupPost);
 
-router.get('/logout',isLoggedIn,isBlockedUser,user.userLogout)
+router.get('/logout',isLoggedIn,user.userLogout)
 
 //OTP routers
 router.get('/signup-otp',isLoggedOut, user.signupOtp);
@@ -64,7 +65,15 @@ router.post('/resend-otp',isLoggedOut,user.resendOtp);
 router.get('/shop',isLoggedIn,isBlockedUser, user.userShop)
 router.get('/product-details/:productId',isLoggedIn,isBlockedUser, user.productDetails)
 
-// profile
+// Cart Routers
+router.post('/add-to-cart',isLoggedIn,isBlockedUser,cart.addTocart);
+router.get('/cart',isLoggedIn,isBlockedUser,cart.showcart);
+router.post('/cart-delete',isLoggedIn,isBlockedUser,cart.deleteCart);
+router.post('/update-cart-quantity',isLoggedIn,isBlockedUser,cart.updateCart);
+router.get('/latest-cart',isLoggedIn,isBlockedUser,cart.latestCart);
+// router.post('/addtocartIn',cart.addToCartIn);
+
+// Profile
 router.get('/profile',isLoggedIn,isBlockedUser,profile.profile)
 router.get('/edit-profile',isLoggedIn,isBlockedUser,profile.editProfile)
 router.patch('/edit-profile',isLoggedIn,isBlockedUser,profile.editProfilePatch);
