@@ -48,7 +48,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="/assets/imgs/theme/techoasis_logo.png" class="logo" alt="inloop Dashboard">
+                <img src="/assets/imgs/theme/techoasis_logo.png" class="logo" alt="Techoasis Logo">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
@@ -144,7 +144,7 @@
                 <!-- <div class="col-lg-2"></div> -->
                 <div class="col-8">
                     <div class="content-header">
-                        <h2 class="content-title">Add New Product</h2>
+                        <h2 class="content-title">Edit Product</h2>
                     </div>
                 </div>
             </div>
@@ -155,49 +155,77 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="row">
-                                <form id="addNewProduct" enctype="multipart/form-data">
+                                <form id="editProductForm" enctype="multipart/form-data">
+                                    <!-- Hidden field for _id -->
+                                    <input type="hidden" id="productId" name="productId" value="<%= product._id %>">
+
                                     <div class="form-group mb-3">
                                         <label for="productName">Product Name</label> <br>
                                         <span id="productNameError" class="text-red"></span>
-                                        <input type="text" class="form-control" id="productName" name="productName">
+                                        <input type="text" class="form-control" id="productName" name="productName" 
+                                        value="<%= product.productName %>">
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="productDescription">Description</label> <br>
                                         <span id="descriptionError" class="text-red"></span>
-                                        <textarea class="form-control" id="productDescription" name="description"></textarea>
+                                        <textarea class="form-control" id="productDescription" name="description"><%= product.description %></textarea>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="productBrand">Brand</label> <br>
                                         <span id="brandError" class="text-red"></span>
-                                        <input type="text" class="form-control" id="productBrand" name="brand">
+                                        <input type="text" class="form-control" id="productBrand" name="brand" 
+                                            value="<%= product.brand %>">
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="productCountInStock">Count in Stock</label> <br>
                                         <span id="stockError" class="text-red"></span>
-                                        <input type="number" class="form-control" id="productCountInStock" name="countInStock">
+                                        <input type="number" class="form-control" id="productCountInStock" name="countInStock" 
+                                            value="<%= product.countInStock %>">
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="productCategory">Category</label> <br>
                                         <span id="categoryError" class="text-red"></span>
                                         <select class="form-control" id="productCategory" name="category">
-                                            <option value="">Select a category</option>
                                             <% categories.forEach(category => { %>
-                                                <option value="<%= category._id %>"><%= category.name %></option>
+                                                <option value="<%= category._id %>"
+                                                    <%= product.category && category._id.toString() === product.category._id.toString() ? 'selected' : '' %>>
+                                                    <%= category.name %>
+                                                </option>
                                             <% }) %>
                                         </select>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="productPrice">Original Price</label> <br>
                                         <span id="priceError" class="text-red"></span>
-                                        <input type="number" class="form-control" id="productPrice" name="price">
+                                        <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.price %>">
                                     </div>
+                                    <div class="form-group mb-3">
+                                        <label for="productDiscount">Discount (%)</label>
+                                        <span id="productDiscountError" class="text-red"></span>
+                                        <input type="number" class="form-control" id="productDiscountPrice"
+                                            name="discountPrice" value="<%= product.discountPrice %>">
+                                    </div>
+                                    
                                     <div class="form-group mb-3">
                                         <label for="images">Additional Images (Upload multiple files)</label> <br>
                                         <span id="imagesError" class="text-red" ></span>
                                         <input type="file" class="form-control-file" id="images" name="images" accept="image/*" multiple>
                                         <div id="imagePreviews"></div>
+                                        <button type="button" class="btn btn-primary p-2 px-5" id="updateImages"
+                                            style="display: none;">Save</button>
+                                        <% if (product.images && product.images.length > 0) { %>
+                                        <div class="row">
+                                            <% product.images.forEach((image,i) => {%>
+                                            <div class="col-md-3">
+                                                <img src="/<%= image %>" alt="Additional Image" id="imagesUpdate<%= i %>" style="max-width: 100%; height: 50px;">
+                                            </div>
+                                            <% }); %>
+                                        </div>
+                                        <% } else { %>
+                                        <p>No additional images available.</p>
+                                        <% } %>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" id="addProductBtn">Add Product</button>
+                                    <button type="submit" class="btn btn-primary" id="editProductBtn">Edit Product</button>
                                 </form>
                             </div>
                         </div>
@@ -257,11 +285,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <!-- <script src="/js/admin-product.js"></script> -->
     <script src="/assets/js/main.js" type="text/javascript"></script>
-
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('addNewProduct');
-            const submitBtn = document.getElementById('addProductBtn');
+            const form = document.getElementById('editProductForm');
+            const submitBtn = document.getElementById('editProductBtn');
         
             const productName = document.getElementById('productName');
             const productDescription = document.getElementById('productDescription');
@@ -270,7 +298,7 @@
             const productCountInStock = document.getElementById('productCountInStock');
             const productCategory = document.getElementById('productCategory');
             const productPrice = document.getElementById('productPrice');
-            // const productDiscountPrice = document.getElementById('productDiscountPrice');
+            const productDiscountPrice = document.getElementById('productDiscountPrice');
         
             const productNameError = document.getElementById('productNameError');
             const descriptionError = document.getElementById('descriptionError');
@@ -279,7 +307,7 @@
             const stockError = document.getElementById('stockError');
             const categoryError = document.getElementById('categoryError');
             const priceError = document.getElementById('priceError');
-            // const discountPriceError = document.getElementById('productDiscountError');
+            const discountPriceError = document.getElementById('productDiscountError');
         
             const imagePreviews = document.getElementById('imagePreviews');
             const cropperImage = document.getElementById('cropperImage');
@@ -543,8 +571,7 @@
                     validateStock() &&
                     validateCategory() &&
                     validatePrice() &&
-                    validateAdditionalImages()
-                    // validateDiscountPrice();
+                    validateDiscountPrice();
             }
         
             function processCurrentImage() {
@@ -582,6 +609,9 @@
             async function uploadProductImages() {
                 const formData = new FormData();
                 
+                if(croppedFiles && croppedFiles.length ==0) {
+                    return [];
+                }
                 for (let i = 0; i < croppedFiles.length; i++) {
                     formData.append('images', croppedFiles[i]);
                 }
@@ -614,17 +644,18 @@
                     const imagePaths = await uploadProductImages();
         
                     const productData = {
+                        productId: document.getElementById('productId').value,
                         productName: document.getElementById('productName').value,
                         description: document.getElementById('productDescription').value,
                         brand: document.getElementById('productBrand').value,
                         countInStock: parseInt(document.getElementById('productCountInStock').value),
                         category: document.getElementById('productCategory').value,
                         price: parseFloat(document.getElementById('productPrice').value),
-                        // discountPrice: parseFloat(document.getElementById('productDiscountPrice').value),
-                        images: imagePaths
+                        discountPrice: parseFloat(document.getElementById('productDiscountPrice').value),
+                        newImages: imagePaths || []
                     };
         
-                    const response = await fetch("/admin/product-management/newProduct", {
+                    const response = await fetch("/admin/product-management/editProduct/<%=product._id%>", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json'
@@ -635,7 +666,7 @@
                     const result = await response.json();
         
                     if (result.success) {
-                        alert("Product Added successfully");
+                        alert("Product updated successfully");
                         window.location.href = result.redirectUrl;
                     } else {
                         alert("Error updating product: " + result.error);

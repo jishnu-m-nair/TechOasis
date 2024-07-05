@@ -63,7 +63,7 @@
 const multer = require('multer');
 const path = require('path');
 
-function createMulterConfig({ storageDir, allowedTypes, maxSize }) {
+function createMulterConfig({ storageDir, allowedTypes }) {
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
             cb(null, storageDir); // Use the provided storage directory
@@ -85,7 +85,7 @@ function createMulterConfig({ storageDir, allowedTypes, maxSize }) {
     return multer({
         storage: storage,
         fileFilter: fileFilter,
-        limits: { fileSize: maxSize } // Set the maximum file size
+        // limits: { fileSize: maxSize } // Set the maximum file size
     });
 }
 
@@ -93,12 +93,12 @@ function createMulterConfig({ storageDir, allowedTypes, maxSize }) {
 const upload = createMulterConfig({
     storageDir: 'public/uploads/', // Directory for general file uploads
     allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'], // Allowed file types
-    maxSize: 5 * 1024 * 1024 // 5 MB file size limit
+    // maxSize: 5 * 1024 * 1024 // 5 MB file size limit
 });
 const productUpload = createMulterConfig({
     storageDir: 'public/uploads/products/', // Directory for general file uploads
     allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'], // Allowed file types
-    maxSize: 5 * 1024 * 1024 // 5 MB file size limit
+    // maxSize: 5 * 1024 * 1024 // 5 MB file size limit
 });
 
 // Category images upload configuration

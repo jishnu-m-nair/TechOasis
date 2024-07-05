@@ -95,7 +95,11 @@ const categoryManagementCreate = async (req, res) => {
     }
 
     // Use req.file to access the uploaded file
-    const image = req.file.filename;
+    
+	const imagePath = req.file.filename;
+	const imageName = path.basename(imagePath);
+	const basePath = 'uploads/categories/';
+	const image = path.join(basePath, imageName);
     
     // Check if a category with the same name already exists (case-insensitive)
     const categoryExists = await categoryModel.findOne({
@@ -154,20 +158,16 @@ const categoryManagementEdit = async (req, res) => {
     // Update name and description
     category.name = editName;
     category.description = editDescription;
-    // console.log(category.image+"############");
-    // Update image if a new one is uploaded
-    // if (req.file) {
-    //   // Replace backslashes with forward slashes and remove 'public/' from the path
-    //   const newImage = req.file.path.replace("public/", "");
-    //   category.image = newImage;
-    // }
+
     if (req.file) {
-      // Extract filename from the path and save only the filename
-      const imagePath = req.file.path;
-      const imageName = path.basename(imagePath);
-      category.image = imageName;
-  }
-    console.log(req.body, req.file);
+		const imagePath = req.file.path;
+		const imageName = path.basename(imagePath);
+		const basePath = 'uploads/categories/';
+		const categoryImage = path.join(basePath, imageName);
+		category.image = categoryImage;
+    
+	}
+    console.log(category.image);
     await category.save();
     req.session.editCategory = true
     res.status(200).redirect("/admin/category-management");

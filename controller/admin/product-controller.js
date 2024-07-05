@@ -259,47 +259,50 @@ const productManagementCreate = async (req, res) => {
 //     }
 // };
 
-const productManagementEdit = async (req, res) => {
+const editProductPost = async (req, res) => {
+    console.log("reached")
     try {
-      const productId = req.params.Id;
-      const existingProduct = await ProductModel.findById(productId);
-      if (!existingProduct) {
-        return res.status(404).json({
-          success: false,
-          error: 'Product not found'
-        });
-      }
+		const productId = req.params.Id;
+		const existingProduct = await ProductModel.findById(productId);
+		if (!existingProduct) {
+		return res.status(404).json({
+			success: false,
+			error: 'Product not found'
+		});
+	}
   
-      const {
+    const {
         productName,
         description,
         brand,
         countInStock,
         category,
         price,
-        discountPrice
-      } = req.body;
+        discountPrice,
+        newImages,
+    } = req.body;
   
-      let image = existingProduct.image;
-      let images = existingProduct.images;
-  
-      if (req.files) {
-        if (req.files['image']) {
-          image = req.files['image'][0].path.replace(/\\/g, '/').replace('public/', '');
-        }
-        if (req.files['images']) {
-          const newImages = req.files['images'].map((file) =>
-            file.path.replace(/\\/g, '/').replace('public/', '')
-          );
-          images = [...existingProduct.images, ...newImages];
-        }
-      }
-  
-      const parsedPrice = parseFloat(price);
-      const parsedDiscountPrice = parseFloat(discountPrice);
-      const afterDiscount = Math.floor(parsedPrice - (parsedPrice * (parsedDiscountPrice / 100)));
-  
-      const updatedProduct = await ProductModel.findByIdAndUpdate(
+	let image = existingProduct.image;
+	let images = existingProduct.images || [];
+	if (newImages && newImages.length > 0){
+		images = [...existingProduct.images, ...newImages];
+	} else {
+		console.log('no new images')
+	}
+
+	if(images && images.length > 5){
+		return res.status(400).json({
+			success: false,
+			error: 'Total images must be 5 or below'
+		})
+	}
+
+	const parsedPrice = parseFloat(price);
+	console.log(typeof parsedPrice)
+	const parsedDiscountPrice = parseFloat(discountPrice);
+	const afterDiscount = Math.floor(parsedPrice - (parsedPrice * (parsedDiscountPrice / 100)));
+
+	const updatedProduct = await ProductModel.findByIdAndUpdate(
         productId,
         {
           productName,
@@ -314,30 +317,31 @@ const productManagementEdit = async (req, res) => {
           afterDiscount
         },
         { new: true }
-      );
+    );
   
-      if (!updatedProduct) {
-        return res.status(404).json({
-          success: false,
-          message: 'Product not found'
-        });
-      }
+	if (!updatedProduct) {
+		return res.status(404).json({
+			success: false,
+			message: 'Product not found'
+		});
+	}
 
-      console.log('Product updated successfully')
-      return res.status(200).json({
-        success: true,
-        message: 'Product updated successfully',
-        product: updatedProduct
-      });
+	console.log('Product updated successfully')
+	return res.status(200).json({
+		success: true,
+		message: 'Product updated successfully',
+		product: updatedProduct,
+		redirectUrl: '/admin/product-management'
+	});
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        error: 'Internal Server Error',
-        errorMessage: error.message
-      });
+		console.error(error);
+		return res.status(500).json({
+			success: false,
+			error: 'Internal Server Error',
+			errorMessage: error.message
+		});
     }
-  };
+};
 
 
 
@@ -398,43 +402,6 @@ const productManagementPublish = async (req, res) => {
         });
     }
 }
-
-
-
-// const removeProductImg = async (req, res) => {
-//     try {
-//         const index = req.query.index;
-//         const productId = req.query.updateproductId;
-//         console.log(index,productId);
-//         let pro = await ProductModel.findById(productId)
-//         pro.images.splice(index,1)
-//         pro.save()
-
-//         // const product = await ProductModel.findById({
-//         //     _id: productId
-//         // });
-//         // if (!product) {
-//         //     return res.status(404).json({
-//         //         error: "Product not found"
-//         //     });
-//         // }
-
-//         // if (index >= 0 && index < product.productImages.length) {
-//         //     product.productImages.splice(index, 1);
-
-//         //     await ProductModel.findByIdAndUpdate(productId, {
-//         //         productImages: product.productImages,
-//         //     });
-//         // }
-//         // // res.redirect(`/admin/update/${productId}`);
-//         // res.redirect(`/product-management/editProduct/${productId}`);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             error: "Server error"
-//         });
-//     }
-// }
 
 const removeProductImg = async (req, res) => {
     try {
@@ -586,15 +553,24 @@ const addProduct = async (req,res)=>{
   const addProductPost = async (req, res) => {
     try {
         console.log(req.body);
-        if (!req.files['images'] || req.files['images'].length === 0) {
-            return res.status(400).json({
-                error: 'Bad Request',
-                errorMessage: 'Image data is missing or invalid'
-            });
-        }
-        const allImages = req.files['images'];
-        allImages.reverse();
-        const mainImage = allImages[0];
+        // if (!req.files['images'] || req.files['images'].length === 0) {
+        //     return res.status(400).json({
+        //         error: 'Bad Request',
+        //         errorMessage: 'Image data is missing or invalid'
+        //     });
+        // }
+        // const allImages = req.files['images'];
+		const {
+			productName,
+			description,
+			brand,
+			countInStock,
+			category,
+			price,
+			images,
+		} = req.body;
+        // images.reverse();
+        const image = images[0];
         
         // const additionalImages = allImages.slice(1);
         // Check for existing product name
@@ -623,18 +599,19 @@ const addProduct = async (req,res)=>{
                 errorMessage: 'Product name already exists'
             });
         }
+		const parsedPrice = parseFloat(price);
         // Create new product
             const product = new ProductModel({
-                productName: req.body.productName,
-                description: req.body.description,
-                image: mainImage.path.replace(/\\/g, '/').replace('public/', ''),
-                images: allImages.map(file => file.path.replace(/\\/g, '/').replace('public/', '')),
-                brand: req.body.brand,
-                countInStock: req.body.countInStock,
-                category: req.body.category,
-                price: req.body.price,
+                productName,
+                description,
+                image,
+                images,
+                brand,
+                countInStock,
+                category,
+                price : parsedPrice,
                 discountPrice: 0,
-                afterDiscount: Math.floor(parseInt(req.body.price))
+                afterDiscount: Math.floor(parsedPrice)
             });
             console.log(product.images);
             console.log(product);
@@ -672,21 +649,34 @@ const addProduct = async (req,res)=>{
 };
 
 const editProduct = async (req,res)=>{
-    const products = await ProductModel.find(query)
-                .populate('category') // Populate the 'category' field
-                .skip(perPage * (page - 1))
-                .limit(perPage)
-                .sort({createdAt:-1})
+    const productId = req.params.Id
+    const product = await ProductModel.findById(productId)
+                .populate('category')
+                .lean() // Populate the 'category' field
     const categories = await CategoryModel.find().lean();
-    console.log(categories);
-    res.render('admin/edit-product',{categories,products,pagetitle:"Edit Product Page"});
+    res.render('admin/edit-product',{categories,product,pagetitle:"Edit Product Page"});
+}
+
+const productImageUpload =  (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: 'No files uploaded.' });
+        }
+
+        // Get the file paths
+        const filePaths = req.files.map(file => file.path.replace('public/', '')); // Remove 'public/' from the path
+
+        res.json({ success: true, imagePaths: filePaths });
+    } catch (error) {
+        console.error('Error uploading product images:', error);
+        res.status(500).json({ success: false, message: 'Error uploading images.' });
+    }
 }
 
 module.exports = {
     productManagementGet,
     productManagementCreate,
     productCategories,
-    productManagementEdit,
     productManagementDelete,
     productManagementPublish,
     removeProductImg,
@@ -694,5 +684,7 @@ module.exports = {
     getProductDetails,
     addProductPost,
     addProduct,
-    editProduct
+    editProduct,
+	editProductPost,
+	productImageUpload
 }

@@ -43,7 +43,9 @@ router.get('/auth/google/failure', user.googleAuthFailure);
 // router.get('/dashboard',isLoggedIn,user.home);
 router.get('/home',isLoggedIn,user.home);
 
-
+router.get('/order',(req,res)=>{
+  res.render('order');
+});
 
 router.get('/',user.login);
 
