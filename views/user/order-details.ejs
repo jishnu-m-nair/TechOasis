@@ -1,0 +1,199 @@
+
+    <!-- Start Header Area -->
+    <%- include('user-partials/header.ejs') %>
+    <!-- End Header Area -->
+
+    <!-- Start Navbar Area -->
+    <%- include('user-partials/navbar.ejs') %>
+    <!-- End Navbar Area -->
+
+    <!-- ...:::: Start Breadcrumb Section :::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--golden">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="breadcrumb-title">Order Summary</h3>
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="/home">Home</a></li>
+                                    <li class="active" aria-current="page">Order Summary</li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Breadcrumb Section :::... -->
+
+    <!-- ...:::: Start Order Section :::... -->
+    <div class="container mt-5 mb-5">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-8">
+                <div class="card div-container">
+                    <div class="invoice p-5">
+                        <% if (orderDetails.status === "Pending") { %>
+                        <h5>Your order Confirmed!</h5>
+                        <div class="d-flex justify-content-start">
+                            <span class="font-weight-bold pr-1">
+                                    Hello ,
+                            </span>
+                            <span>
+                                You order has been confirmed and will be
+                                shipped in next two days!
+                            </span>
+                        </div>
+                        <% } else if (orderDetails.status === "Cancelled") { %>
+                            <h5>Order Cancelled!</h5>
+                            <div class="d-flex justify-content-start">
+                                <span class="font-weight-bold pr-1">
+                                        Hello ,
+                                </span>
+                                <span>
+                                    This order has been cancelled
+                                </span>
+                            </div>
+                        <% } %>
+
+                        
+
+                        <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-bold">Order Date</td>
+                                        <td class="font-weight-bold">Order No</td>
+                                        <td class="font-weight-bold">Status</td>
+                                        <td class="font-weight-bold">Payment</td>
+                                        <td class="font-weight-bold">Shiping Address</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span>
+                                                <%- new Date(orderDetails.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span><%= orderDetails.oId %></span>
+                                        </td>
+                                        <td>
+                                            <span><%= orderDetails.status %></span>
+                                        </td>
+                                        <td>
+                                            <span><%= orderDetails.paymentMethod %></span>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <%=orderDetails.deliveryAddress.houseNo%>,
+                                                <%=orderDetails.deliveryAddress.street%>,
+                                                <%=orderDetails.deliveryAddress.landmark%>,
+                                                <%=orderDetails.deliveryAddress.city%>,
+                                                <%=orderDetails.deliveryAddress.district%>
+                                                <%=orderDetails.deliveryAddress.state%>,
+                                                Pincode-<%=orderDetails.deliveryAddress.pincode%>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="border-bottom table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-bold">Image</td>
+                                        <td class="font-weight-bold">Product name</td>
+                                        <td class="font-weight-bold">Quantity</td>
+                                        <td class="font-weight-bold">Total Price</td>
+                                    </tr>
+                                    <% console.log(orderDetails.items) %>
+                                    <% for(const item of orderDetails.items) { %>
+                                    <tr>
+                                        <% console.log(item) %>
+                                        <td class="product_thumb">
+                                            <a href="/product-details/<%=item.productId%>">
+                                                <img src="/<%=item.image%>" alt="product image" style="width: 60px"/>
+                                            </a>
+                                        </td>
+                                        <% console.log(item.productName) %>
+                                        <td class="product_name">
+                                            <a href="/product-details/<%=item.productId%>">
+                                                <%=item.productName%>
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            <div class="detail-qty">
+                                                <span class="qty-val me-3" id="qty">
+                                                    <%=item.quantity%>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="product_total">
+                                            Rs.<%=item.totalPrice%>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row d-flex justify-content-end">
+                            <div class="col-md-5">
+                                <table class="table ">
+                                    <tbody class="totals">
+                                        <!-- <tr>
+                                            <td>
+                                                <div class="text-left">
+                                                    <span class="text-muted">Subtotal</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-right">
+                                                    <span>Rs.<%= orderDetails.billTotal %>.00</span>
+                                                </div>
+                                            </td>
+                                        </tr> -->
+
+                                        <tr class="border-top border-bottom">
+                                            <td>
+                                                <div class="text-left">
+                                                    <span class="font-weight-bold">Subtotal</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-right">
+                                                    <span class="font-weight-bold">Rs.<%= orderDetails.billTotal %>.00</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <p class="font-weight-bold mb-0">
+                            Thanks for shopping with us!
+                        </p>
+                        <span>TechOasis Team</span>
+                        <div>
+                            <a href="/home" class="btn btn-md btn-golden">Continue Shopping</a>
+                        </div><br>
+                        <div>
+                            <a href="/profile?tab=orders" class="btn btn-md btn-golden">View Orders</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Footer Section -->
+    <%- include('user-partials/footer.ejs') %>
+    <!-- End Footer Section -->
+
+    <%- include('user-partials/scripts.ejs') %>
+

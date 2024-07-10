@@ -1,0 +1,146 @@
+
+    <!-- Start Header Area -->
+    <%- include('user-partials/header.ejs') %>
+    <!-- End Header Area -->
+
+    <!-- Start Navbar Area -->
+    <%- include('user-partials/navbar.ejs') %>
+    <!-- End Navbar Area -->
+
+    <!-- ...:::: Start Breadcrumb Section :::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--golden">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="breadcrumb-title">Order Summary</h3>
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="/home">Home</a></li>
+                                    <li class="active" aria-current="page">Order Summary</li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Breadcrumb Section :::... -->
+
+    <!-- ...:::: Start Order Section :::... -->
+    <div class="order-section">
+        <!-- Start Order Table -->
+        <div class="order-table-wrapper" data-aos="fade-up" data-aos-delay="0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table_desc">
+                            <div class="table_page table-responsive">
+                                <table>
+                                    <!-- Start Order Table Head -->
+                                    <thead>
+                                        <tr>
+                                            <th class="product_thumb">Image</th>
+                                            <th class="product_name">Product</th>
+                                            <th class="product-price">Price</th>
+                                            <th class="product_quantity">Quantity</th>
+                                            <th class="product_total">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- End Order Table Head -->
+                                    <tbody>
+                                        <!-- Start Order Single Item-->
+                                        <% if (orderDetails && orderDetails.items.length > 0) { %>
+                                        <% for (const item of orderDetails.items) { %>
+                                        <tr>
+                                            <td class="product_thumb">
+                                                <a href="/product-details/<%= item.productId %>">
+                                                    <img src="/<%= item.image %>" alt="">
+                                                </a>
+                                            </td>
+                                            <td class="product_name">
+                                                <a href="/product-details/<%= item.productId %>">
+                                                    <%= item.productName %>
+                                                </a>
+                                            </td>
+                                            <td class="product-price">
+                                                <span>
+                                                    Rs.<%= item.productPrice %>.00
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="detail-qty radius m-auto">
+                                                    <span class="qty-val me-3">
+                                                        <%= item.quantity %>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="product_total">
+                                                <span>Rs.<%= item.totalPrice %>.00</span>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                        <% } %>
+                                        <!-- End Order Single Item-->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Order Table -->
+
+        <!-- Start Order Summary -->
+        <div class="order_summary_area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="order_summary right" data-aos="fade-up" data-aos-delay="400">
+                            <h3>Order Summary</h3>
+                            <div class="summary_inner">
+                                <div class="order_subtotal">
+                                    <p>Subtotal</p>
+                                    <% if (orderDetails) { %>
+                                    <p class="order_amount">
+                                        Rs.<%= orderDetails.billTotal %>.00
+                                    </p>
+                                    <% } %>
+                                </div>
+
+                                <div class="order_subtotal">
+                                    <p>Total</p>
+                                    <% if (orderDetails) { %>
+                                    <p class="order_amount">
+                                        Rs.<%= orderDetails.billTotal %>.00
+                                    </p>
+                                    <% } %>
+                                </div>
+
+                                <div class="order_summary_buttons">
+                                    <div class="summary_btn">
+                                        <a href="/home" class="btn btn-md btn-golden">Continue Shopping</a>
+                                    </div>
+                                    <div class="summary_btn">
+                                        <a href="/orders" class="btn btn-md btn-golden">View Orders</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Order Summary -->
+    </div>
+    <!-- ...:::: End Order Section :::... -->
+
+    <!-- Start Footer Section -->
+    <%- include('user-partials/footer.ejs') %>
+    <!-- End Footer Section -->
+
+    <%- include('user-partials/scripts.ejs') %>
+

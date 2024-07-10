@@ -3,14 +3,16 @@ const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 const AddressModel = require("../../model/address-model");
+const OrderModel = require("../../model/order-model");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { sentOtp } = require("../../config/nodeMailer");
 const { isBlockedUser } = require("../../middlewares/auth");
 
+// Password Hashing
 const securePassword = async (password) => {
     try {
-        const passwordHash = await bcrypt.hash(password, 10); // Add await here
+        const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
         console.log(error.message);
@@ -21,25 +23,25 @@ const securePassword = async (password) => {
 const profile = async(req,res)=>{
     try {
       const userId = req.session.userId;
-      const userinfo = await UserModel.findById(userId);
-      // const addresses = await AddressModel.findOne({user:userId})
-      // Fetch addresses for the user
+      const userInfo = await UserModel.findById(userId);
       const addressDocument = await AddressModel.findOne({ user: userId });
-  
-      // Extract the nested addresses array
+      const orderDetails = await OrderModel.find({ user: userId }).sort({createdAt: -1});
+
       const addresses = addressDocument ? addressDocument.addresses : [];
-      res.render('user/profile',{userinfo,addresses,userId,pageTitle: "Profile Page"});
+
+      res.render('user/profile',{userInfo,addresses,userId,orderDetails,pageTitle: "Profile Page"});
     } catch (error) {
       console.log(error);
     }
-  };
+};
 
 // Edit Profile
 const editProfile = async (req, res) => {
     try {
         const userId = req.session.userId;
-        const userinfo = await UserModel.findById(userId);
-        res.render("user/edit-profile", { userinfo, pageTitle: "Edit Profile Page"});
+        const userInfo = await UserModel.findById(userId);
+
+        res.render("user/edit-profile", { userInfo, pageTitle: "Edit Profile Page"});
     } catch (error) {
         console.log(error);
     }
@@ -47,10 +49,9 @@ const editProfile = async (req, res) => {
 
 const editProfilePatch = async (req, res) => {
     const { fullname, phone } = req.body;
-    const userId = req.session.userId; // Assume user ID is available from authentication middleware
+    const userId = req.session.userId;
 
     try {
-        // Find the user and update their info
         const user = await UserModel.findByIdAndUpdate(
             userId,
             { fullname, phone },
@@ -75,7 +76,7 @@ const editProfilePatch = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const userId = req.session.userId;
-        res.render("user/change-password", { userId, pageTitle: "Change Password Page"});
+        res.render("user/change-password", { pageTitle: "Change Password Page"});
     } catch (error) {
         console.error(error);
     }
@@ -84,25 +85,16 @@ const changePassword = async (req, res) => {
 const changePasswordPost = async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
 
-    // Check if all fields are provided
     if (!currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({ message: "All fields are required." });
     }
 
     if (newPassword !== confirmPassword) {
-        return res
-            .status(400)
-            .json({
-                message: "New password and confirm password do not match.",
-            });
+        return res.status(400).json({ message: "New password and confirm password do not match." });
     }
 
     if (newPassword.length < 8) {
-        return res
-            .status(400)
-            .json({
-                message: "New password must be at least 8 characters long.",
-            });
+        return res.status(400).json({ message: "New password must be at least 8 characters long." });
     }
 
     try {
@@ -117,40 +109,27 @@ const changePasswordPost = async (req, res) => {
             userData.password
         );
         if (!isCurrentPasswordValid) {
-            return res
-                .status(400)
-                .json({ message: "Current password is incorrect." });
+            return res .status(400).json({ message: "Current password is incorrect." });
         }
         let newPasswordHash = await securePassword(newPassword);
 
         const updatedUser = await UserModel.findOneAndUpdate(
-            { _id: userData._id }, // Use the actual user ID field for update
+            { _id: userData._id },
             { password: newPasswordHash },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
         if (!updatedUser) {
-            return res
-                .status(500)
-                .json({
-                    message: "An error occurred while updating the password. 1",
-                });
+            return res.status(500).json({ message: "An error occurred while updating the password."});
         }
 
-        // Respond with a success message
-        return res
-            .status(200)
-            .json({
-                message: "User password updated",
-                redirectUrl: "/profile",
-            });
+        return res.status(200).json({
+            message: "User password updated",
+            redirectUrl: "/profile"
+        });
     } catch (error) {
         console.error(error);
-        return res
-            .status(500)
-            .json({
-                message: "An error occurred while changing the password.",
-            });
+        return res.status(500).json({ message: "An error occurred while changing the password." });
     }
 };
 
@@ -197,7 +176,7 @@ const addAddressPost = async (req, res) => {
         addressRecord.addresses.push(newAddress);
         await addressRecord.save();
 
-        res.status(200).json({ message: 'Address added successfully', redirectUrl: '/profile' });
+        res.status(200).json({ message: 'Address added successfully', redirectUrl: '/profile?tab=address' });
     } catch (error) {
         console.error('Error adding address:', error);
         res.status(500).json({ message: 'An error occurred while adding the address.' });
@@ -207,7 +186,7 @@ const addAddressPost = async (req, res) => {
 // Edit Address
 const editAddress = async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.session.userId;
         const addressId = req.params.addressId;
 
         // Fetch the user's address record
@@ -262,60 +241,16 @@ const editAddressPatch = async (req, res) => {
             return res.status(404).json({ message: 'Address or user not found' });
         }
 
-        res.status(200).json({ message: 'Address updated successfully', redirectUrl: '/profile' });
+        res.status(200).json({ message: 'Address updated successfully', redirectUrl: '/profile?tab=address' });
     } catch (error) {
         console.error('Error updating address:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-const postEditAddress = async (req, res) => {
-    const addressId = req.params.id;
-    const {
-        addressType,
-        houseNo,
-        street,
-        landmark,
-        pincode,
-        city,
-        district,
-        state,
-        country,
-    } = req.body;
-
-    try {
-        const updatedAddress = await AddressModel.findByIdAndUpdate(
-            addressId,
-            {
-                addressType,
-                houseNo,
-                street,
-                landmark,
-                pincode,
-                city,
-                district,
-                state,
-                country,
-            },
-            { new: true }
-        );
-        if (!updatedAddress) {
-            return res.status(404).json({ message: "Address not found" });
-        }
-        res.status(200).json({
-            message: "Address updated successfully",
-            address: updatedAddress,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "An error occurred while updating the address",
-        });
-    }
-};
-
 const deleteAddress = async (req, res) => {
-    const { userId, addressId } = req.params;
+    const { addressId } = req.params;
+    const userId = req.session.userId
 
     try {
         // Find the user's address record

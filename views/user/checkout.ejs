@@ -1,0 +1,254 @@
+    <!-- Start Header Area -->
+    <%- include('user-partials/header.ejs') %>
+    <!-- End Header Area -->
+
+    <!-- Start Navbar Area -->
+    <%- include('user-partials/navbar.ejs') %>
+    <!-- End Navbar Area -->
+
+    <!-- ...:::: Start Breadcrumb Section:::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--golden">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="breadcrumb-title">Checkout</h3>
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="/home">Home</a></li>
+                                    <li><a href="/shop">Shop</a></li>
+                                    <li class="active" aria-current="page">Checkout</li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- ...:::: End Breadcrumb Section:::... -->
+
+    <!-- ...:::: Start Checkout Section:::... -->
+    <div class="checkout-section">
+        <div class="container">
+            <!-- Start User Details Checkout Form -->
+            <% if(typeof err !== 'undefined'){ %>
+                <p class="text-danger"><%= err %></p>
+            <% } %>
+            <div class="checkout_form" data-aos="fade-up" data-aos-delay="400">
+                <div class="row">
+                    <form class="d-flex" id="checkoutForm">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="tab-pane" id="address">
+                                <% if(addressList.addresses.length !== 0 ) { %>
+                                    <p>The following addresses will be used on the checkout page</p>
+                                <% } else { %>
+                                    <p>You have not added any address. Please add address to proceed further</p>
+                                <% } %>
+                                <h5 class="billing-address">Address</h5>
+                                <% if(addressList!==null && typeof addressList!=='undefined') { %>
+                                    <% for (let i = 0; i < addressList.addresses.length; i++) { %>
+                                        <div class="card">
+                                            <!-- <label for="address-<%= addressList.addresses[i]._id %>"> -->
+                                                <div class="card-body d-flex justify-content-start">
+                                                    <div>
+                                                        <input type="radio" value="<%=addressList.addresses[i]._id%>" name="address" id="address-<%= addressList.addresses[i]._id %>" style="width: 20px;" required></div>
+                                                        
+                                                        <p class="text-success pl-2"><%=addressList.addresses[i].addressType %></p>
+                                                    <div><br>
+                                                        <p class="card-text"><%=addressList.addresses[i].houseNo%>,<%=addressList.addresses[i].street%>,<%=addressList.addresses[i].landmark%>,<%=addressList.addresses[i].city%>,<%=addressList.addresses[i].district%>
+                                                            <%=addressList.addresses[i].state%>,Pincode-<%=addressList.addresses[i].pincode%></p>
+                                                        <a href="/edit-address/<%= addressList.addresses[i]._id %>" class="view">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                    </div> 
+                                                </div>
+                                            <!-- </label> -->
+                                        </div><br>
+                                    <% } %>
+                                <% } %>
+                                <% if(addressList.addresses.length === 0 ) { %>
+                                    <div class="card">
+                                        <div class="card-body d-flex justify-content-start">
+                                            <p>You have not added any address. Please add address to proceed further</p>
+                                        </div>
+                                    </div><br>
+                                <% } %>
+                                <% if(addressList.addresses.length < 3 ) { %>
+                                    <div class="card">
+                                        <a href="/add-address" id="addAddressLink" class="nav-link btn btn-block btn-md btn-black-default-hover">
+                                            Add Address
+                                        </a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    
+                        <div class="col-lg-6 col-md-6">
+                            <h3>Your order</h3>
+                            <div class="order_table table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(typeof selectedItems!=='undefined') { %>
+                                            <% for (let i = 0; i < selectedItems.length; i++) { %>
+                                            <tr>
+                                                <td> <%=selectedItems[i].productId.productName%> <strong> × <%=selectedItems[i].quantity%></strong></td>
+                                                <td> Rs.<%=selectedItems[i].productId.afterDiscount%>.00</td>
+                                            </tr>
+                                            <% } %>
+                                        <% } %>
+                                    </tbody>
+                                    <tfoot>
+                                        <!-- <tr>
+                                            <th>Cart Subtotal</th>
+                                            <td>$215.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Shipping</th>
+                                            <td><strong>$5.00</strong></td>
+                                        </tr> -->
+                                        <tr class="order_total">
+                                            <th>Order Total</th>
+                                            <td><strong>Rs.<%=billTotal%>.00</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="payment_method">
+                                <div class="panel-default">
+                                    <label class="radio-default d-flex" for="COD">
+                                        <input type="radio" style="width: 15px;" name="paymentOption" id="COD" value="COD" required>
+                                        <span class="pl-2">Cash on Delivery (COD)</span>
+                                    </label>
+                                    <label class="radio d-flex" for="online">
+                                        <input type="radio" style="width: 15px;" name="paymentOption" id="online" value="" required>
+                                        <span class="pl-2">Online Payment</span>
+                                    </label>
+                                </div>
+                                <div class="order_button pt-3">
+                                    <button class="btn btn-md btn-black-default-hover" id="placeOrderBtn" type="submit">
+                                        Place Order
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div> <!-- Start User Details Checkout Form -->
+        </div>
+    </div><!-- ...:::: End Checkout Section:::... -->
+    
+    <!-- Start Footer Section -->
+    <%- include('user-partials/footer.ejs') %>
+    <!-- End Footer Section -->
+
+    <script src="/userassets/js/vendor/vendor.min.js"></script>
+    <script src="/userassets/js/plugins/plugins.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Main JS -->
+    <script src="/userassets/js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const proceedButton = document.getElementById('checkoutForm');
+    
+    if (proceedButton) {
+        proceedButton.addEventListener("submit", async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            const selectedAddressType = document.querySelector('input[name="address"]:checked');
+            const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked');
+
+            if (!selectedAddressType || !selectedPaymentOption) {
+                Swal.fire({
+                    title: "Attention!",
+                    text: "Please select both an address type and a payment option.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
+            const addressId = selectedAddressType.value;
+            const paymentOption = selectedPaymentOption.value;
+
+            const data = {
+                addressId,
+                paymentOption,
+            };
+console.log(data)
+            if (paymentOption === "COD") {
+                try {
+                    console.log('reached')
+                    const response = await fetch('/checkout', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    // const datas = await response.json();
+                    if (response.ok) {
+                        console.log("in response.ok")
+                        const responseData = await response.json();
+                        if (responseData.success) {
+                            Swal.fire({
+                                title: "Order Placed!",
+                                text: "Your order has been placed successfully.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                window.location.href = `/order-confirmation/${responseData.orderId}`;
+                            });
+                            // window.location.href = `/order-confirmation/${responseData.orderId}`;
+                            // Uncomment the next line if you want to redirect after successful order
+                            // window.location.href = "/orderConfirmation/" + responseData.orderId;
+                        } else {
+                            console.log("Checkout failed:", responseData.error);
+                            Swal.fire({
+                                title: "Error",
+                                text: "Checkout failed: " + responseData.error,
+                                icon: "error",
+                                confirmButtonText: "OK",
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: "Out of Stock!",
+                            text: `This product is currently out of stock.`,
+                            icon: "warning",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    Swal.fire({
+                        title: "Error",
+                        text: "An error occurred while processing your order.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: "Invalid Payment",
+                    text: "Online Payment unavailable! Select Cash on Delivery",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+            }
+        });
+    } else {
+        console.error("Checkout form not found");
+    }
+});
+    </script>
+</body>
+</html>

@@ -1,204 +1,196 @@
-    <!-- Start Header Area -->
-    <%- include('user-partials/header.ejs') %>
-    <!-- End Header Area -->
+<!-- Start Header Area -->
+<%- include('user-partials/header.ejs') %>
+<!-- End Header Area -->
 
-    <style>
-        .dashboard-container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            background: white; /* White background */
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
-        }
+<style>
+    .dashboard-container {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        background: white; /* White background */
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+    }
 
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        .dashboard-header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333; /* Dark text */
-        }
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: 24px;
+        color: #333; /* Dark text */
+    }
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        .d-flex {
-            display: flex;
-        }
+    .d-flex {
+        display: flex;
+    }
 
-        .d-flex span {
-            font-weight: bold;
-            padding-right: 15px;
-            color: #555; /* Slightly darker for emphasis */
-        }
+    .d-flex span {
+        font-weight: bold;
+        padding-right: 15px;
+        color: #555; /* Slightly darker for emphasis */
+    }
 
-        .d-flex p {
-            margin: 0;
-            color: #333; /* Dark text */
-        }
+    .d-flex p {
+        margin: 0;
+        color: #333; /* Dark text */
+    }
 
-        .view i {
-            margin-right: 5px; /* Space between icon and text */
-        }
+    .view i {
+        margin-right: 5px; /* Space between icon and text */
+    }
 
-        .text-red {
-            color: red !important;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        .form-background {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .default-form-box {
-            margin-bottom: 20px;
-        }
-        .btn-black-default-hover {
-            background-color: #000;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .btn-black-default-hover:hover {
-            background-color: #333;
-        }
+    .text-red {
+        color: red !important;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    .form-background {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .default-form-box {
+        margin-bottom: 20px;
+    }
+    .btn-black-default-hover {
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    .btn-black-default-hover:hover {
+        background-color: #333;
+    }
 
-    </style>
+</style>
 
-    <!-- Start Navbar Area -->
-    <%- include('user-partials/navbar.ejs') %>
-    <!-- End Navbar Area -->
+<!-- Start Navbar Area -->
+<%- include('user-partials/navbar.ejs') %>
+<!-- End Navbar Area -->
 
-    <!-- ...:::: Start Breadcrumb Section:::... -->
-    <div class="breadcrumb-section breadcrumb-bg-color--golden">
-        <div class="breadcrumb-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <h3 class="breadcrumb-title">My Account</h3>
-                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
-                            <nav aria-label="breadcrumb">
-                                <ul>
-                                    <li><a href="/home">Home</a></li>
-                                    <li><a href="/shop">Shop</a></li>
-                                    <li><a href="/profile">Profile</a></li>
-                                    <li class="active" aria-current="page">Edit Profile</li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- ...:::: End Breadcrumb Section:::... -->
-
-    <!-- ...:::: Start Account Dashboard Section:::... -->
-    <!-- <div class="customer-login"> -->
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--golden">
+    <div class="breadcrumb-wrapper">
         <div class="container">
-            <div class="row justify-content-center">
-    
-                <!-- Register area start -->
-                <div class="col-lg-4 col-md-4 form-background pt-2 pb-2">
-                    <div class="account_form register" data-aos="fade-up" data-aos-delay="200">
-                        <form id="editProfileForm" action="/edit-profile" method="POST">
-                            <div class="default-form-box">
-                                <label>Full Name <span class="text-red">*</span></label>
-                                <span id="nameError" class="text-red"></span>
-                                <input type="text" placeholder="Your full name" name="fullname" id="fullname" value="<%= userinfo ? userinfo.fullname : '' %>" maxlength="50" required style="border: 1px solid #000!important;">
-                            </div>
-                            <div class="default-form-box">
-                                <label>Mobile <span class="text-red">*</span></label>
-                                <span id="phoneError" class="text-red"></span>
-                                <input type="text" placeholder="Your mobile phone number" name="phone" id="phone" value="<%= userinfo ? userinfo.phone : '' %>" maxlength="10" required style="border: 1px solid #000!important;">
-                            </div>
-    
-                            <div>
-                                <span class="text-red"><%= errorMessage %></span>
-                            </div>
-                            <div class="login_submit">
-                                <button id="submitBtn" class="btn btn-md btn-black-default-hover" type="submit">Save</button>
-                            </div>
-                        </form>
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="breadcrumb-title">Edit Profile</h3>
+                    <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                        <nav aria-label="breadcrumb">
+                            <ul>
+                                <li><a href="/home">Home</a></li>
+                                <li><a href="/profile">Profile</a></li>
+                                <li class="active" aria-current="page">Edit Profile</li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
-                <!-- Register area end -->
-    
             </div>
         </div>
-    <!-- </div> -->
-    <!-- ...:::: End Account Dashboard Section:::... -->
+    </div>
+</div> <!-- ...:::: End Breadcrumb Section:::... -->
 
-    <!-- Start Footer Section -->
-    <%- include('user-partials/footer.ejs') %>
-    <!-- End Footer Section -->
+<!-- ...:::: Start Account Dashboard Section:::... -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <!-- Edit Profile Start -->
+            <div class="col-lg-4 col-md-4 form-background pt-2 pb-2">
+                <div class="account_form register" data-aos="fade-up" data-aos-delay="200">
+                    <form id="editProfileForm" novalidate>
+                        <div class="default-form-box">
+                            <label>Full Name <span class="text-red">*</span></label>
+                            <span id="nameError" class="text-red"></span>
+                            <input type="text" placeholder="Your full name" name="fullname" id="fullname" value="<%= userInfo ? userInfo.fullname : '' %>" maxlength="50" required style="border: 1px solid #000!important;">
+                        </div>
+                        <div class="default-form-box">
+                            <label>Mobile <span class="text-red">*</span></label>
+                            <span id="phoneError" class="text-red"></span>
+                            <input type="text" placeholder="Your mobile phone number" name="phone" id="phone" value="<%= userInfo ? userInfo.phone : '' %>" maxlength="10" required style="border: 1px solid #000!important;">
+                        </div>
+
+                        <div>
+                            <span class="text-red"><%= errorMessage %></span>
+                        </div>
+                        <div class="login_submit">
+                            <button id="submitBtn" class="btn btn-md btn-black-default-hover" type="submit">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Edit Profile End -->
+        </div>
+    </div>
+<!-- ...:::: End Account Dashboard Section:::... -->
+
+<!-- Start Footer Section -->
+<%- include('user-partials/footer.ejs') %>
+<!-- End Footer Section -->
 
 
-    <!-- custom scripts -->
-    <script>
-        document.getElementById('editProfileForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-    
-            // Clear previous error messages
-            document.getElementById('nameError').textContent = '';
-            document.getElementById('phoneError').textContent = '';
-    
-            // Get form values
-            const fullname = document.getElementById('fullname').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-    
-            // Validate fields
-            let isValid = true;
-            if (fullname === '') {
-                document.getElementById('nameError').textContent = 'Full name is required.';
-                isValid = false;
+<!-- custom scripts -->
+<script>
+    document.getElementById('editProfileForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const fullname = document.getElementById('fullname').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('phoneError').textContent = '';
+
+        // Validate fields
+        let isValid = true;
+        if (fullname === '') {
+            document.getElementById('nameError').textContent = 'Full name is required.';
+            isValid = false;
+        }
+        if (phone === '' || phone.length !== 10 || isNaN(phone)) {
+            document.getElementById('phoneError').textContent = 'Mobile number must be exactly 10 digits.';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        const data = { fullname, phone };
+
+        fetch('/edit-profile', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                window.location.href = data.redirectUrl;
+            } else if (data.errors) {
+                alert('Failed to update profile');
+                console.error('Validation errors:', data.errors);
             }
-            if (phone === '' || phone.length !== 10 || isNaN(phone)) {
-                document.getElementById('phoneError').textContent = 'Mobile number must be exactly 10 digits.';
-                isValid = false;
-            }
-    
-            if (!isValid) return;
-    
-            // Prepare data for PATCH request
-            const data = { fullname, phone };
-    
-            // Send PATCH request using Fetch API
-            fetch('/edit-profile', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert('Profile updated successfully');
-                    // Optionally, handle the response and update the UI accordingly
-                    window.location.href = data.redirectUrl;
-                } else if (data.errors) {
-                    alert('Failed to update profile');
-                    console.error('Validation errors:', data.errors);
-                }
-            })
-            .catch(error => {
-                alert('Error updating profile');
-                console.error('Error:', error);
-            });
+        })
+        .catch(error => {
+            alert('Error updating profile');
+            console.error('Error:', error);
         });
-    </script>
-    
+    });
+</script>
 
-    <%- include('user-partials/scripts.ejs') %>
+
+<%- include('user-partials/scripts.ejs') %>

@@ -3,6 +3,7 @@ const router = express.Router()
 const user = require('../controller/user/user-controller')
 const profile = require('../controller/user/profile-controller')
 const cart = require('../controller/user/cart-controller')
+const checkout = require('../controller/checkout-controller')
 const passport = require('passport');
 const {isLoggedIn,isLoggedOut,isBlockedUser} =  require('../middlewares/auth')
 require('dotenv').config()
@@ -85,9 +86,17 @@ router.get('/add-address',isLoggedIn,isBlockedUser,profile.addAddress);
 router.post('/add-address',isLoggedIn,isBlockedUser,profile.addAddressPost);
 router.get('/edit-address/:userId/:addressId',isLoggedIn,isBlockedUser, profile.editAddress)
 router.patch('/edit-address/:userId/:addressId',isLoggedIn,isBlockedUser, profile.editAddressPatch);
-router.delete('/delete-address/:userId/:addressId',isLoggedIn,isBlockedUser, profile.deleteAddress);
+router.get('/edit-address/:addressId',isLoggedIn,isBlockedUser, profile.editAddress)
+router.patch('/edit-address/:addressId',isLoggedIn,isBlockedUser, profile.editAddressPatch);
+router.delete('/delete-address/:addressId',isLoggedIn,isBlockedUser, profile.deleteAddress);
 
-// router.post('/edit-address/:userId/:addressId',isLoggedIn,isBlockedUser, profile.postEditAddress)
+//checkout
+router.get('/checkout',isLoggedIn,isBlockedUser, checkout.orderCheckout)
+router.post('/checkout',isLoggedIn,isBlockedUser,checkout.orderCheckoutPost)
+
+// order confirmation
+router.get('/order-confirmation/:orderId',checkout.orderConfirmGet)
+router.get('/order-details/:orderId',checkout.orderDetailsGet)
 
 
 module.exports = router;
