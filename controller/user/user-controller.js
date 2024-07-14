@@ -2,79 +2,59 @@ const mongoose = require("mongoose");
 const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
+const OrderModel = require("../../model/order-model");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { sentOtp } = require("../../config/nodeMailer");
 const { isBlockedUser } = require("../../middlewares/auth");
-
-// Import necessary modules
 const passport = require("passport");
 
+// google authentication
 const googleAuth = passport.authenticate("google", {
     scope: ["profile", "email"],
 });
 
-const googleAuthCallback = (req, res) => {
+const googleAuthCallback = async (req, res) => {
+
     const user = req.user;
 
     if (!user) {
-        req.flash(
-            "errorMessage",
-            "Authentication failed, user data is missing."
-        );
-        return res.redirect("/login");
+        const errorMessage = "Authentication failed, user data is missing."
+        return res.render("user/login",{errorMessage,pageTitle:"Login Page"});
     }
-
     req.session.userId = user._id;
     req.session.email = user.email;
-    console.log("Session userId set:", req.session.userId);
-
-    res.redirect("/home");
+    return res.redirect("/home");
 };
 
 const googleAuthFailure = async (req, res) => {
     try {
         const userId = req.session.userId;
-        console.log("UserId in session:", userId);
 
         if (userId) {
             const isBlocked = await isBlockedUser(userId);
             if (isBlocked) {
-                req.flash(
-                    "errorMessage",
-                    "User is blocked. Please contact support."
-                );
-                console.log(
-                    "Flash errorMessage set for blocked user:",
-                    req.flash("errorMessage")
-                );
-                return res.redirect("/login");
+                const errorMessage = "User is blocked. Please contact support."
+                return res.render("user/login",{
+                    errorMessage,
+                    pageTitle: "Login Page"
+                });
             }
         }
-
-        req.flash(
-            "errorMessage",
-            "Google authentication failed. Please try again."
-        );
-        console.log(
-            "Flash errorMessage set for auth failure:",
-            req.flash("errorMessage")
-        );
-        res.redirect("/login");
+        const errorMessage = "Google authentication failed. Please try again."
+        res.render("user/login",{
+            errorMessage,
+            pageTitle: "Login Page"
+        });
     } catch (error) {
         console.error("Error during failure handling:", error);
-        req.flash(
-            "errorMessage",
-            "An unexpected error occurred. Please try again."
-        );
-        console.log(
-            "Flash errorMessage set for unexpected error:",
-            req.flash("errorMessage")
-        );
+        const errorMessage = "An unexpected error occurred. Please try again."
+        console.log(errorMessage);
         res.redirect("/login");
     }
 };
 
+// password hashing
 const securePassword = async (password) => {
     try {
         const passwordHash = await bcrypt.hash(password, 10);
@@ -84,6 +64,7 @@ const securePassword = async (password) => {
     }
 };
 
+// home page
 const home = async (req, res) => {
     try {
         let products = await ProductModel.find({ isFeatured: true }).limit(10);
@@ -106,14 +87,12 @@ const home = async (req, res) => {
         let bannerProduct2 = null;
 
         if (gamingCategory) {
-            // Find one featured product in the 'gaming' category
             bannerProduct1 = await ProductModel.findOne({
                 category: gamingCategory._id,
                 isFeatured: true,
             });
         }
         if (businessCategory) {
-            // Find one featured product in the 'gaming' category
             bannerProduct2 = await ProductModel.findOne({
                 category: businessCategory._id,
                 isFeatured: true,
@@ -138,20 +117,10 @@ const home = async (req, res) => {
                 });
             } else {
                 req.session.isBlocked = true;
-                return res.redirect("/login");
+                return res.redirect("/login?error=blocked");
             }
-        } else {
-            res.render("user/index", {
-                item,
-                products,
-                category,
-                userEmail: null,
-                bannerProduct1,
-                bannerProduct2,
-                gamingProducts,
-                pageTitle: "Home Page"
-            });
         }
+          
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -162,24 +131,14 @@ const home = async (req, res) => {
 
 //Login
 const login = async (req, res) => {
+    
     let errorMessage = "";
     try {
-        let data = {
-            email: "",
-            password: "",
-        };
-
-        if (req.session.data) {
-            data = req.session.data;
-        }
-
         if (req.session.isBlocked) {
-            req.session.user = false;
+            req.session.userId = "";
             req.session.isBlocked = false;
             errorMessage = "Sorry user blocked";
             res.render("user/login", {
-                err: errorMessage,
-                data,
                 errorMessage,
                 pageTitle: "Login Page"
             });
@@ -187,8 +146,6 @@ const login = async (req, res) => {
             req.session.passwordIncorrect = false;
             errorMessage = "Incorrect Password";
             res.render("user/login", {
-                err: errorMessage,
-                data,
                 errorMessage,
                 pageTitle: "Login Page"
             });
@@ -196,19 +153,12 @@ const login = async (req, res) => {
             req.session.noUser = false;
             errorMessage = "Incorrect email or password";
             res.render("user/login", {
-                err: errorMessage,
-                data,
                 errorMessage,
                 pageTitle: "Login Page"
             });
         }
-        // else if (req.session.user) {
-        //   res.redirect("/");
-        // }
         else {
             res.render("user/login", {
-                err: "",
-                data,
                 errorMessage,
                 pageTitle: "Login Page"
             });
@@ -225,8 +175,6 @@ const loginPost = async (req, res) => {
             email: req.body.email,
         });
 
-        req.session.data = {};
-
         if (userData) {
             const isPassWordValid = await bcrypt.compare(
                 req.body.password,
@@ -236,28 +184,18 @@ const loginPost = async (req, res) => {
             if (isPassWordValid) {
                 if (userData.isBlocked) {
                     req.session.isBlocked = true;
-                    req.session.data = req.body;
                     res.redirect("/login");
                 } else {
-                    // req.session.data = req.body
-                    req.session.userDetails = {
-                        userId: userData._id,
-                        email: req.body.email,
-                    };
                     req.session.email = req.body.email;
                     req.session.userId = userData._id;
                     res.redirect("/home");
                 }
             } else {
-                // Password does not match
                 req.session.passwordIncorrect = true;
-                req.session.data = req.body;
                 res.redirect("/login");
             }
         } else {
-            // User not found
             req.session.noUser = true;
-            req.session.data = req.body;
             res.redirect("/login");
         }
     } catch (error) {
@@ -267,60 +205,25 @@ const loginPost = async (req, res) => {
 };
 
 //Signup/Register
-let signup = (req, res) => {
-    let data = {
-        fullname: "",
-        email: "",
-        phone: "",
-        password: "",
-    };
-
-    if (req.session.data) {
-        data = req.session.data;
-
-        res.render("user/signup", {
-            error: req.flash("error"),
-            data,
-            errorMessage: "",
-            formData: req.body,
-            pageTitle: "Signup Page"
-        });
-    } else {
-        res.render("user/signup", {
-            error: req.flash("error"),
-            data,
-            errorMessage: "",
-            formData: req.body,
-            pageTitle: "Signup Page"
-        });
-    }
+const signup = (req, res) => {
+    res.render("user/signup", {
+        errorMessage: "",
+        formData: req.body,
+        pageTitle: "Signup Page"
+    });
 };
 
 const signupPost = async (req, res, next) => {
     try {
         const { fullname, email, password, phone } = req.body;
-
-        req.session.data = {};
-        // Check if either the email or phone number is already registered
-        const existingUser = await UserModel.findOne({
-            $or: [{ email }, { phone }],
-        });
-
-        if (existingUser) {
-            if (existingUser.email === email && existingUser.phone == phone) {
-                res.render("user/signup", {
-                    errorMessage:
-                        "Email and phone number is already registered",
-                    formData: req.body,
-                    pageTitle: "Signup Page"
-                });
-            } else if (existingUser.email === email) {
-                res.render("user/signup", {
-                    errorMessage: "Email is already registered!",
-                    formData: req.body,
-                    pageTitle: "Signup Page"
-                });
-            }
+        const existingUser = await UserModel.findOne({ email });
+        
+        if (existingUser && existingUser.email === email) {
+            res.render("user/signup", {
+                errorMessage: "Email is already registered!",
+                formData: req.body,
+                pageTitle: "Signup Page"
+            });
         } else {
             let passwordHash = await securePassword(password);
 
@@ -331,6 +234,7 @@ const signupPost = async (req, res, next) => {
                 phone,
                 isVerified: false,
             };
+            req.session.userDetails = {};
             req.session.userDetails = user;
             req.session.otp = sentOtp(email);
             req.session.otpExpiry = Date.now() + 60000;
@@ -342,19 +246,22 @@ const signupPost = async (req, res, next) => {
     }
 };
 
+const signupOtp = async (req, res) => {
+    res.render("user/signup-otp", { pageTitle: "Signup Otp" });
+};
+
 const signupOtpPost = async (req, res) => {
     try {
         const { otp } = req.body;
         const user = new UserModel(req.session.userDetails);
         const otpRegister = req.session.otp;
-        // const user = req.session.userDetails; // Retrieve user details from session
         const otpExpiry = req.session.otpExpiry;
+
         if (!user) {
             return res.status(400).json({ message: "User session not found." });
         }
 
         if (otpRegister !== otp || otpExpiry < Date.now()) {
-            // if (otpRegister !== otp ) {
             return res.status(401).json({ message: "Invalid OTP." });
         }
 
@@ -364,14 +271,12 @@ const signupOtpPost = async (req, res) => {
             user.otp = null;
         }
 
-        await user.save(); // Persist user updates
+        await user.save();
 
         req.session.email = user.email;
+        req.session.userId = user._id;
 
-        // req.session.destroy(); // Destroy session (optional)
-
-        res.status(200).json({ message: "OTP verification successful." }); // Success message
-        // res.redirect('/home');
+        res.status(200).json({ message: "",redirectUrl:"/home" });
     } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -380,27 +285,6 @@ const signupOtpPost = async (req, res) => {
     }
 };
 
-const signupOtp = async (req, res) => {
-    try {
-        // Check for OTP expiration and incorrect OTP in one step
-        const hasError = req.session.otpExpired || req.session.otpFalse;
-
-        // Clear both flags regardless of error
-        req.session.otpExpired = false;
-        req.session.otpFalse = false;
-
-        const errorMessage = hasError
-            ? req.session.otpExpired
-                ? "OTP expired. Please request a new one."
-                : "Incorrect OTP"
-            : "";
-
-        res.render("user/signup-otp", { err: errorMessage, pageTitle: "Signup Otp" }); // Render OTP page with error message (if any)
-    } catch (error) {
-        console.error(error.message); // Log the error for debugging
-        res.status(500).send("An error occurred loading the OTP page.");
-    }
-};
 
 const resendOtp = async (req, res) => {
     try {
@@ -413,14 +297,12 @@ const resendOtp = async (req, res) => {
                 .json({ message: "User details not found in session." });
         }
 
-        // Invalidate the previous OTP
-        user.otp = null;
-        user.otpExpiry = null;
+        req.session.otp = null;
+        req.session.otpExpiry = null;
 
-        // Send a new OTP and set its expiration time
         const newOtp = sentOtp(email);
-        user.otp = newOtp;
-        user.otpExpiry = Date.now() + 60000; // OTP expiration time (10 seconds)
+        req.session.otp = newOtp;
+        req.session.otpExpiry = Date.now() + 60000;
 
         res.status(200).json({ message: "OTP resent successfully." });
     } catch (error) {
@@ -433,126 +315,113 @@ const resendOtp = async (req, res) => {
 
 const userLogout = (req, res) => {
     // Destroy the session
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("Error destroying session:", err);
-            // Handle errors gracefully (e.g., redirect to an error page)
-            return res.status(500).send("Error logging out");
+    req.session.userId="";
+    const adminId = req.session?.admin || "";
+    if(req.session.userId=="" && adminId==""){
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error destroying session:", err);
+                return res.status(500).send("Error logging out");
+            }
+            console.log("Session destroyed");
+        });
+    }
+    res.redirect("/login");
+};
+
+// // Searching function
+// const getSearchQuery = (searchQuery) => {
+//     if (searchQuery) {
+//         return {
+//             $or: [
+//                 { productName: { $regex: searchQuery, $options: "i" } },
+//                 { brand: { $regex: searchQuery, $options: "i" } }
+//             ]
+//         };
+//     }
+//     return {};
+// };
+
+const filterProducts =  async (req, res) => {
+    try {
+        const { page, category, brands, sort } = req.body;
+        const limit = 6;
+        const skip = (page - 1) * limit;
+
+        let query = {};
+        if(category != "all") {
+            query.category = category;
+        }
+        if (brands && brands.length > 0) {
+            query.brand = { $in: brands };
         }
 
-        console.log("Session destroyed");
-        res.redirect("/login"); // Redirect to login page
-    });
+        let sortOption = {};
+        switch(sort) {
+            case 'priceHighToLow':
+                sortOption = { price: -1 };
+                break;
+            case 'priceLowToHigh':
+                sortOption = { price: 1 };
+                break;
+            case 'nameAZ':
+                sortOption = { productName: 1 };
+                break;
+            case 'nameZA':
+                sortOption = { productName: -1 };
+                break;
+            default:
+                sortOption = { createdAt: -1 }; //newArrivals
+        }
+
+        const products = await ProductModel.find(query)
+            .populate('category')
+            .sort(sortOption)
+            .skip(skip)
+            .limit(limit);
+
+        const totalProducts = await ProductModel.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        res.json({
+            products,
+            currentPage: page,
+            totalPages,
+            totalProducts
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 };
 
 const userShop = async (req, res) => {
     try {
-        const perPage = 8; // Define how many products you want per page
-        const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
-        // const sortOption = req.query.sort || 'featured'; // Get the sort option from the request query parameters or default to 'featured
-        const selectedCategory = req.query.category || null;
-        const searchQuery = req.query.search || "";
-        const id = req.params.productId;
+        const perPage = 6;
+        const page = 1;
 
-        let query = {
-            isFeatured: true,
-            $or: [
-                {
-                    productName: {
-                        $regex: searchQuery,
-                        $options: "i",
-                    },
-                },
-                {
-                    brand: {
-                        $regex: searchQuery,
-                        $options: "i",
-                    },
-                },
-            ],
-        };
-
-        // if (sortOption === 'lowToHigh') {
-        //   sortCriteria = {
-        //     afterDiscount: 1
-        //   };
-        // } else if (sortOption === 'highToLow') {
-        //   sortCriteria = {
-        //     afterDiscount: -1
-        //   };
-        // } else if (sortOption === 'releaseDate') {
-        //   sortCriteria = {
-        //     createdAt: -1
-        //   }; // or any other field for release date
-        // } else if (sortOption === 'avgRating') {
-        //   sortCriteria = {
-        //     rating: -1
-        //   }; // or any other field for average rating
-        // } else {
-        //   // Default to 'featured' or any other default sorting option
-        //   sortCriteria = {
-        //     createdAt: -1
-        //   }; // Default sorting
-        // }
-
-        // if (selectedCategory && mongoose.Types.ObjectId.isValid(selectedCategory)) {
-        //   query.category = new mongoose.Types.ObjectId(selectedCategory);
-        // }
-        let sortCriteria = {};
-        let products = await ProductModel.find(query)
-            // .populate("category", "name")
-            .populate({
-                path: "category",
-                select: "name",
-                match: {
-                    _id: new mongoose.Types.ObjectId(selectedCategory),
-                }, // Add this match condition
-            })
-            .sort(sortCriteria)
-            .skip(perPage * (page - 1))
+        let products = await ProductModel.find({isFeatured: true})
+            .populate("category")
             .limit(perPage);
-
-        // Reset filterProduct when the page changes
-        // if (!req.query.category && page > 1) {
-        //   req.session.filterProduct = null;
-        // }
 
         const totalProducts = await ProductModel.countDocuments({
             isFeatured: true,
         });
-        // const totalProducts = await ProductModel.countDocuments(query);
-
-        // Retrieve products based on the latest update timestamp
-        // const latestProducts = await ProductModel.find({
-        //     isFeatured: true
-        //   })
-        const latestProducts = await ProductModel.find({
-            isFeatured: true,
-        })
-            .populate("category", "name")
-            .sort({
-                createdAt: -1,
-            }) // Sort by the most recent updates
-            .limit(3); // Retrieve the latest 3 products
-
         const category = await CategoryModel.find();
-
-        // Calculate the total number of pages
         const totalPages = Math.ceil(totalProducts / perPage);
 
-        // if (req.session.filterProduct) {
-        //   products = req.session.filterProduct
-        // }
+        const brands = await ProductModel.aggregate([
+            {$match:{isFeatured:true}},
+            {$group:{_id:'$brand'}},
+            {$project:{_id:0,brand:"$_id"}}
+        ]);
+        const brandNames = brands.map(brand => brand.brand);
 
         res.render("user/shop", {
             products,
-            newProducts: latestProducts,
             category,
             currentPage: page,
             totalPages,
-            // sortOption,
-            selectedCategory: selectedCategory,
-            searchQuery: searchQuery,
+            brandNames,
             totalProducts,
             pageTitle: "Shop Page"
         });
@@ -574,22 +443,19 @@ const productDetails = async (req, res) => {
                 message: "Invalid product ID format",
             });
         }
-        const product = await ProductModel.findById(productId).populate(
-            "category",
-            "name"
-        );
+        const product = await ProductModel.findById(productId)
+            .populate( "category", "name" );
         const category = await CategoryModel.find({});
         if (!product) {
-            // Handle the case where the product with the specified id is not found
             return res.status(404).json({
                 message: "No such product found",
             });
         }
         const relatedProducts = await ProductModel.find({
-            category: product.category._id, // Use the product's category ID
-            _id: { $ne: product._id }, // Exclude the current product
+            category: product.category._id,
+            _id: { $ne: product._id },
         });
-        // Render a template to display the product details
+        
         res.render("user/product-details", {
             product,
             category,
@@ -615,10 +481,11 @@ module.exports = {
     loginPost,
     signup,
     signupPost,
-    signupOtpPost,
     signupOtp,
+    signupOtpPost,
     resendOtp,
     userLogout,
     userShop,
-    productDetails,
+    filterProducts,
+    productDetails
 };

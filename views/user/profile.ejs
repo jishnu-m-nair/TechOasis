@@ -7,9 +7,9 @@
             max-width: 500px;
             margin: auto;
             padding: 20px;
-            background: white; /* White background */
+            background: white;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .dashboard-header {
@@ -20,7 +20,7 @@
         .dashboard-header h1 {
             margin: 0;
             font-size: 24px;
-            color: #333; /* Dark text */
+            color: #333;
         }
 
         .user-info {
@@ -36,23 +36,23 @@
         .d-flex span {
             font-weight: bold;
             padding-right: 15px;
-            color: #555; /* Slightly darker for emphasis */
+            color: #555;
         }
 
         .d-flex p {
             margin: 0;
-            color: #333; /* Dark text */
+            color: #333;
         }
 
         .view i {
-            margin-right: 5px; /* Space between icon and text */
+            margin-right: 5px;
         }
         .no-userinfo {
             padding: 20px;
             text-align: center;
-            color: #ff0000; /* Red color for error or notice */
-            background-color: #fff3f3; /* Light red background */
-            border: 1px solid #ff0000; /* Red border */
+            color: #ff0000;
+            background-color: #fff3f3;
+            border: 1px solid #ff0000;
             border-radius: 8px;
             margin-top: 20px;
         }
@@ -88,7 +88,7 @@
             padding: 10px 20px;
             font-size: 16px;
             color: #fff;
-            background-color: #007bff; /* Primary button color */
+            background-color: #007bff;
             border: none;
             border-radius: 5px;
             text-align: center;
@@ -97,24 +97,23 @@
         }
 
         .new-address-button:hover {
-            background-color: #0056b3; /* Darker shade on hover */
+            background-color: #0056b3;
         }
 
         .new-address-button:active {
-            background-color: #00408d; /* Even darker shade on active click */
+            background-color: #00408d;
         }
 
         .btn-seperator {
-            margin: 0 20px;  /* Sets 20px margin on left and right sides */
-            padding: 0 5px;  /* Adds some optional padding for better visual separation */
+            margin: 0 20px;
+            padding: 0 5px;
         }
 
-        .d-flex .view,  /* Target both buttons within the .d-flex div */
+        .d-flex .view,
         .d-flex .btn-seperator {
-            /* Override default button styles (if needed) */
-            border: none;  /* Remove button borders */
-            background-color: transparent;  /* Remove button background */
-            padding: 5px;  /* Add some padding for visual separation */
+            border: none;
+            background-color: transparent;
+            padding: 5px;
         }
 
     </style>
@@ -134,7 +133,6 @@
                             <nav aria-label="breadcrumb">
                                 <ul>
                                     <li><a href="/home">Home</a></li>
-                                    <li><a href="/shop">Shop</a></li>
                                     <li class="active" aria-current="page">My Account</li>
                                 </ul>
                             </nav>
@@ -167,7 +165,7 @@
                                     class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a></li>
                             
                             <li><a href="/logout"
-                                    class="nav-link btn btn-block btn-md btn-black-default-hover">logout</a></li>
+                                    class="btn btn-block btn-md btn-black-default-hover">logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -191,7 +189,11 @@
                                         </div>
                                         <div class="d-flex">
                                             <span>Mobile:</span>
-                                            <p id="mobile"><%= userInfo.phone %></p>
+                                            <% if(userInfo.phone == null) { %>
+                                                <p id="mobile">N/A</p>
+                                            <% } else { %> 
+                                                <p id="mobile"><%= userInfo.phone %></p>
+                                            <% } %>
                                         </div>
                                         <div class="d-flex">
                                             <a href="/edit-profile" class="view">
@@ -252,9 +254,6 @@
                                             <div class="row">
                                                 <div class="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-3">
                                                     <div class="emptycart-content text-center">
-                                                        <!-- <div class="image">
-                                                            <img class="img-fluid" src="userassets/images/emprt-cart/empty-cart.png" alt="">
-                                                        </div> -->
                                                         <h4 class="title">No Orders</h4>
                                                         <h6 class="sub-title">Sorry Mate... You haven't ordered any products!</h6>
                                                         <a href="/shop" class="btn btn-lg btn-golden">Continue Shopping</a>
@@ -328,7 +327,6 @@
 
         // Function to set active tab
         function setActiveTab(tabId) {
-            // Check if the tab exists, if not, default to 'dashboard'
             const tabExists = document.querySelector(`.dashboard-list .nav-link[href$="tab=${tabId}"]`);
             if (!tabExists) {
                 tabId = 'dashboard';
@@ -349,28 +347,22 @@
                 }
             });
 
-            // Update URL if it's different from the current tab
             if (getQueryParam('tab') !== tabId) {
                 history.pushState(null, '', `/profile?tab=${tabId}`);
             }
         }
 
-        // Get the active tab from the query parameter
         let activeTab = getQueryParam('tab') || 'dashboard';
-
-        // Set the initial active tab
         setActiveTab(activeTab);
 
-        // Add click event listeners to tab links
         document.querySelectorAll('.dashboard-list .nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default tab switching behavior
-                const tabId = this.getAttribute('href').split('=')[1]; // Get tab id from href
+                e.preventDefault();
+                const tabId = this.getAttribute('href').split('=')[1];
                 setActiveTab(tabId);
             });
         });
 
-        // Handle browser back/forward buttons
         window.addEventListener('popstate', function() {
             const newActiveTab = getQueryParam('tab') || 'dashboard';
             setActiveTab(newActiveTab);
@@ -389,8 +381,7 @@
         
                         const result = await response.json();
                         if (response.ok) {
-                            alert('Address deleted successfully');
-                            // Optionally, redirect or update the UI
+                            alert(result.message);
                             this.closest('.address-item').remove();
                         } else {
                             alert('Failed to delete address:'+ result.message);

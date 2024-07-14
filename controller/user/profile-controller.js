@@ -5,9 +5,9 @@ const CategoryModel = require("../../model/category-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
-const { sentOtp } = require("../../config/nodeMailer");
-const { isBlockedUser } = require("../../middlewares/auth");
+// require("dotenv").config();
+// const { sentOtp } = require("../../config/nodeMailer");
+// const { isBlockedUser } = require("../../middlewares/auth");
 
 // Password Hashing
 const securePassword = async (password) => {
@@ -148,11 +148,9 @@ const addAddressPost = async (req, res) => {
     try {
         const { userId, addressType, houseNo, street, landmark, pincode, city, district, state, country } = req.body;
 
-        // Fetch the user's existing addresses
         let addressRecord = await AddressModel.findOne({ user: userId });
 
         if (!addressRecord) {
-            // If no address record exists, create a new one
             addressRecord = new AddressModel({ user: userId, addresses: [] });
         }
 
@@ -160,7 +158,6 @@ const addAddressPost = async (req, res) => {
             return res.status(400).json({ message: 'You can only have up to 3 addresses.' });
         }
 
-        // Add the new address
         const newAddress = {
             addressType,
             houseNo,
@@ -189,21 +186,18 @@ const editAddress = async (req, res) => {
         const userId = req.session.userId;
         const addressId = req.params.addressId;
 
-        // Fetch the user's address record
         const addressRecord = await AddressModel.findOne({ user: userId });
 
         if (!addressRecord) {
             return res.status(404).render('error', { message: 'Address not found.', pageTitle: "Edit Address Page" });
         }
 
-        // Find the specific address to edit
         const address = addressRecord.addresses.id(addressId);
 
         if (!address) {
             return res.status(404).render('error', { message: 'Address not found.', pageTitle: "Edit Address Page" });
         }
 
-        // Render the edit form with the current address data
         res.render('user/edit-address', { address, userId, addressId, pageTitle: "Edit Address Page"});
     } catch (error) {
         console.error('Error fetching address:', error);
@@ -213,11 +207,9 @@ const editAddress = async (req, res) => {
 
 const editAddressPatch = async (req, res) => {
     const { addressType, houseNo, street, landmark, pincode, city, district, state, country } = req.body;
-    const userId = req.params.userId; // Assume user ID is available from authentication middleware
-    const addressId = req.params.addressId; // Address ID from the route parameter
-    console.log(addressId);
+    const userId = req.params.userId;
+    const addressId = req.params.addressId;
     try {
-        // Construct the update object
         const updateObject = {
             'addresses.$.addressType': addressType,
             'addresses.$.houseNo': houseNo,
@@ -253,20 +245,17 @@ const deleteAddress = async (req, res) => {
     const userId = req.session.userId
 
     try {
-        // Find the user's address record
         const addressRecord = await AddressModel.findOne({ user: userId });
 
         if (!addressRecord) {
             return res.status(404).json({ success: false, message: 'Address record not found.' });
         }
 
-        // Remove the specific address by ID
         const address = addressRecord.addresses.id(addressId);
         if (!address) {
             return res.status(404).json({ success: false, message: 'Address not found.' });
         }
 
-        // Filter out the address with the specified addressId
         addressRecord.addresses = addressRecord.addresses.filter(address => address._id.toString() !== addressId);
         await addressRecord.save();
 

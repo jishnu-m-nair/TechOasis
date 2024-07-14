@@ -25,11 +25,11 @@ app.use(nocache());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret', // Use environment variable for the secret
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
     httpOnly: true, // Prevents JavaScript from accessing the cookies
-    sameSite: 'Strict' // Prevents the browser from sending this cookie along with cross-site requests
+    sameSite: 'lax' // Prevents the browser from sending this cookie along with cross-site requests
   }
 }));
 

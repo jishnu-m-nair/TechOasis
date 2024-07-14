@@ -638,7 +638,7 @@
                         alert("Product Added successfully");
                         window.location.href = result.redirectUrl;
                     } else {
-                        alert("Error updating product: " + result.error);
+                        alert("Error updating product: " + result.errorMessage);
                     }
                 } catch (error) {
                     console.error("Error:", error);

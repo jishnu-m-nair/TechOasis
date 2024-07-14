@@ -7,46 +7,24 @@ const checkout = require('../controller/checkout-controller')
 const passport = require('passport');
 const {isLoggedIn,isLoggedOut,isBlockedUser} =  require('../middlewares/auth')
 require('dotenv').config()
-
 require('../middlewares/authenticate');
-
 
 //user home
 router.get('/contact',(req,res) => {
     res.render('user/contact-us',{ pageTitle: "Contact Page" })
 });
 
-// Google OAuth routes
-// router.get('/auth/google',isLoggedOut, passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// router.get('/auth/google/callback',isLoggedOut, passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-//   // Access user data from req.user
-//   const user = req.user;
-
-//   // Store specific data in session if needed
-//   req.session.userId = user._id;
-//   req.session.email = user.email;
-
-//   // Redirect to the protected route
-//   res.redirect('/home'); // Redirect to dashboard after successful login
-// });
-
 // Define routes using the controller
-router.get('/auth/google', isLoggedOut, user.googleAuth);
+router.get('/auth/google',isLoggedOut, user.googleAuth);
 
-router.get('/auth/google/callback', isLoggedOut,
+router.get('/auth/google/callback',isLoggedOut,
   passport.authenticate('google', { failureRedirect: '/auth/google/failure' }), user.googleAuthCallback
 );
 
 // Define a route for handling Google authentication failures
-router.get('/auth/google/failure', user.googleAuthFailure);
+router.get('/auth/google/failure',isLoggedOut, user.googleAuthFailure);
 
-// router.get('/dashboard',isLoggedIn,user.home);
-router.get('/home',isLoggedIn,user.home);
-
-router.get('/order',(req,res)=>{
-  res.render('order');
-});
+router.get('/home',isLoggedIn,isBlockedUser,user.home);
 
 router.get('/',user.login);
 
@@ -57,7 +35,7 @@ router.post('/login',user.loginPost);
 router.get('/signup',isLoggedOut, user.signup);
 router.post('/signup',user.signupPost);
 
-router.get('/logout',isLoggedIn,user.userLogout)
+router.get('/logout',user.userLogout)
 
 //OTP routers
 router.get('/signup-otp',isLoggedOut, user.signupOtp);
@@ -67,6 +45,7 @@ router.post('/resend-otp',isLoggedOut,user.resendOtp);
 //product routers
 router.get('/shop',isLoggedIn,isBlockedUser, user.userShop)
 router.get('/product-details/:productId',isLoggedIn,isBlockedUser, user.productDetails)
+router.post('/api/products',user.filterProducts);
 
 // Cart Routers
 router.post('/add-to-cart',isLoggedIn,isBlockedUser,cart.addTocart);
@@ -95,8 +74,8 @@ router.get('/checkout',isLoggedIn,isBlockedUser, checkout.orderCheckout)
 router.post('/checkout',isLoggedIn,isBlockedUser,checkout.orderCheckoutPost)
 
 // order confirmation
-router.get('/order-confirmation/:orderId',checkout.orderConfirmGet)
-router.get('/order-details/:orderId',checkout.orderDetailsGet)
+router.get('/order-confirmation/:orderId',isLoggedIn,isBlockedUser,checkout.orderConfirmGet)
+router.get('/order-details/:orderId',isLoggedIn,isBlockedUser,checkout.orderDetailsGet)
 
 
 module.exports = router;

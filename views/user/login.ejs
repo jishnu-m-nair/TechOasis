@@ -94,9 +94,6 @@
                         <% if (errorMessage) { %>
                             <p class="error-message" style="color: red;"><%= errorMessage %></p>
                         <% } %>
-                        <% if (successMessage) { %>
-                            <p class="success-message"><%= successMessage %></p>
-                        <% } %>
                         <form id="signInForm" action="/login" method="POST">
                             <div class="default-form-box">
                                 <label>Email <span style="color: red;">*</span></label>
@@ -122,9 +119,6 @@
                                 <a href="#">Forgot Password?</a>
                             </div>
                         </form>
-                        
-                        
-
                     </div>
                 </div>
                 <!--login area start-->
@@ -187,7 +181,7 @@
         });
 
         function togglePasswordVisibility(button) {
-            const passwordInput = button.parentElement.querySelector('input[name="adminPassword"]');
+            const passwordInput = button.parentElement.querySelector('input[name="password"]');
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 button.innerHTML = '<i class="fas fa-eye-slash"></i>';
