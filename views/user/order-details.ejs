@@ -3,6 +3,104 @@
     <%- include('user-partials/header.ejs') %>
     <!-- End Header Area -->
 
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+     <style>
+        #cancelOrderModal {
+        display: none;
+        position: fixed;
+        z-index: 1050;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    #cancelOrderModal .modal-dialog {
+        position: relative;
+        width: auto;
+        margin: 10px;
+    }
+
+    #cancelOrderModal .modal-content {
+        position: relative;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+
+    #cancelOrderModal .modal-header {
+        padding: 10px 20px;
+        border-bottom: 1px solid #ccc;
+        background-color: #f0f0f0;
+    }
+
+    #cancelOrderModal .modal-body {
+        padding: 20px;
+    }
+
+    #cancelOrderModal .modal-title {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    #cancelOrderModal .close {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #000;
+        opacity: 0.5;
+        font-size: 1.5rem;
+    }
+
+    #cancelOrderModal .close:hover {
+        opacity: 0.8;
+        cursor: pointer;
+    }
+
+    #cancelOrderModal .form-group {
+        margin-bottom: 15px;
+    }
+
+    #cancelOrderModal label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    #cancelOrderModal textarea {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    #cancelOrderModal .btn {
+        display: inline-block;
+        padding: 8px 15px;
+        font-size: 14px;
+        font-weight: 400;
+        text-align: center;
+        cursor: pointer;
+        color: #fff;
+        /* background-color: #007bff;
+        border: 1px solid #007bff; */
+        border-radius: 3px;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .btn-danger{
+        background-color: red;
+        color: #fff;
+        border: none;
+    }
+
+     </style>
+
     <!-- Start Navbar Area -->
     <%- include('user-partials/navbar.ejs') %>
     <!-- End Navbar Area -->
@@ -57,6 +155,34 @@
                                 </span>
                             </div>
                         <% } %>
+
+                        <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
+                            <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                        <% } %>
+
+                        <!-- Modal for order cancellation -->
+                        <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="cancelOrderForm">
+                                            <div class="form-group">
+                                                <label for="cancellationReason">Reason for Cancellation</label>
+                                                <textarea class="form-control" id="cancellationReason" rows="3" required></textarea>
+                                            </div>
+                                            <input type="hidden" id="orderId" value="<%= orderDetails._id %>">
+                                            <button type="submit" class="btn btn-md btn-golden">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         
 
@@ -194,6 +320,38 @@
     <!-- Start Footer Section -->
     <%- include('user-partials/footer.ejs') %>
     <!-- End Footer Section -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('cancelOrderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+    
+            const orderId = document.getElementById('orderId').value;
+            const reason = document.getElementById('cancellationReason').value;
+    
+            try {
+                const response = await fetch('/api/cancel-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderId, reason }),
+                });
+    
+                if (response.ok) {
+                    alert('Cancellation request submitted successfully');
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message}`);
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again later.');
+            }
+        });
+    </script>
 
     <%- include('user-partials/scripts.ejs') %>
 

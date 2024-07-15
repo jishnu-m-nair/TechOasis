@@ -76,6 +76,7 @@ router.post('/checkout',isLoggedIn,isBlockedUser,checkout.orderCheckoutPost)
 // order confirmation
 router.get('/order-confirmation/:orderId',isLoggedIn,isBlockedUser,checkout.orderConfirmGet)
 router.get('/order-details/:orderId',isLoggedIn,isBlockedUser,checkout.orderDetailsGet)
+router.post('/api/cancel-order',isLoggedIn,isBlockedUser, checkout.cancelOrderRequest);
 
 
 module.exports = router;

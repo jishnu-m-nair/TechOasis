@@ -293,11 +293,38 @@ const orderDetailsGet = async (req,res) => {
     }
 }
 
+const cancelOrderRequest = async (req, res) => {
+    const { orderId, reason } = req.body;
+
+    if (!orderId || !reason) {
+        return res.status(400).json({ message: 'Order ID and reason are required' });
+    }
+
+    try {
+        const order = await OrderModel.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        order.requests.push({
+            type: 'Cancel',
+            status: 'Pending',
+            reason: reason,
+        });
+
+        await order.save();
+
+        res.status(200).json({ message: 'Cancellation request submitted successfully', order });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 
 module.exports = {
     orderCheckout,
     orderCheckoutPost,
     orderConfirmGet,
-    orderDetailsGet
+    orderDetailsGet,
+    cancelOrderRequest
 };
