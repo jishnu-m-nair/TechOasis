@@ -79,20 +79,6 @@
         border-radius: 3px;
     }
 
-    #cancelOrderModal .btn {
-        display: inline-block;
-        padding: 8px 15px;
-        font-size: 14px;
-        font-weight: 400;
-        text-align: center;
-        cursor: pointer;
-        color: #fff;
-        /* background-color: #007bff;
-        border: 1px solid #007bff; */
-        border-radius: 3px;
-        transition: background-color 0.3s, border-color 0.3s;
-    }
-
     .btn-danger{
         background-color: red;
         color: #fff;
@@ -133,7 +119,7 @@
             <div class="col-md-8">
                 <div class="card div-container">
                     <div class="invoice p-5">
-                        <% if (orderDetails.status === "Pending") { %>
+                        <% if (orderDetails.status === "Pending" || orderDetails.status === "Processing" ) { %>
                         <h5>Your order Confirmed!</h5>
                         <div class="d-flex justify-content-start">
                             <span class="font-weight-bold pr-1">
@@ -154,8 +140,29 @@
                                     This order has been cancelled
                                 </span>
                             </div>
+                        <% } else if (orderDetails.status === "Shipped") { %>
+                            <h5>Order has been shipped</h5>
+                            <div class="d-flex justify-content-start">
+                                <span class="font-weight-bold pr-1">
+                                        Hello ,
+                                </span>
+                                <span>
+                                    Order is shipped, it will reach you soon
+                                </span>
+                            </div>
+                        <% } else if (orderDetails.status === "Delivered") { %>
+                            <h5>Order is Delivered</h5>
+                            <div class="d-flex justify-content-start">
+                                <span class="font-weight-bold pr-1">
+                                        Hello ,
+                                </span>
+                                <span>
+                                    This order has been Delivered
+                                </span>
+                            </div>
                         <% } %>
-
+                        
+                        <br>
                         <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
                             <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
                         <% } %>
@@ -183,8 +190,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        
 
                         <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
                             <table class="table table-borderless">

@@ -318,6 +318,7 @@
     <!-- End Footer Section -->
 
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Function to get query parameter value
         function getQueryParam(param) {
@@ -373,21 +374,30 @@
                 const userId = this.dataset.userId;
                 const addressId = this.dataset.addressId;
         
-                if (confirm('Are you sure you want to delete this address?')) {
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you really want to delete this address?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, keep it'
+                });
+
+                if (result.isConfirmed) {
                     try {
                         const response = await fetch(`/delete-address/${addressId}`, {
                             method: 'DELETE'
                         });
-        
+
                         const result = await response.json();
                         if (response.ok) {
-                            alert(result.message);
+                            await Swal.fire('Deleted!', result.message, 'success');
                             this.closest('.address-item').remove();
                         } else {
-                            alert('Failed to delete address:'+ result.message);
+                            Swal.fire('Failed!', 'Failed to delete address: ' + result.message, 'error');
                         }
                     } catch (error) {
-                        alert('An error occurred while deleting the address.');
+                        Swal.fire('Error!', 'An error occurred while deleting the address.', 'error');
                         console.error(error);
                     }
                 }

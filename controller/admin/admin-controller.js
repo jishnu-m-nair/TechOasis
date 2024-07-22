@@ -19,14 +19,11 @@ let adminlogin = async (req, res) => {
         }
 
         if (!req.session.admin == "") {
-            console.log("inside session login");
             res.redirect("/admin");
         } else {
-            const errorMessage = "Incorrect Email or Password";
             res.render("admin/admin-login", {
-                err: errorMessage,
+                err: '',
                 adminData,
-                pagetitle: "User Management",
             });
         }
     } catch (error) {
@@ -48,12 +45,11 @@ let adminloginpost = async (req, res) => {
         };
 
         // Find admin by email
-        const adminExist = await AdminModel.findOne({ adminEmail }).exec();
+        const adminExist = await AdminModel.findOne({ adminEmail });
         if (!adminExist) {
             return res.render("admin/admin-login", {
-                message: "Invalid Email or Password",
+                err: "Invalid Email or Password",
                 adminData: req.session.adminData,
-                pagetitle: "User Management",
             });
         }
 
@@ -68,9 +64,8 @@ let adminloginpost = async (req, res) => {
             return res.redirect("/admin");
         } else {
             return res.render("admin/admin-login", {
-                message: "Invalid Password",
+                err: "Invalid Password",
                 adminData: req.session.adminData,
-                pagetitle: "User Management",
             });
         }
     } catch (error) {
@@ -92,13 +87,10 @@ let adminlogout = (req, res) => {
     // res.redirect("/admin/login");
     req.session.admin = "";
     const userId = req.session?.userId || "";
-    console.log(userId, "req.session.userId");
-    console.log(req.session.admin, "req.session.admin");
     if (userId == "" && req.session.admin == "") {
         req.session.destroy((err) => {
             if (err) {
                 console.error("Error destroying session:", err);
-                // Handle errors gracefully (e.g., redirect to an error page)
                 return res.status(500).send("Error logging out");
             }
 
@@ -106,31 +98,25 @@ let adminlogout = (req, res) => {
         });
     }
     console.log("logging ot admin");
-    res.redirect("/admin/login"); // Redirect to login page
+    res.redirect("/admin/login");
 };
 
 const postAdminRegister = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        // Check if email and password are provided
         if (!email || !password) {
             req.session.data = req.body;
             return res.redirect("/admin/signup");
         } else {
-            // Hash the password
             const passwordHash = await securePassword(password);
 
-            // Create admin object
             const admin = new AdminModel({
                 adminEmail: email,
                 adminPassword: passwordHash,
             });
 
-            // Save admin details to the database
             await admin.save();
-
-            // Redirect to login page
             // res.redirect("/admin/login");
             res.send("successful");
         }
@@ -151,8 +137,8 @@ const securePassword = async (password) => {
 };
 
 let usermanagement = async (req, res) => {
-    const perPage = 5; // Define how many users you want per page
-    const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
+    const perPage = 5;
+    const page = parseInt(req.query.page) || 1;
     try {
         const totalUsers = await UserModel.countDocuments();
         const userdetails = await UserModel.find()

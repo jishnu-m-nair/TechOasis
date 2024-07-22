@@ -3,11 +3,14 @@ const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 const OrderModel = require("../../model/order-model");
+const { securePassword } = require("../../utils/helpers");
+
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { sentOtp } = require("../../config/nodeMailer");
 const { isBlockedUser } = require("../../middlewares/auth");
 const passport = require("passport");
+const categoryModel = require("../../model/category-model");
 
 // google authentication
 const googleAuth = passport.authenticate("google", {
@@ -20,7 +23,10 @@ const googleAuthCallback = async (req, res) => {
 
     if (!user) {
         const errorMessage = "Authentication failed, user data is missing."
-        return res.render("user/login",{errorMessage,pageTitle:"Login Page"});
+        return res.render("user/login",{
+            errorMessage,
+            pageTitle:"Login Page"
+        });
     }
     req.session.userId = user._id;
     req.session.email = user.email;
@@ -29,98 +35,85 @@ const googleAuthCallback = async (req, res) => {
 
 const googleAuthFailure = async (req, res) => {
     try {
-        const userId = req.session.userId;
-
-        if (userId) {
-            const isBlocked = await isBlockedUser(userId);
-            if (isBlocked) {
-                const errorMessage = "User is blocked. Please contact support."
-                return res.render("user/login",{
-                    errorMessage,
-                    pageTitle: "Login Page"
-                });
-            }
-        }
-        const errorMessage = "Google authentication failed. Please try again."
+        const errorMessage = "User is blocked. Please contact support."
         res.render("user/login",{
             errorMessage,
             pageTitle: "Login Page"
         });
     } catch (error) {
-        console.error("Error during failure handling:", error);
-        const errorMessage = "An unexpected error occurred. Please try again."
-        console.log(errorMessage);
-        res.redirect("/login");
+        const errorMessage = "An unexpected error occurred. Please try again later."
+        res.redirect(`/login?error=${errorMessage}`);
     }
 };
 
 // password hashing
-const securePassword = async (password) => {
-    try {
-        const passwordHash = await bcrypt.hash(password, 10);
-        return passwordHash;
-    } catch (error) {
-        console.log(error.message);
-    }
-};
+// const securePassword = async (password) => {
+//     try {
+//         const passwordHash = await bcrypt.hash(password, 10);
+//         return passwordHash;
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// };
 
 // home page
 const home = async (req, res) => {
     try {
-        let products = await ProductModel.find({ isFeatured: true }).limit(10);
-        let item = await ProductModel.find();
-        const category = await CategoryModel.find({});
+        let products = await ProductModel.find({
+            isFeatured: true
+        })
+        .populate({
+            path:"category",
+            match:{ isFeatured: true }
+        })
+        .sort({ createdAt: -1 })
+        .limit(10);
+        
+        products = products.filter(product => product.category !== null);
+        const category = await CategoryModel.find({ isFeatured: true });
         const gamingCategory = await CategoryModel.findOne({
             name: { $regex: /^gaming$/i },
+            isFeatured: true
         });
         const businessCategory = await CategoryModel.findOne({
             name: { $regex: /^business$/i },
+            isFeatured: true
         });
-        let gamingProducts = null;
-        if (gamingCategory) {
-            gamingProducts = await ProductModel.find({
-                category: gamingCategory._id,
-                isFeatured: true,
-            }).limit(6);
-        }
         let bannerProduct1 = null;
-        let bannerProduct2 = null;
-
         if (gamingCategory) {
             bannerProduct1 = await ProductModel.findOne({
                 category: gamingCategory._id,
                 isFeatured: true,
             });
         }
+        let bannerProduct2 = null;
         if (businessCategory) {
             bannerProduct2 = await ProductModel.findOne({
                 category: businessCategory._id,
                 isFeatured: true,
             });
         }
+        let singleCategory = null;
+        singleCategory = await categoryModel.findOne({ isFeatured: true });
+        let singleCategoryProducts = null;
+        if(singleCategory) {
+            singleCategoryProducts = await ProductModel
+                .find({
+                    category:singleCategory._id,
+                    isFeatured:true
+                })
+                .populate("category","name")
+                .limit(6);
 
-        if (req.session.email) {
-            let userData = await UserModel.findOne({
-                email: req.session.email,
-            });
-
-            if (!userData.isBlocked) {
-                res.render("user/index", {
-                    item,
-                    products,
-                    category,
-                    userEmail: userData.email,
-                    bannerProduct1,
-                    bannerProduct2,
-                    gamingProducts,
-                    pageTitle: "Home Page"
-                });
-            } else {
-                req.session.isBlocked = true;
-                return res.redirect("/login?error=blocked");
-            }
         }
-          
+        res.render("user/index", {
+            products,
+            category,
+            bannerProduct1,
+            bannerProduct2,
+            singleCategoryProducts,
+            pageTitle: "Home Page"
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -226,6 +219,9 @@ const signupPost = async (req, res, next) => {
             });
         } else {
             let passwordHash = await securePassword(password);
+            if(!passwordHash){
+                return res.render('500',{ errorMessage: "Password hashing has a problem" })
+            }
 
             let user = {
                 fullname,
@@ -312,9 +308,95 @@ const resendOtp = async (req, res) => {
         });
     }
 };
+const forgotPassword = async (req,res)=>{
+    try {
+        res.render('user/forgot-password',{ pageTitle: "Forgot Password" })
+    } catch (error) {
+        res.render('500');
+    }
+}
+const forgotPasswordPost = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    try {
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        req.session.forgotOtp = sentOtp(email);
+        req.session.forgotOtpExpiry = Date.now() + 60000;
+        req.session.email = email;
+
+        res.status(200).json({ message: 'OTP sent to your email.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred. Please try again later.' });
+    }
+};
+
+const resetPassword = async (req,res) =>{
+    try {
+        res.render('user/reset-password',{ pageTitle: "Reset Password" })
+    } catch (error) {
+       res.render('500'); 
+    }
+}
+
+const resetPasswordPost = async (req, res) => {
+    const { otp, newPassword} = req.body;
+    const email = req.session.email;
+    if (!otp) {
+        return res.status(400).json({ message: 'OTP is required.' });
+    }
+    if (!newPassword) {
+        return res.status(400).json({ message: 'New password is required.' });
+    }
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    if (!req.session.forgotOtp || !req.session.forgotOtpExpiry) {
+        return res.status(400).json({ message: 'OTP session expired. Please request a new OTP.' });
+    }
+    if (req.session.forgotOtp !== otp) {
+        return res.status(400).json({ message: 'Invalid OTP.' });
+    }
+    if (Date.now() > req.session.forgotOtpExpiry) {
+        return res.status(400).json({ message: 'OTP expired. Please request a new OTP.' });
+    }
+
+    // OTP is valid
+    try {
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const hashedPassword = await securePassword(newPassword);
+        if(!hashedPassword) {
+            return res.render('500',{ errorMessage: "Password hashing has a problem" });
+        }
+        user.password = hashedPassword;
+        await user.save();
+
+        req.session.forgotOtp = null;
+        req.session.forgotOtpExpiry = null;
+
+        res.status(200).json({ message: 'Password has been reset successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred. Please try again later.' });
+    }
+};
 
 const userLogout = (req, res) => {
-    // Destroy the session
     req.session.userId="";
     const adminId = req.session?.admin || "";
     if(req.session.userId=="" && adminId==""){
@@ -329,35 +411,35 @@ const userLogout = (req, res) => {
     res.redirect("/login");
 };
 
-// // Searching function
-// const getSearchQuery = (searchQuery) => {
-//     if (searchQuery) {
-//         return {
-//             $or: [
-//                 { productName: { $regex: searchQuery, $options: "i" } },
-//                 { brand: { $regex: searchQuery, $options: "i" } }
-//             ]
-//         };
-//     }
-//     return {};
-// };
 
-const filterProducts =  async (req, res) => {
+const filterProducts = async (req, res) => {
     try {
-        const { page, category, brands, sort } = req.body;
+        const { page = 1, category, brands, sort, search } = req.body;
         const limit = 6;
         const skip = (page - 1) * limit;
 
-        let query = {};
-        if(category != "all") {
+        const featuredCategories = await categoryModel.find({ isFeatured: true }).select('_id');
+        const featuredCategoryIds = featuredCategories.map(cat => cat._id);
+
+        let query = { category: { $in: featuredCategoryIds } };
+        query.isFeatured = true;
+        if (category && category !== "all") {
             query.category = category;
         }
+
         if (brands && brands.length > 0) {
             query.brand = { $in: brands };
         }
 
+        if (search && search.trim() !== '') {
+            query.$or = [
+                { productName: { $regex: search, $options: 'i' } },
+                { brand: { $regex: search, $options: 'i' } }
+            ];
+        }
+
         let sortOption = {};
-        switch(sort) {
+        switch (sort) {
             case 'priceHighToLow':
                 sortOption = { price: -1 };
                 break;
@@ -371,11 +453,10 @@ const filterProducts =  async (req, res) => {
                 sortOption = { productName: -1 };
                 break;
             default:
-                sortOption = { createdAt: -1 }; //newArrivals
+                sortOption = { createdAt: -1 }; // newArrivals
         }
 
-        const products = await ProductModel.find(query)
-            .populate('category')
+        let products = await ProductModel.find(query)
             .sort(sortOption)
             .skip(skip)
             .limit(limit);
@@ -394,6 +475,7 @@ const filterProducts =  async (req, res) => {
     }
 };
 
+
 const userShop = async (req, res) => {
     try {
         const perPage = 6;
@@ -406,7 +488,7 @@ const userShop = async (req, res) => {
         const totalProducts = await ProductModel.countDocuments({
             isFeatured: true,
         });
-        const category = await CategoryModel.find();
+        const category = await CategoryModel.find({ isFeatured: true });
         const totalPages = Math.ceil(totalProducts / perPage);
 
         const brands = await ProductModel.aggregate([
@@ -437,7 +519,6 @@ const productDetails = async (req, res) => {
     try {
         const { productId } = req.params;
 
-        // Validate the productId format before using findById
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({
                 message: "Invalid product ID format",
@@ -453,6 +534,7 @@ const productDetails = async (req, res) => {
         }
         const relatedProducts = await ProductModel.find({
             category: product.category._id,
+            isFeatured: true,
             _id: { $ne: product._id },
         });
         
@@ -476,7 +558,7 @@ module.exports = {
     googleAuthCallback,
     googleAuthFailure,
     home,
-    securePassword,
+    // securePassword,
     login,
     loginPost,
     signup,
@@ -484,6 +566,10 @@ module.exports = {
     signupOtp,
     signupOtpPost,
     resendOtp,
+    forgotPassword,
+    forgotPasswordPost,
+    resetPassword,
+    resetPasswordPost,
     userLogout,
     userShop,
     filterProducts,

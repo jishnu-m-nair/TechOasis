@@ -47,72 +47,8 @@
                 <span class="text">Coupon Management</span>
             </a>
         </li>
-
-         
-
-         <!-- <li class="menu-item has-submenu">
-                <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
-                    <span class="text">Sellers</span>
-                </a>
-                <div class="submenu">
-                    <a href="page-sellers-cards.html">Sellers cards</a>
-                    <a href="page-sellers-list.html">Sellers list</a>
-                    <a href="page-seller-detail.html">Seller profile</a>
-                </div>
-            </li> -->
-         <!-- <li class="menu-item has-submenu">
-                <a class="menu-link" href="page-transactions-1.html"> <i
-                        class="icon material-icons md-monetization_on"></i>
-                    <span class="text">Transactions</span>
-                </a>
-                <div class="submenu">
-                    <a href="page-transactions-1.html">Transaction 1</a>
-                    <a href="page-transactions-2.html">Transaction 2</a>
-                    <a href="page-transactions-details.html">Transaction Details</a>
-                </div>
-            </li> -->
-         <!-- <li class="menu-item has-submenu">
-                <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
-                    <span class="text">Account</span>
-                </a>
-                <div class="submenu">
-                    <a href="page-account-login.html">User login</a>
-                    <a href="page-account-register.html">User registration</a>
-                    <a href="page-error-404.html">Error 404</a>
-                </div>
-            </li> -->
-         <!-- <li class="menu-item">
-                <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
-                    <span class="text">Reviews</span>
-                </a>
-            </li> -->
-         <!-- <li class="menu-item">
-            <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
-               <span class="text">Brands</span> </a>
-         </li> -->
-         <!-- <li class="menu-item">
-                <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
-                    <span class="text">Statistics</span>
-                </a>
-            </li> -->
       </ul>
-      <!-- <hr> -->
-      <!-- <ul class="menu-aside">
-            <li class="menu-item has-submenu">
-                <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                    <span class="text">Settings</span>
-                </a>
-                <div class="submenu">
-                    <a href="page-settings-1.html">Setting sample 1</a>
-                    <a href="page-settings-2.html">Setting sample 2</a>
-                </div>
-            </li>
-            <li class="menu-item">
-                <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                    <span class="text"> Starter page </span>
-                </a>
-            </li>
-        </ul> -->
+      
       <br>
       <br>
    </nav>
@@ -161,11 +97,8 @@
       <div class="content-header">
          <div>
             <h2 class="content-title card-title">Category Management</h2>
-            <!-- <p>Lorem ipsum dolor sit amet.</p> -->
          </div>
          <div>
-            <!-- <a href="#" class="btn btn-light rounded font-md">Export</a>
-                <a href="#" class="btn btn-light rounded  font-md">Import</a> -->
             <a href="#" class="btn btn-primary btn-sm rounded" data-bs-toggle="modal"
                data-bs-target="#addProductModal">Add new category</a>
 
@@ -212,37 +145,6 @@
 
          </div>
       </div>
-      <!-- <div class="card mb-4"> -->
-      <!-- <header class="card-header">
-                <div class="row align-items-center"> -->
-      <!-- <div class="col col-check flex-grow-0">
-                        <div class="form-check ms-2">
-                            <input class="form-check-input" type="checkbox" value="">
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                        <select class="form-select">
-                            <option selected>All category</option>
-                            <option>Electronics</option>
-                            <option>Clothes</option>
-                            <option>Automobile</option>
-                        </select>
-                    </div> -->
-      <!-- <div class="col-md-2 col-6">
-                        <input type="date" value="02.05.2022" class="form-control">
-                    </div> -->
-      <!-- <div class="col-md-2 col-6">
-                        <select class="form-select">
-                            <option selected>Status</option>
-                            <option>Active</option>
-                            <option>Disabled</option>
-                            <option>Show all</option>
-                        </select>
-                    </div> -->
-      <!-- </div> -->
-      <!-- </header> card-header end// -->
-
-
       <div class="card-body">
          <div class="table-responsive ">
             <table class="table text-center">
@@ -280,10 +182,6 @@
                         </button>
                      </td>
                   </tr>
-
-
-
-
 
                   <!-- Edit Modal -->
                   <div class="modal fade" id="editModal<%= category._id %>" tabindex="-1"
@@ -338,14 +236,13 @@
 
 
                   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                  <!-- <script>
+                  <script>
                      async function publishCategory(categoryId) {
                         let result = await Swal.fire({
                            title: 'Do you want to save the changes?',
-                           showDenyButton: true,
                            showCancelButton: true,
-                           confirmButtonText: 'Save',
-                           denyButtonText: `Don't save`,
+                           cancelButtonText: 'No',
+                           confirmButtonText: 'Yes',
                         })
                         if (result.isConfirmed) {
                            let response = await fetch('/admin/category-management/isFeatured', {
@@ -364,11 +261,11 @@
                            }
 
                            window.location.reload();
-                        } else if (result.isDenied) {
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
                            Swal.fire('Changes are not saved', '', 'info')
                         }
                      }
-                  </script> -->
+                  </script>
                   </td>
 
                   <!-- End Edit Modal -->
@@ -385,16 +282,14 @@
    <input type="text" value="<%= error %>" id="Iserror" hidden>
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-   <!-- <script>
+   <script>
       $(document).ready(function () {
          let error = document.getElementById('Iserror')
          if (error.value === 'Category name already exists') {
             Swal.fire({
                icon: 'error',
                title: 'Category Name Exists',
-               text: 'The category name already exists. Please choose a different name.',
-               timer: 2000,
-               timerProgressBar: true
+               text: 'The category name already exists. Please choose a different name.'
             })
          } else if (error.value === 'New Category added succesfully') {
             Swal.fire({
@@ -421,7 +316,7 @@
 
 
       // })
-   </script> -->
+   </script>
 
 
 

@@ -15,8 +15,7 @@ const userSchema = new mongoose.Schema({
    },
    phone: {
       type: Number,
-      unique: true,
-      sparse: true
+      default: null
    },
    password: {
       type: String
@@ -51,7 +50,6 @@ const userSchema = new mongoose.Schema({
   }
 
 });
-
 
 const UserModel = mongoose.model('users', userSchema)
 

@@ -36,8 +36,13 @@
         margin-bottom: 10px;
     }
     .product-item {
-    padding-left: 20px; /* Adjust as needed */
-}
+        padding-left: 20px; /* Adjust as needed */
+    }
+    .btn-danger{
+        background-color: red;
+        color: #fff;
+        border: none;
+    }
 </style>
 
 <!-- Start Navbar Area -->
@@ -147,6 +152,17 @@
                     <div class="shop-sort-section">
                         <div class="container">
                             <div class="row">
+                                <div class="col-search">
+                                    <form class="searchForm" id="searchForm">
+                                        <div class="input-group">
+                                            <input name="search" id="searchInput" type="text" class="form-control" placeholder="Search">
+                                            <button class="btn" type="button" id="clearSearch"> <i class="icon-close"></i></button>
+                                            <button class="btn btn-black-default-hover bg" type="submit"> <i class="icon-magnifier"></i></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div> <br>
+                            <div class="row">
                                 <!-- Start Sort Wrapper Box -->
                                 <div class="sort-box d-flex justify-content-between align-items-md-center align-items-start flex-md-row flex-column"
                                     data-aos="fade-up" data-aos-delay="0">
@@ -204,7 +220,7 @@
                                                                         <% if(product.countInStock === 0) { %>
                                                                             <a class="text-danger">Out Of Stock</a>
                                                                         <% } else { %>
-                                                                            <a href='#' onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
+                                                                            <a onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
                                                                         <% } %>
                                                                     </div>
                                                                     <div class="action-link-right">
@@ -289,19 +305,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // $(document).ready(function() {
-        //     const selectElement = $('#sortOptions');
-        //     console.log("jquery called")
-        //     console.log(selectElement.val()); // Check if the element is found
-            
-        //     selectElement.on('change', function(e) {
-        //         console.log("Event listener called"); // Verify event listener is called
-        //         const currentSort = e.target.value;
-        //         console.log("Selected value:", currentSort); // Log selected value
-        //         updateProducts()
-        //     });
-        //     console.log("not called");
-        // });
         async function addProductCart(productId) {
             event.preventDefault();
             try {
@@ -353,21 +356,24 @@
             const $filterButton = $('#filterButton');
             const $selectElement = $('#sortOptions');
             const $paginationContainer = $('#paginationContainer ul');
+            const $searchForm = $('#searchForm');
+            const $searchInput = $('#searchInput');
+            const $clearSearchButton = $('#clearSearch');
 
             let currentPage = 1;
             let currentCategory = 'all';
             let currentBrands = [];
             let currentSort = 'newArrivals';
+            let currentSearch = '';
 
             function updateProducts(currentPage) {
                 const url = '/api/products';
-                console.log(currentSort);
-                console.log(currentPage)
                 const data = {
                     page: currentPage,
                     category: currentCategory,
                     brands: currentBrands,
-                    sort: currentSort
+                    sort: currentSort,
+                    search: currentSearch
                 };
 
                 $.ajax({
@@ -427,7 +433,7 @@
                                             <div class="action-link-left">
                                                 ${product.countInStock === 0 
                                                     ? '<a class="text-danger">Out Of Stock</a>' 
-                                                    : `<a href='#' onclick="addProductCart('${product._id}')">Add to Cart</a>`
+                                                    : `<a onclick="addProductCart('${product._id}')">Add to Cart</a>`
                                                 }
                                             </div>
                                             <div class="action-link-right">
@@ -516,19 +522,31 @@
             });
 
             if ($selectElement.length) {
-                console.log($selectElement.val());
-                console.log("passed if");
                 $selectElement.on('change', function(e) {
                     e.preventDefault();
                     console.log("event listener called");
                     currentSort = $(this).val();
                     currentPage = 1;
-                    console.log(currentSort); // This should log the selected value
-                    updateProducts(currentPage); // Ensure this function is defined
+                    updateProducts(currentPage);
                 });
             } else {
                 console.error('Element with id "sortOptions" not found.');
             }
+
+            $searchForm.on('submit', function(e) {
+                e.preventDefault();
+                currentSearch = $(this).find('input[name="search"]').val().trim();
+                currentPage = 1;
+                updateProducts(currentPage);
+            });
+            $clearSearchButton.on('click', function() {
+                $searchInput.val('');
+                if (currentSearch !== '') {
+                    currentSearch = '';
+                    currentPage = 1;
+                    updateProducts(currentPage);
+                }
+            });
 
             // Initial load
             updateProducts(1);

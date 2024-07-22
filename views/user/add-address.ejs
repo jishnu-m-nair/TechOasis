@@ -38,7 +38,7 @@
                 <form id="addressForm">
                     <div class="default-form-box">
                         <label>Address Type <span class="text-red">*</span></label>
-                        <select id="addressType" name="addressType" required>
+                        <select id="addressType" name="addressType">
                             <option value="" disabled selected>Select address type</option>
                             <option value="home">Home</option>
                             <option value="work">Work</option>
@@ -49,47 +49,49 @@
     
                     <div class="default-form-box">
                         <label>House No <span class="text-red">*</span></label>
-                        <input type="text" id="houseNo" name="houseNo" required>
+                        <input type="text" id="houseNo" name="houseNo">
                         <span id="houseError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>Street</label>
                         <input type="text" id="street" name="street">
+                        <span id="streetError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>Landmark</label>
                         <input type="text" id="landmark" name="landmark">
+                        <span id="landmarkError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>Pincode <span class="text-red">*</span></label>
-                        <input type="number" id="pincode" name="pincode" required>
+                        <input type="text" id="pincode" name="pincode" maxlength="6">
                         <span id="pincodeError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>City <span class="text-red">*</span></label>
-                        <input type="text" id="city" name="city" required>
+                        <input type="text" id="city" name="city">
                         <span id="cityError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>District <span class="text-red">*</span></label>
-                        <input type="text" id="district" name="district" required>
+                        <input type="text" id="district" name="district">
                         <span id="districtError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>State <span class="text-red">*</span></label>
-                        <input type="text" id="state" name="state" required>
+                        <input type="text" id="state" name="state">
                         <span id="stateError" class="text-red"></span>
                     </div>
     
                     <div class="default-form-box">
                         <label>Country <span class="text-red">*</span></label>
-                        <input type="text" id="country" name="country" required>
+                        <input type="text" id="country" name="country">
                         <span id="countryError" class="text-red"></span>
                     </div>
     
@@ -109,7 +111,7 @@
 
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- custom scripts -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -121,19 +123,85 @@
             document.querySelectorAll('.text-red').forEach(element => element.textContent = '');
     
             // Gather form data
-            const addressType = document.getElementById('addressType').value;
-            const houseNo = document.getElementById('houseNo').value;
-            const street = document.getElementById('street').value;
-            const landmark = document.getElementById('landmark').value;
-            const pincode = document.getElementById('pincode').value;
-            const city = document.getElementById('city').value;
-            const district = document.getElementById('district').value;
-            const state = document.getElementById('state').value;
-            const country = document.getElementById('country').value;
-    
-            // Perform client-side validation
-            if (!addressType || !houseNo || !pincode || !city || !district || !state || !country) {
-                document.getElementById('typeError').textContent = 'Please fill in all required fields.';
+            const addressType = document.getElementById('addressType').value.trim();
+            const houseNo = document.getElementById('houseNo').value.trim();
+            const street = document.getElementById('street').value.trim();
+            const landmark = document.getElementById('landmark').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const district = document.getElementById('district').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const country = document.getElementById('country').value.trim();
+
+            // Form Validation
+            let isValid = true;
+
+            if (!addressType) {
+                document.getElementById('typeError').textContent = 'Address type is required.';
+                isValid = false;
+            }
+
+            if (!houseNo) {
+                document.getElementById('houseError').textContent = 'House number is required.';
+                isValid = false;
+            }
+
+            if (!street) {
+                document.getElementById('streetError').textContent = 'Street is required.';
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9\s]+$/.test(street)) {
+                document.getElementById('streetError').textContent = 'Street should contain only letters, numbers, and spaces.';
+                isValid = false;
+            }
+
+            if(landmark !== "") {
+                if (!/^[a-zA-Z0-9\s]+$/.test(landmark)) {
+                    document.getElementById('landmarkError').textContent = 'Landmark should contain only letters, numbers, and spaces.';
+                    isValid = false;
+                }
+            }
+            
+            if (!pincode) {
+                document.getElementById('pincodeError').textContent = 'Pincode is required.';
+                isValid = false;
+            } else if (!/^\d{6}$/.test(pincode)) {
+                document.getElementById('pincodeError').textContent = 'Pincode must be 6 digits.';
+                isValid = false;
+            }
+
+            if (!city) {
+                document.getElementById('cityError').textContent = 'City is required.';
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(city)) {
+                document.getElementById('cityError').textContent = 'City should contain only letters and spaces.';
+                isValid = false;
+            }
+
+            if (!district) {
+                document.getElementById('districtError').textContent = 'District is required.';
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(district)) {
+                document.getElementById('districtError').textContent = 'District should contain only letters and spaces.';
+                isValid = false;
+            }
+
+            if (!state) {
+                document.getElementById('stateError').textContent = 'State is required.';
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(state)) {
+                document.getElementById('stateError').textContent = 'State should contain only letters and spaces.';
+                isValid = false;
+            }
+
+            if (!country) {
+                document.getElementById('countryError').textContent = 'Country is required.';
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(country)) {
+                document.getElementById('countryError').textContent = 'Country should contain only letters and spaces.';
+                isValid = false;
+            }
+
+            if (!isValid) {
                 return;
             }
     
@@ -144,7 +212,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        userId: '<%= userId %>', // Replace with your actual user ID
+                        userId: '<%= userId %>',
                         addressType,
                         houseNo,
                         street,
@@ -160,14 +228,29 @@
                 const data = await response.json();
     
                 if (response.ok) {
-                    alert(data.message);
-                    window.location.href = data.redirectUrl; // Redirect to profile
+                    await Swal.fire({
+                        title: 'Success',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    window.location.href = data.redirectUrl;
                 } else {
-                    alert(data.message);
+                    await Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while adding the address.');
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while adding the address.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     });

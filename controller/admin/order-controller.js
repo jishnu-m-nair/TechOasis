@@ -1,20 +1,56 @@
+const mongoose = require('mongoose');
 const OrderModel = require("../../model/order-model");
 const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 
 const orderManagement = async (req,res) =>{
-    const allOrders = await OrderModel.find({}).populate("user",'fullname email').limit(8);
-    res.render("admin/order",{pagetitle:"Order Management",allOrders})
+    const perPage = 8;
+    const page = parseInt(req.query.page) || 1;
+    try {
+        const allOrders = await OrderModel.find({})
+            .populate("user",'fullname email')
+            .skip(perPage * (page - 1))
+            .limit(perPage);
+
+        if(!allOrders) {
+            return res.status(400).render('admin-404',{ errorMessage : "Order data does not exists" });
+        }
+        const totalOrders = await OrderModel.countDocuments();
+        const totalPages = Math.ceil(totalOrders / perPage);
+
+        res.render("admin/order",{
+            allOrders,
+            perPage,
+            currentPage: page,
+            totalPages,
+            pagetitle:"Order Management",
+        });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 }
 
 const orderDetailed = async (req,res) =>{
     const { orderId } = req.params;
-    const orderDetail = await OrderModel.findOne({oId:orderId}).populate("user",'fullname email phone');
-    const orderAddress = `${orderDetail.deliveryAddress.houseNo},${orderDetail.deliveryAddress.street},${orderDetail.deliveryAddress.landmark},
-    ${orderDetail.deliveryAddress.city},${orderDetail.deliveryAddress.district},${orderDetail.deliveryAddress.state},
-    ${orderDetail.deliveryAddress.country},Pincode: ${orderDetail.deliveryAddress.pincode}`
-    res.render("admin/order-detailed",{pagetitle:"Order Detailed",orderDetail,orderAddress})
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        return res.status(400).render('admin-error',{ errorMessage : "Order ObjectId Invalid" });
+    }
+    
+    try {
+        const orderDetail = await OrderModel.findById(orderId).populate("user",'fullname email phone');
+        
+        const orderAddress = `${orderDetail.deliveryAddress.houseNo},${orderDetail.deliveryAddress.street},${orderDetail.deliveryAddress.landmark},
+        ${orderDetail.deliveryAddress.city},${orderDetail.deliveryAddress.district},${orderDetail.deliveryAddress.state},
+        ${orderDetail.deliveryAddress.country},Pincode: ${orderDetail.deliveryAddress.pincode}`;
+
+        res.render("admin/order-detailed",{pagetitle:"Order Detailed",orderDetail,orderAddress})
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 }
 
 const updateOrderStatus = async (req, res) => {
@@ -43,7 +79,7 @@ const updateCancelStatus = async (req, res) => {
             { $set: { 'requests.$.status': status } },
             { new: true }
         );
-
+        console.log(order.requests[0].status)
         if (!order) {
             return res.status(404).json({ message: 'Order or request not found' });
         }

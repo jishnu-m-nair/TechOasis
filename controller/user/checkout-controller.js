@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const UserModel = require("../model/user-model");
-const ProductModel = require("../model/product-model");
-const CategoryModel = require("../model/category-model");
-const CartModel = require("../model/cart-model");
-const AddressModel = require("../model/address-model");
-const OrderModel = require("../model/order-model");
+const UserModel = require("../../model/user-model");
+const ProductModel = require("../../model/product-model");
+const CategoryModel = require("../../model/category-model");
+const CartModel = require("../../model/cart-model");
+const AddressModel = require("../../model/address-model");
+const OrderModel = require("../../model/order-model");
 // const crypto = require("crypto");
 
 async function getRandomNumber(min, max) {
@@ -31,17 +31,25 @@ async function generateUniqueOrderID() {
 const orderCheckout = async (req, res) => {
     try {
         let UserExist = req.session.userId ? true : false;
-        const addressList = await AddressModel.findOne({
+
+        let addressList = await AddressModel.findOne({
             user: req.session.userId,
         });
+        console.log(addressList);
+        if(!addressList){
+            addressList = null;
+        }
         const userDetails = await UserModel.findOne({
             _id: req.session.userId,
         });
         const category = await CategoryModel.find();
         const cartCheckout = await CartModel.findOne({owner: req.session.userId}).populate({ path: "items.productId", model: "Products" });
+        if (!cartCheckout || cartCheckout.items.length === 0) {
+            return res.status(404).render("404",{ errorMessage: 'Cart not found or empty' });
+        }
 
         const selectedItems = cartCheckout.items;
-        let selectedAddressTypes = []; // Initialize selectedAddressTypes as an empty array
+        // let selectedAddressTypes = [];
 
         // Calculate the total amount for the order
         const billTotal = selectedItems.reduce(
@@ -89,7 +97,7 @@ const orderCheckout = async (req, res) => {
                     selectedItems,
                     billTotal,
                     itemCount,
-                    selectedAddressTypes,
+                    // selectedAddressTypes,
                     userDetails,
                     err: true,
                     pageTitle: "checkout",
@@ -102,7 +110,7 @@ const orderCheckout = async (req, res) => {
                     selectedItems,
                     billTotal,
                     itemCount,
-                    selectedAddressTypes,
+                    // selectedAddressTypes,
                     userDetails,
                     err: "",
                     pageTitle: "checkout",
@@ -110,6 +118,7 @@ const orderCheckout = async (req, res) => {
             }
         });
     } catch (err) {
+        console.log("catch block");
         console.log(err);
     }
 };

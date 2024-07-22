@@ -42,12 +42,19 @@ router.post('/admin/product-management/featuredProduct',product.productManagemen
 router.get('/admin/category-management',AdminLogSession,category.categoryManagementGet);
 router.post('/admin/category-management/newCategory',AdminLogSession, categoryUpload.single('image'),category.categoryManagementCreate)
 router.post('/admin/category-management/edit-category/:categoryId',AdminLogSession,categoryUpload.single('editImage'),category.categoryManagementEdit)
-// router.post('/admin/category-management/isFeatured',AdminLogSession,category.categoryManagementFeatured)
+router.post('/admin/category-management/isFeatured',AdminLogSession,category.categoryManagementFeatured)
 
 // order details
 router.get('/admin/order-management',AdminLogSession,order.orderManagement);
 router.get('/admin/order-management/order-detailed/:orderId',AdminLogSession,order.orderDetailed);
 router.post('/api/update-order-status',AdminLogSession,order.updateOrderStatus);
 router.post('/api/update-cancel-req',AdminLogSession, order.updateCancelStatus);
+
+router.get('/error',(req,res)=>{
+    res.render('admin-error')
+})
+router.get('/admin-404',(req,res)=>{
+    res.render('admin-404')
+})
 
 module.exports = router;

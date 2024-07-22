@@ -3,7 +3,7 @@ const router = express.Router()
 const user = require('../controller/user/user-controller')
 const profile = require('../controller/user/profile-controller')
 const cart = require('../controller/user/cart-controller')
-const checkout = require('../controller/checkout-controller')
+const checkout = require('../controller/user/checkout-controller')
 const passport = require('passport');
 const {isLoggedIn,isLoggedOut,isBlockedUser} =  require('../middlewares/auth')
 require('dotenv').config()
@@ -34,6 +34,12 @@ router.post('/login',user.loginPost);
 
 router.get('/signup',isLoggedOut, user.signup);
 router.post('/signup',user.signupPost);
+
+router.get('/forgot-password',user.forgotPassword);
+router.post('/forgot-password',user.forgotPasswordPost);
+router.get('/reset-password', user.resetPassword);
+router.post('/reset-password', user.resetPasswordPost);
+
 
 router.get('/logout',user.userLogout)
 

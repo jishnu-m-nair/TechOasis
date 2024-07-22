@@ -107,28 +107,32 @@
                                 <option value="Delivered">Delivered</option>
                                 <option value="Cancelled">Cancelled</option> -->
                             </select>
-                            <a class="btn btn-primary" id="saveStatusBtn" href="#">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                            <% if(orderDetail.status !== "Delivered" && orderDetail.status !== "Cancelled") { %>
+                                <a class="btn btn-primary" id="saveStatusBtn" href="#">Save</a>
+                            <% } %>
+                            <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
                         </div>
                     </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">
                     <div class="row mb-50 mt-20 order-info-wrap">
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-person"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Customer</h6>
-                                    <p class="mb-1">
-                                        <%= orderDetail.user.fullname %> <br> 
-                                        <%= orderDetail.user.email %> <br>
-                                        <%= orderDetail.user.phone %>
-                                    </p>
-                                </div>
-                            </article>
-                        </div> <!-- col// -->
+                        <% if(orderDetail.user) { %>
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Customer</h6>
+                                        <p class="mb-1">
+                                            <%= orderDetail.user.fullname %> <br> 
+                                            <%= orderDetail.user.email %> <br>
+                                            <%= orderDetail.user.phone %>
+                                        </p>
+                                    </div>
+                                </article>
+                            </div>
+                        <% } %>
                         <div class="col-md-4">
                             <article class="icontext align-items-start">
                                 <span class="icon icon-sm rounded-circle bg-primary-light">
@@ -182,7 +186,7 @@
                                                     </a>
                                                 </td>
                                                 <td> ₹<%=item.productPrice %> </td>
-                                                <td> 2 </td>
+                                                <td> <%=item.quantity %> </td>
                                                 <td class="text-end"> ₹<%=item.totalPrice %> </td>
                                             </tr>
                                         <% } %>
@@ -204,6 +208,7 @@
                                 <div class="mb-3">
                                     <h6 class="mb-15">Cancel Request</h6>
                                 </div>
+                                <p><strong style="font-weight: 700;"> Reason :</strong> <%= orderDetail.requests[0].reason %></p>
                                 <% let requestStatus = orderDetail.requests[0].status; %>
         
                                 <select class="form-control mb-3" id="cancelRequestStatus" <%= requestStatus === 'Accepted' || requestStatus === 'Rejected' ? 'disabled' : '' %>>
@@ -211,8 +216,9 @@
                                     <option value="Rejected" <%= requestStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
                                     <option value="Accepted" <%= requestStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
                                 </select>
-
+                                <% if(requestStatus === 'Pending') { %>
                                 <button class="btn btn-primary" id="saveRequestStatus">Update</button>
+                                <% } %>
                             </div>
                             <% } %>
                         </div>
@@ -241,10 +247,13 @@
     <script src="/assets/js/vendors/select2.min.js"></script>
     <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
     <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Main Script -->
     <script src="/assets/js/main.js" type="text/javascript"></script>
     <script>
         const currentStatus = "<%= orderDetail.status %>";
+        const orderDetail = JSON.parse('<%- JSON.stringify(orderDetail) %>');
         const orderId = "<%= orderDetail._id %>";
     
         const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
@@ -255,7 +264,7 @@
             if (currentStatus === "Pending" || 
                 (currentStatus === "Processing" && status !== "Pending") || 
                 (currentStatus === "Shipped" && status !== "Pending" && status !== "Processing") || 
-                (currentStatus === "Delivered" && status !== "Pending" && status !== "Processing" && status !== "Shipped") || 
+                (currentStatus === "Delivered" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Cancelled") || 
                 (currentStatus === "Cancelled" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Delivered")) {
                 
                 const option = document.createElement('option');
@@ -286,27 +295,49 @@
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
                     const result = await response.json();
-                    alert('Error updating order status: ' + result.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error updating order status: ' + result.message,
+                    });
                 } else {
                     const text = await response.text();
-                    alert('Error updating order status: ' + text);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error updating order status: ' + text,
+                    });
                 }
                 return;
             }
 
             const result = await response.json();
-            alert('Order status updated successfully');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Order status updated successfully',
+            });
         } catch (error) {
             console.error('Error:', error);
-            alert('An unexpected error occurred');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An unexpected error occurred',
+            });
         }
         });
 
         document.getElementById('saveRequestStatus').addEventListener('click', async function() {
-        const orderId = '<%= orderDetail._id %>';
-        const requestId = '<%= orderDetail.requests[0]._id %>';
+            console.log(orderDetail,"hiiii")
+            console.log(orderDetail.requests,"helooo");
+        let requestId =null;
+        if(orderDetail.requests.length > 0){
+            requestId = orderDetail.requests[0]._id;
+        }
         const status = document.getElementById('cancelRequestStatus').value;
-
+        console.log(orderId,"orderId")
+        console.log(status,"status")
+        console.log(requestId,"reqId")
         try {
             const response = await fetch('/api/update-cancel-req', {
                 method: 'POST',
@@ -317,14 +348,28 @@
             });
 
             if (response.ok) {
-                alert('Request status updated successfully');
-                location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Request status updated successfully',
+                }).then(() => {
+                    location.reload();
+                });
             } else {
                 const errorData = await response.json();
-                alert(`Error: ${errorData.message}`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Error: ${errorData.message}`,
+                });
+
             }
         } catch (error) {
-            alert('An error occurred. Please try again later.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred. Please try again later.',
+            });
         }
     });
     </script>

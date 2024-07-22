@@ -68,7 +68,9 @@ app.use(express.urlencoded({ extended: true }));
 // Route handlers
 app.use('/', userRouter);
 app.use('/', adminRouter);
-
+app.use("*",(req,res,next)=>{
+    res.render("404");
+})
 // // Google OAuth routes
 // app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
