@@ -43,6 +43,7 @@ router.get('/admin/category-management',AdminLogSession,category.categoryManagem
 router.post('/admin/category-management/newCategory',AdminLogSession, categoryUpload.single('image'),category.categoryManagementCreate)
 router.post('/admin/category-management/edit-category/:categoryId',AdminLogSession,categoryUpload.single('editImage'),category.categoryManagementEdit)
 router.post('/admin/category-management/isFeatured',AdminLogSession,category.categoryManagementFeatured)
+router.post('/api/category-filter', AdminLogSession, category.getCategoryList);
 
 // order details
 router.get('/admin/order-management',AdminLogSession,order.orderManagement);

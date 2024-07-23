@@ -1,0 +1,47 @@
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="/admin" class="brand-wrap">
+            <img src="/assets/imgs/theme/techoasis_logo.png" class="logo" alt="Techoasis Logo">
+        </a>
+        <div>
+            <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
+            </button>
+        </div>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item <%= page === 'dashboard' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item <%= page === 'user-management' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin/usermanagement"> <i class="icon material-icons md-person"></i>
+                    <span class="text">User Management</span>
+                </a>
+            </li>
+            <li class="menu-item <%= page === 'product-management' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin/product-management"> <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Product Management</span>
+                </a>
+            </li>
+            <li class="menu-item <%= page === 'category-management' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin/category-management"> <i class="icon material-icons md-category"></i>
+                    <span class="text">Category Management</span>
+                </a>
+            </li>
+            <li class="menu-item <%= page === 'order-management' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin/order-management"> <i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Order Management</span>
+                </a>
+            </li>
+            <li class="menu-item <%= page === 'coupon-management' ? 'active' : '' %>">
+                <a class="menu-link" href="/admin/coupon-management"> <i class="icon material-icons md-redeem coupon-icon"></i>
+                    <span class="text">Coupon Management</span>
+                </a>
+            </li>
+        </ul>
+        <br>
+        <br>
+    </nav>
+</aside>
