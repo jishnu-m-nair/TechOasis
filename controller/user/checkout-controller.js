@@ -5,28 +5,13 @@ const CategoryModel = require("../../model/category-model");
 const CartModel = require("../../model/cart-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
-// const crypto = require("crypto");
+const { generateUniqueOrderID } = require('../../utils/helpers');
+const Razorpay = require('razorpay');
 
-async function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-// Function to generate a unique order ID
-async function generateUniqueOrderID() {
-    // Generate a random 6-digit number
-    const randomPart = await getRandomNumber(100000, 999999);
-
-    // Get the current date
-    const currentDate = new Date();
-
-    // Format the date as YYYYMMDD
-    const datePart = currentDate.toISOString().slice(0, 10).replace(/-/g, "");
-
-    // Combine the date and random number with "ID"
-    const orderID = `ID_${randomPart}${datePart}`;
-
-    return orderID;
-}
+const razorpay = new Razorpay({
+	key_id: process.env.RAZORPAY_CLIENT_ID,
+	key_secret: process.env.RAZORPAY_CLIENT_SECRET
+});
 
 const orderCheckout = async (req, res) => {
     try {
@@ -35,40 +20,31 @@ const orderCheckout = async (req, res) => {
         let addressList = await AddressModel.findOne({
             user: req.session.userId,
         });
-        console.log(addressList);
-        if(!addressList){
+        if (!addressList) {
             addressList = null;
         }
         const userDetails = await UserModel.findOne({
             _id: req.session.userId,
         });
         const category = await CategoryModel.find();
-        const cartCheckout = await CartModel.findOne({owner: req.session.userId}).populate({ path: "items.productId", model: "Products" });
+        const cartCheckout = await CartModel.findOne({ owner: req.session.userId }).populate({ path: "items.productId", model: "Products" });
         if (!cartCheckout || cartCheckout.items.length === 0) {
-            return res.status(404).render("404",{ errorMessage: 'Cart not found or empty' });
+            return res.status(404).render("404", { errorMessage: 'Cart not found or empty' });
         }
 
         const selectedItems = cartCheckout.items;
-        // let selectedAddressTypes = [];
 
-        // Calculate the total amount for the order
         const billTotal = selectedItems.reduce(
             (total, item) => total + item.price,
             0
         );
-        // Get the count of selected items
+
         const itemCount = selectedItems.length;
 
         let flag = 0;
         Promise.all(
             selectedItems.map(async (item, index) => {
                 let stock = await ProductModel.findById(item.productId);
-                console.log(
-                    "Quantity",
-                    item.quantity,
-                    "Stock",
-                    stock.countInStock
-                );
                 if (item.quantity > stock.countInStock) {
                     flag = 1;
                     selectedItems[index].quantity = stock.countInStock;
@@ -83,7 +59,6 @@ const orderCheckout = async (req, res) => {
                             await cartCheckout.save();
                         }
                     });
-                    //save
                 }
             })
         ).then(() => {
@@ -97,7 +72,6 @@ const orderCheckout = async (req, res) => {
                     selectedItems,
                     billTotal,
                     itemCount,
-                    // selectedAddressTypes,
                     userDetails,
                     err: true,
                     pageTitle: "checkout",
@@ -110,7 +84,6 @@ const orderCheckout = async (req, res) => {
                     selectedItems,
                     billTotal,
                     itemCount,
-                    // selectedAddressTypes,
                     userDetails,
                     err: "",
                     pageTitle: "checkout",
@@ -123,22 +96,18 @@ const orderCheckout = async (req, res) => {
     }
 };
 
-let orderCheckoutPost = async (req, res, next) => {
+const orderCheckoutPost = async (req, res, next) => {
     try {
-        console.log("reachesd")
-        if (!req.body.paymentOption || !req.body.addressId) {
-            // Handle invalid or missing data in the request
+        const { paymentOption, addressId } = req.body;
+        if (!paymentOption || !addressId) {
             return res
                 .status(400)
-                .json({ success: false, error: "Invalid data in the request",id:req.body.addressId });
+                .json({ success: false, error: "Invalid data in the request" });
         }
-        const {paymentOption, addressId} = req.body;
 
-        const cart = await CartModel.findOne({ owner: req.session.userId }).populate({path:'items.productId',model:'Products'});
+        const cart = await CartModel.findOne({ owner: req.session.userId }).populate({ path: 'items.productId', model: 'Products' });
 
         if (!cart || cart.items.length === 0) {
-            // Handle the case where the user has no items in the cart
-            console.log("no cart");
             return res
                 .status(400)
                 .json({ success: false, error: "No items in the cart" });
@@ -149,8 +118,6 @@ let orderCheckoutPost = async (req, res, next) => {
         });
 
         if (!address) {
-            // Handle the case where the user has no address
-            console.log("no address");
             return res
                 .status(400)
                 .json({ success: false, error: "User has no address" });
@@ -174,21 +141,19 @@ let orderCheckoutPost = async (req, res, next) => {
         };
 
         const selectedItems = cart.items;
-        // console.log(req.body.paymentOption)
-        if (req.body.paymentOption === "COD") {
+        const order_id = await generateUniqueOrderID();
+        let billTotal = selectedItems.reduce((total, item) => total + (parseFloat(item.productId.price) * parseInt(item.quantity)), 0);
+        if (paymentOption === "COD") {
 
-            const order_id = await generateUniqueOrderID();
             // Create a new order
             const orderData = {
                 user: req.session.userId,
                 items: [],
                 oId: order_id,
                 paymentStatus: "Pending",
-                paymentMethod: req.body.paymentOption,
+                paymentMethod: paymentOption,
                 deliveryAddress: orderAddress,
             };
-            // console.log("selected items-------------",selectedItems)
-            // console.log("orderData Before---------------",orderData)
             for (const item of selectedItems) {
                 orderData.items.push({
                     productId: item.productId._id,
@@ -199,36 +164,29 @@ let orderCheckoutPost = async (req, res, next) => {
                     totalPrice: Math.floor(parseFloat(item.productId.price) * parseInt(item.quantity))
                 })
             }
-            
-            console.log("before======================",orderData);
+
             for (const item of selectedItems) {
                 const product = await ProductModel.findOne({
                     _id: item.productId,
                 });
 
-
                 if (product) {
-                    // Ensure that the requested quantity is available in stock
                     if (product.countInStock >= item.quantity) {
-                        // Decrease the countInStock by the purchased quantity
                         product.countInStock -= item.quantity;
-                        console.log(product.countInStock);
                         await product.save();
                     } else {
-                        // Handle the case where the requested quantity is not available
                         return res.status(400).json({
                             success: false,
                             error: "Not enough stock for some items",
                         });
                     }
                 } else {
-                    // Handle the case where the product was not found
                     return res
                         .status(400)
                         .json({ success: false, error: "Product not found" });
                 }
             }
-            
+
             let billTotal = selectedItems.reduce(
                 (total, item) => total + item.price,
                 0
@@ -237,32 +195,29 @@ let orderCheckoutPost = async (req, res, next) => {
             console.log(orderData);
             const order = new OrderModel(orderData);
             await order.save();
-            console.log("Order Sucess");
-            
-
-            // // Update payment status based on order status
-            // if (order.status === "Delivered") {
-            //     order.paymentStatus = "Success";
-            //     await order.save();
-            // }
+            const orderId = order._id;
 
             // Remove selected items from the cart
             try {
-                result = await CartModel.deleteOne({ owner: req.session.userId })
-                console.log("cart is cleared");
+                result = await CartModel.deleteOne({ owner: req.session.userId });
             } catch (error) {
-                console.log("error in cart clear"+error);
+                console.log("error in cart clear" + error);
             }
-
-            // // Get the order ID after saving it
-            const orderId = order._id;
 
             return res.status(201).json({
                 success: true,
                 message: "order placed successfully",
                 orderId,
-                // order,
-            }); // Redirect to a confirmation page
+            });
+        } else if (paymentOption === "Razorpay") {
+            const options = {
+                amount: billTotal * 100, // smallest currency amount
+                currency: 'INR',
+                receipt: order_id
+            };
+            const razorpayOrder = await razorpay.orders.create(options);
+            return res.status(201).json({ success: true, orderId: razorpayOrder.id });
+
         } else {
             return res
                 .status(400)
@@ -274,16 +229,99 @@ let orderCheckoutPost = async (req, res, next) => {
     }
 };
 
-const orderConfirmGet = async (req,res) =>{
+const handlePaymentSuccess = async (req, res, next) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, addressId } = req.body;
+
+        const cart = await CartModel.findOne({ owner: req.session.userId }).populate({ path: 'items.productId', model: 'Products' });
+
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ success: false, error: "No items in the cart" });
+        }
+
+        const address = await AddressModel.findOne({ user: req.session.userId });
+
+        if (!address) {
+            return res.status(400).json({ success: false, error: "User has no address" });
+        }
+
+        const deliveryAddress = address.addresses.find(addr => addr._id.toString() === addressId);
+        if (!deliveryAddress) {
+            return res.status(400).json({ success: false, error: "Address not found" });
+        }
+
+        const orderAddress = {
+            addressType: deliveryAddress.addressType,
+            houseNo: deliveryAddress.houseNo,
+            street: deliveryAddress.street,
+            landmark: deliveryAddress.landmark,
+            pincode: deliveryAddress.pincode,
+            city: deliveryAddress.city,
+            district: deliveryAddress.district,
+            state: deliveryAddress.state,
+            country: deliveryAddress.country,
+        };
+
+        const selectedItems = cart.items;
+        const order_id = await generateUniqueOrderID();
+
+        const orderData = {
+            user: req.session.userId,
+            items: [],
+            oId: order_id,
+            paymentStatus: "Success",
+            paymentMethod: "Razorpay",
+            deliveryAddress: orderAddress,
+            billTotal: selectedItems.reduce((total, item) => total + (parseFloat(item.productId.price) * parseInt(item.quantity)), 0)
+        };
+
+        for (const item of selectedItems) {
+            orderData.items.push({
+                productId: item.productId._id,
+                image: item.productId.image,
+                productName: item.productId.productName,
+                productPrice: item.productId.price,
+                quantity: item.quantity,
+                totalPrice: Math.floor(parseFloat(item.productId.price) * parseInt(item.quantity))
+            });
+        }
+
+        for (const item of selectedItems) {
+            const product = await ProductModel.findOne({ _id: item.productId });
+
+            if (product) {
+                if (product.countInStock >= item.quantity) {
+                    product.countInStock -= item.quantity;
+                    await product.save();
+                } else {
+                    return res.status(400).json({ success: false, error: "Not enough stock for some items" });
+                }
+            } else {
+                return res.status(400).json({ success: false, error: "Product not found" });
+            }
+        }
+
+        const order = new OrderModel(orderData);
+        await order.save();
+        await CartModel.deleteOne({ owner: req.session.userId });
+
+        return res.status(201).json({ success: true, message: "Order placed successfully", orderId: order._id });
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+};
+
+const orderConfirmGet = async (req, res) => {
     const orderId = req.params.orderId;
     const orderDetails = await OrderModel.findById(orderId)
     const userDetails = await UserModel.findById(req.session.userId)
     console.log(userDetails.fullname)
     const userName = userDetails.fullname;
-    res.render("user/order",{orderDetails,userName,pageTitle:"Order Confirmation"})
+    res.render("user/order", { orderDetails, userName, pageTitle: "Order Confirmation" })
 }
 
-const orderDetailsGet = async (req,res) => {
+const orderDetailsGet = async (req, res) => {
     try {
         const userId = req.session.userId;
         const { orderId } = req.params;
@@ -291,8 +329,8 @@ const orderDetailsGet = async (req,res) => {
         let orderDetails = await OrderModel.findById(orderId);
 
         if (orderDetails) {
-            res.render('user/order-details',{orderDetails, pageTitle: "Order Page"});
-            
+            res.render('user/order-details', { orderDetails, pageTitle: "Order Page" });
+
         } else {
             res.send("no orders available in this id");
         }
@@ -334,6 +372,7 @@ module.exports = {
     orderCheckout,
     orderCheckoutPost,
     orderConfirmGet,
+    handlePaymentSuccess,
     orderDetailsGet,
-    cancelOrderRequest
+    cancelOrderRequest,
 };
