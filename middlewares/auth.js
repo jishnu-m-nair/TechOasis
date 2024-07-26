@@ -17,7 +17,7 @@ const isLoggedOut = (req, res, next) => {
     }
 };
 
-const AdminLogSession = (req, res, next) => {
+const isAdmin = (req, res, next) => {
     if (!req.session.admin == "") {
         next();
     } else {
@@ -52,6 +52,6 @@ const isBlockedUser = async (req, res, next) => {
 module.exports = {
     isLoggedIn,
     isLoggedOut,
-    AdminLogSession,
+    isAdmin,
     isBlockedUser,
 };

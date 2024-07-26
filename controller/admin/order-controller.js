@@ -79,7 +79,6 @@ const updateCancelStatus = async (req, res) => {
             { $set: { 'requests.$.status': status } },
             { new: true }
         );
-        console.log(order.requests[0].status)
         if (!order) {
             return res.status(404).json({ message: 'Order or request not found' });
         }

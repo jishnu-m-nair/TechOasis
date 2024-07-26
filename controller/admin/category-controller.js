@@ -22,7 +22,6 @@ const categoryManagementGet = async (req, res) => {
 const categoryManagementCreate = async (req, res) => {
     try {
         const { name, description } = req.body;
-        console.log("reached");
         if (!req.file) {
             return res.status(400).json({ message: "Category image is required" });
         }
@@ -47,7 +46,6 @@ const categoryManagementCreate = async (req, res) => {
         });
 
         await category.save();
-        console.log("saved")
 
         res.status(201).json({ message: "Category added successfully" });
     } catch (error) {
@@ -123,7 +121,6 @@ const getCategoryList = async (req, res) => {
     try {
         const { filter, search } = req.body;
 
-        // Construct filter object based on query parameters
         const filterCriteria = {};
         if (filter === 'true') {
             filterCriteria.isFeatured = true;
@@ -131,10 +128,9 @@ const getCategoryList = async (req, res) => {
             filterCriteria.isFeatured = false;
         }
         if (search) {
-            filterCriteria.name = { $regex: search, $options: 'i' }; // Case-insensitive search
+            filterCriteria.name = { $regex: search, $options: 'i' };
         }
 
-        // Fetch categories from database based on filter criteria
         const categories = await CategoryModel.find(filterCriteria);
 
         res.status(200).json(categories);
