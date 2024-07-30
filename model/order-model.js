@@ -104,6 +104,9 @@ const orderSchema = new Schema(
             type: Number,
             default: 0,
         },
+        razorpayOrderId:{
+            type: String
+        }
     },
     {
         timestamps: true,

@@ -3,6 +3,7 @@ const OrderModel = require("../../model/order-model");
 const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
+const WalletModel = require("../../model/wallet-model");
 
 const orderManagement = async (req,res) =>{
     const perPage = 8;
@@ -85,7 +86,6 @@ const updateCancelStatus = async (req, res) => {
 
         if (status === 'Accepted') {
             order.status = 'Cancelled';
-
             for (const item of order.items) {
                 await ProductModel.findByIdAndUpdate(
                     item.productId,
@@ -95,6 +95,16 @@ const updateCancelStatus = async (req, res) => {
             }
 
             await order.save();
+            if(order.paymentMethod === "Razorpay") {
+                const wallet = await WalletModel.findOne({owner:order.user});
+                wallet.balance += order.billTotal;
+                wallet.transactions.push({ 
+                    amount: order.billTotal, 
+                    type: "credit", 
+                    reason: `Refund of cancellation of orderId: ${order.oId}`
+                });
+                await wallet.save();
+            }
         }
 
         res.status(200).json({ message: 'Request status updated successfully', order });

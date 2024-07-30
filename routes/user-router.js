@@ -81,6 +81,7 @@ router.delete('/delete-address/:addressId', isLoggedIn, isBlockedUser, profile.d
 router.get('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckout)
 router.post('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckoutPost)
 router.post('/payment-success',isLoggedIn, isBlockedUser,checkout.handlePaymentSuccess)
+router.post('/payment-failure',isLoggedIn, isBlockedUser,checkout.handlePaymentFailure)
 
 // order confirmation
 router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)

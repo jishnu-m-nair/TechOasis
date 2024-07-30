@@ -3,6 +3,7 @@ const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 const OrderModel = require("../../model/order-model");
+const WalletModel = require("../../model/wallet-model");
 const { securePassword } = require("../../utils/helpers");
 
 const bcrypt = require("bcryptjs");
@@ -45,16 +46,6 @@ const googleAuthFailure = async (req, res) => {
         res.redirect(`/login?error=${errorMessage}`);
     }
 };
-
-// password hashing
-// const securePassword = async (password) => {
-//     try {
-//         const passwordHash = await bcrypt.hash(password, 10);
-//         return passwordHash;
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// };
 
 // home page
 const home = async (req, res) => {
@@ -271,6 +262,14 @@ const signupOtpPost = async (req, res) => {
 
         req.session.email = user.email;
         req.session.userId = user._id;
+
+        const userWallet = new WalletModel({
+            owner: user._id,
+            balance: 0,
+            transactions: []
+        })
+
+        await userWallet.save();
 
         res.status(200).json({ message: "",redirectUrl:"/home" });
     } catch (error) {

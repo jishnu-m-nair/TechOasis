@@ -1,408 +1,536 @@
-    <!-- Start Header Area -->
-    <%- include('user-partials/header.ejs') %>
-    <!-- End Header Area -->
+<!-- Start Header Area -->
+<%- include('user-partials/header.ejs') %>
+<!-- End Header Area -->
 
-    <style>
-        .dashboard-container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+<style>
+  .dashboard-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
 
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-        .dashboard-header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
+  .dashboard-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
 
-        .d-flex {
-            display: flex;
-        }
+  .d-flex {
+    display: flex;
+  }
 
-        .d-flex span {
-            font-weight: bold;
-            padding-right: 15px;
-            color: #555;
-        }
+  .d-flex span {
+    font-weight: bold;
+    padding-right: 15px;
+    color: #555;
+  }
 
-        .d-flex p {
-            margin: 0;
-            color: #333;
-        }
+  .d-flex p {
+    margin: 0;
+    color: #333;
+  }
 
-        .view i {
-            margin-right: 5px;
-        }
-        .no-userinfo {
-            padding: 20px;
-            text-align: center;
-            color: #ff0000;
-            background-color: #fff3f3;
-            border: 1px solid #ff0000;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        address {
-            font-style: normal;
-            line-height: 1.5;
-        }
-        .address-container {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .address-title {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .address-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .address-item {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        .address-item:last-child {
-            border-bottom: none;
-        }
+  .view i {
+    margin-right: 5px;
+  }
 
-        .new-address-button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
+  .no-userinfo {
+    padding: 20px;
+    text-align: center;
+    color: #ff0000;
+    background-color: #fff3f3;
+    border: 1px solid #ff0000;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
 
-        .new-address-button:hover {
-            background-color: #0056b3;
-        }
+  address {
+    font-style: normal;
+    line-height: 1.5;
+  }
 
-        .new-address-button:active {
-            background-color: #00408d;
-        }
+  .address-container {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
 
-        .btn-seperator {
-            margin: 0 20px;
-            padding: 0 5px;
-        }
+  .address-title {
+    font-weight: bold;
+    margin-top: 10px;
+  }
 
-        .d-flex .view,
-        .d-flex .btn-seperator {
-            border: none;
-            background-color: transparent;
-            padding: 5px;
-        }
+  .address-list {
+    list-style-type: none;
+    padding: 0;
+  }
 
-    </style>
+  .address-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
 
-    <!-- Start Navbar Area -->
-    <%- include('user-partials/navbar.ejs') %>
-    <!-- End Navbar Area -->
+  .address-item:last-child {
+    border-bottom: none;
+  }
 
-    <!-- ...:::: Start Breadcrumb Section:::... -->
-    <div class="breadcrumb-section breadcrumb-bg-color--golden">
-        <div class="breadcrumb-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <h3 class="breadcrumb-title">My Account</h3>
-                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
-                            <nav aria-label="breadcrumb">
-                                <ul>
-                                    <li><a href="/home">Home</a></li>
-                                    <li class="active" aria-current="page">My Account</li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  .new-address-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .new-address-button:hover {
+    background-color: #0056b3;
+  }
+
+  .new-address-button:active {
+    background-color: #00408d;
+  }
+
+  .btn-seperator {
+    margin: 0 20px;
+    padding: 0 5px;
+  }
+
+  .d-flex .view,
+  .d-flex .btn-seperator {
+    border: none;
+    background-color: transparent;
+    padding: 5px;
+  }
+</style>
+
+<!-- Start Navbar Area -->
+<%- include('user-partials/navbar.ejs') %>
+<!-- End Navbar Area -->
+
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--golden">
+  <div class="breadcrumb-wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h3 class="breadcrumb-title">My Account</h3>
+          <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+            <nav aria-label="breadcrumb">
+              <ul>
+                <li><a href="/home">Home</a></li>
+                <li class="active" aria-current="page">My Account</li>
+              </ul>
+            </nav>
+          </div>
         </div>
-    </div> <!-- ...:::: End Breadcrumb Section:::... -->
+      </div>
+    </div>
+  </div>
+</div> <!-- ...:::: End Breadcrumb Section:::... -->
 
-    <!-- ...:::: Start Account Dashboard Section:::... -->
-    <div class="account-dashboard">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-12 col-md-3 col-lg-3">
-                    <!-- Nav tabs -->
-                    <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
-                        <ul role="tablist" class="nav flex-column dashboard-list">
-                            <li><a href="?tab=dashboard" data-bs-toggle="tab"
-                                    class="nav-link btn btn-block btn-md btn-black-default-hover active">Dashboard</a>
-                            </li>
-                            <!-- <li><a href="#account-details" data-bs-toggle="tab"
+<!-- ...:::: Start Account Dashboard Section:::... -->
+<div class="account-dashboard">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 col-md-3 col-lg-3">
+        <!-- Nav tabs -->
+        <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
+          <ul role="tablist" class="nav flex-column dashboard-list">
+            <li>
+              <a href="?tab=dashboard" data-bs-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover active">Dashboard</a>
+            </li>
+            <!-- <li><a href="#account-details" data-bs-toggle="tab"
                                     class="nav-link btn btn-block btn-md btn-black-default-hover">Account details</a>
                             </li> -->
-                            <li> <a href="?tab=orders" data-bs-toggle="tab"
-                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Orders</a></li>
-                            <!-- <li><a href="#downloads" data-bs-toggle="tab"
+            <li>
+              <a href="?tab=orders" data-bs-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Orders</a>
+            </li>
+            <!-- <li><a href="#downloads" data-bs-toggle="tab"
                                     class="nav-link btn btn-block btn-md btn-black-default-hover">Downloads</a></li> -->
-                            <li><a href="?tab=address" data-bs-toggle="tab"
-                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a></li>
-                            
-                            <li><a href="/logout"
-                                    class="btn btn-block btn-md btn-black-default-hover">logout</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-12 col-md-9 col-lg-9">
-                    <!-- Tab panes -->
-                    <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
-                        <div class="tab-pane fade show active" id="dashboard">
-                            <div class="dashboard-container">
-                                <div class="dashboard-header">
-                                    <h1>User Dashboard</h1>
-                                </div>
-                                <% if (userInfo) { %>
-                                    <div class="user-info">
-                                        <div class="d-flex">
-                                            <span>Full Name:</span>
-                                            <p id="fullName"><%= userInfo.fullname %></p>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span>Email:</span>
-                                            <p id="email"><%= userInfo.email %></p>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span>Mobile:</span>
-                                            <% if(userInfo.phone == null) { %>
-                                                <p id="mobile">N/A</p>
-                                            <% } else { %> 
-                                                <p id="mobile"><%= userInfo.phone %></p>
-                                            <% } %>
-                                        </div>
-                                        <div class="d-flex">
-                                            <a href="/edit-profile" class="view">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                        </div>
-                                        <div class="d-flex">
-                                            <a href="/change-password" class="view">
-                                                <i class="fas fa-edit"></i> Change Password
-                                            </a>
-                                        </div>
-                                    </div>
-                                <% } else { %>
-                                    <div class="no-userinfo">
-                                        <p>User information is not available.</p>
-                                    </div>
-                                <% } %>
-                            </div>
-                        </div>
-                        
-                        <div class="tab-pane fade" id="orders">
-                            <% if(orderDetails && orderDetails.length>0) { %>
-                                <h4>Orders</h4>
-                                <div class="table_page table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Order</th>
-                                                <th>Status</th>
-                                                <th>Total</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% for(const [i,order] of orderDetails.entries()) { %>
-                                            <tr>
-                                                <td><%=i + 1%></td>
-                                                <td><%- new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
-                                                <% if(order.status === "Delivered") { %>
-                                                <td><span class="text-success"><%= order.status%></span></td>
-                                                <% } else if(order.status === "Cancelled") { %>
-                                                <td><span class="text-danger"><%= order.status%></span></td>
-                                                <% } else { %>
-                                                <td><span class="text-warning"><%= order.status%></span></td>
-                                                <% } %>
-                                                <td><%= order.billTotal %></td>
-                                                <td><a href="/order-details/<%=order._id %>" class="view">view</a></td>
-                                            </tr>
-                                            <% } %>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <% } else { %>
-                                <div class="empty-cart-section section-fluid">
-                                    <div class="emptycart-wrapper">
-                                        <div class="container">
-                                            <div class="row">
-                                                <div class="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-3">
-                                                    <div class="emptycart-content text-center">
-                                                        <h4 class="title">No Orders</h4>
-                                                        <h6 class="sub-title">Sorry Mate... You haven't ordered any products!</h6>
-                                                        <a href="/shop" class="btn btn-lg btn-golden">Continue Shopping</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> 
-                            <% } %>
-                        </div>
-                        <div class="tab-pane" id="address">
-                            <div class="address-container">
-                                <div class="d-flex justify-content-between">
-                                    <h2>My Addresses</h2>
-                                    <a class="btn btn-md btn-black-default-hover" href="/add-address">Add Address</a>
-                                </div>
-                                
+            <li>
+              <a href="?tab=address" data-bs-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a>
+            </li>
+            <li>
+              <a href="?tab=wallet" data-bs-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Wallet</a>
+            </li>
 
-                                <% if (addresses && addresses.length > 0) { %>
-                                    <ul class="address-list">
-                                        <% addresses.forEach(address => { %>
-                                            <li class="address-item">
-                                                <h5 class="address-title"><%= address.addressType %> Address</h5>
-                                                <address>
-                                                    <strong>House No:</strong> <%= address.houseNo %>, 
-                                                    <strong>Street:</strong> <%= address.street %>, 
-                                                    <strong>Landmark:</strong> <%= address.landmark || 'N/A' %>, 
-                                                    <strong>City:</strong> <%= address.city %>, 
-                                                    <strong>District:</strong> <%= address.district %>, 
-                                                    <strong>State:</strong> <%= address.state %>, 
-                                                    <strong>Pincode:</strong> <%= address.pincode %>, 
-                                                    <strong>Country:</strong> <%= address.country %>
-                                                </address>
-                                                <div class="d-flex">
-                                                    <a href="/edit-address/<%= userId %>/<%= address._id %>" class="view">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </a>
-                                                    <p class="btn-seperator">|</p>
-                                                    <button class="delete-address-button text-red view" data-user-id="<%= userId %>" data-address-id="<%= address._id %>">
-                                                        <i class="fas fa-trash"></i> Delete
-                                                    </button>
-                                                </div>
-                                                
-                                            </li>
-                                        <% }) %>
-                                    </ul>
-                                <% } else { %>
-                                    <p>No addresses available. Please add a new address.</p>
-                                <% } %>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
+
+            <li>
+              <a href="/logout" class="btn btn-block btn-md btn-black-default-hover">logout</a>
+            </li>
+          </ul>
         </div>
-    </div> <!-- ...:::: End Account Dashboard Section:::... -->
+      </div>
+      <div class="col-sm-12 col-md-9 col-lg-9">
+        <!-- Tab panes -->
+        <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
+          <div class="tab-pane fade show active" id="dashboard">
+            <div class="dashboard-container">
+              <div class="dashboard-header">
+                <h1>User Dashboard</h1>
+              </div>
+              <% if (userInfo) { %>
+              <div class="user-info">
+                <div class="d-flex">
+                  <span>Full Name:</span>
+                  <p id="fullName">
+                    <%= userInfo.fullname %>
+                  </p>
+                </div>
+                <div class="d-flex">
+                  <span>Email:</span>
+                  <p id="email">
+                    <%= userInfo.email %>
+                  </p>
+                </div>
+                <div class="d-flex">
+                  <span>Mobile:</span>
+                  <% if(userInfo.phone==null) { %>
+                  <p id="mobile">N/A</p>
+                  <% } else { %>
+                  <p id="mobile">
+                    <%= userInfo.phone %>
+                  </p>
+                  <% } %>
+                </div>
+                <div class="d-flex">
+                  <a href="/edit-profile" class="view">
+                    <i class="fas fa-edit"></i> Edit
+                  </a>
+                </div>
+                <div class="d-flex">
+                  <a href="/change-password" class="view">
+                    <i class="fas fa-edit"></i> Change Password
+                  </a>
+                </div>
+              </div>
+              <% } else { %>
+              <div class="no-userinfo">
+                <p>User information is not available.</p>
+              </div>
+              <% } %>
+            </div>
+          </div>
 
-    <!-- Start Footer Section -->
-    <%- include('user-partials/footer.ejs') %>
-    <!-- End Footer Section -->
+          <div class="tab-pane fade" id="orders">
+            <% if(orderDetails && orderDetails.length>0) { %>
+            <h4>Orders</h4>
+            <div class="table_page table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Order</th>
+                    <th>Order Status</th>
+                    <th>Payment Status</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for(const [i,order] of orderDetails.entries()) { %>
+                  <tr>
+                    <td>
+                      <%=i + 1%>
+                    </td>
+                    <td>
+                    <%- new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
+                    </td>
+                    <% if(order.status==="Delivered" ) { %>
+                    <td><span class="text-success">
+                        <%= order.status%>
+                      </span>
+                    </td>
+                    <% } else if(order.status==="Cancelled" ) { %>
+                    <td><span class="text-danger">
+                        <%= order.status%>
+                      </span>
+                    </td>
+                    <% } else { %>
+                    <td><span class="text-warning">
+                        <%= order.status%>
+                      </span>
+                    </td>
+                    <% } %>
+
+                    <% if(order.paymentStatus==="Success" ) { %>
+                    <td><span class="text-success">
+                        <%= order.paymentStatus%>
+                      </span>
+                    </td>
+                    <% } else if(order.paymentStatus==="Failed" ) { %>
+                    <td><span class="text-danger">
+                        <%= order.paymentStatus%>
+                      </span>
+                    </td>
+                    <% } else { %>
+                    <td><span class="text-warning">
+                        <%= order.paymentStatus%>
+                      </span>
+                    </td>
+                    <% } %>
+                    <td>
+                      <%= order.billTotal %>
+                    </td>
+                    <td><a href="/order-details/<%=order._id %>" class="view">view</a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <% } else { %>
+            <div class="empty-cart-section section-fluid">
+              <div class="emptycart-wrapper">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-3">
+                      <div class="emptycart-content text-center">
+                        <h4 class="title">No Orders</h4>
+                        <h6 class="sub-title">Sorry Mate... You haven't ordered
+                          any products!</h6>
+                        <a href="/shop" class="btn btn-lg btn-golden">Continue
+                          Shopping</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
+          </div>
+          <div class="tab-pane" id="address">
+            <div class="address-container">
+              <div class="d-flex justify-content-between">
+                <h2>My Addresses</h2>
+                <a class="btn btn-md btn-black-default-hover" href="/add-address">Add
+                  Address</a>
+              </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // Function to get query parameter value
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
+              <% if (addresses && addresses.length> 0) { %>
+              <ul class="address-list">
+                <% addresses.forEach(address=> { %>
+                <li class="address-item">
+                  <h5 class="address-title">
+                    <%= address.addressType %> Address
+                  </h5>
+                  <address>
+                    <strong>House No:</strong>
+                    <%= address.houseNo %>,
+                    <strong>Street:</strong>
+                    <%= address.street %>,
+                    <strong>Landmark:</strong>
+                    <%= address.landmark || 'N/A' %>,
+                    <strong>City:</strong>
+                    <%= address.city %>,
+                    <strong>District:</strong>
+                    <%= address.district %>,
+                    <strong>State:</strong>
+                    <%= address.state %>,
+                    <strong>Pincode:</strong>
+                    <%= address.pincode %>,
+                    <strong>Country:</strong>
+                    <%= address.country %>
+                  </address>
+                  <div class="d-flex">
+                    <a href="/edit-address/<%= userId %>/<%= address._id %>" class="view">
+                      <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <p class="btn-seperator">|</p>
+                    <button class="delete-address-button text-red view" data-user-id="<%= userId %>" data-address-id="<%= address._id %>">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </div>
+
+                </li>
+                <% }) %>
+              </ul>
+              <% } else { %>
+              <p>No addresses available. Please add a new address.</p>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="wallet">
+            <div class="wallet-container">
+              <div class="wallet-header">
+                <h2>My Wallet</h2>
+              </div>
+              <% if (wallet) { %>
+              <div class="wallet-balance">
+                <h3>Balance: ₹<%= wallet.balance %>
+                </h3>
+              </div>
+
+              <% if (wallet.transactions && wallet.transactions.length> 0) { %>
+              <div class="table_page table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>S.No</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Type</th>
+                      <th>Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% wallet.transactions.forEach((transaction, index)=> { %>
+                    <tr>
+                      <td>
+                        <%= index + 1 %>
+                      </td>
+                      <td>
+                        <%- new Date(transaction.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
+                      <td>
+                        <%= transaction.amount %>
+                      </td>
+                      <td>
+                        <% if(transaction.type==="credit" ) { %>
+                        <span style="color: green;">
+                          <%= transaction.type %>
+                        </span>
+                        <% } else { %>
+                        <span style="color: red;">
+                          <%= transaction.type %>
+                        </span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <%= transaction.reason || 'N/A' %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <% } else { %>
+              <p>No transactions available.</p>
+              <% } %>
+              <% } else { %>
+              <p>Wallet information is not available.</p>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- ...:::: End Account Dashboard Section:::... -->
+
+<!-- Start Footer Section -->
+<%- include('user-partials/footer.ejs') %>
+<!-- End Footer Section -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // Function to get query parameter value
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Function to set active tab
+  function setActiveTab(tabId) {
+    const tabExists = document.querySelector(`.dashboard-list .nav-link[href$="tab=${tabId}"]`);
+    if (!tabExists) {
+      tabId = 'dashboard';
+    }
+
+    document.querySelectorAll('.dashboard-list .nav-link').forEach(link => {
+      if (link.getAttribute('href').includes(tabId)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      if (pane.getAttribute('id') === tabId) {
+        pane.classList.add('show', 'active');
+      } else {
+        pane.classList.remove('show', 'active');
+      }
+    });
+
+    if (getQueryParam('tab') !== tabId) {
+      history.pushState(null, '', `/profile?tab=${tabId}`);
+    }
+  }
+
+  let activeTab = getQueryParam('tab') || 'dashboard';
+  setActiveTab(activeTab);
+
+  document.querySelectorAll('.dashboard-list .nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const tabId = this.getAttribute('href').split('=')[1];
+      setActiveTab(tabId);
+    });
+  });
+
+  window.addEventListener('popstate', function() {
+    const newActiveTab = getQueryParam('tab') || 'dashboard';
+    setActiveTab(newActiveTab);
+  });
+
+  document.querySelectorAll('.delete-address-button').forEach(button => {
+    button.addEventListener('click', async function() {
+      const userId = this.dataset.userId;
+      const addressId = this.dataset.addressId;
+
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to delete this address?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/delete-address/${addressId}`, {
+            method: 'DELETE'
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            await Swal.fire('Deleted!', result.message, 'success');
+            this.closest('.address-item').remove();
+          } else {
+            Swal.fire('Failed!', 'Failed to delete address: ' + result.message, 'error');
+          }
+        } catch (error) {
+          Swal.fire('Error!', 'An error occurred while deleting the address.', 'error');
+          console.error(error);
         }
+      }
+    });
+  });
+</script>
 
-        // Function to set active tab
-        function setActiveTab(tabId) {
-            const tabExists = document.querySelector(`.dashboard-list .nav-link[href$="tab=${tabId}"]`);
-            if (!tabExists) {
-                tabId = 'dashboard';
-            }
-
-            document.querySelectorAll('.dashboard-list .nav-link').forEach(link => {
-                if (link.getAttribute('href').includes(tabId)) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-            document.querySelectorAll('.tab-pane').forEach(pane => {
-                if (pane.getAttribute('id') === tabId) {
-                    pane.classList.add('show', 'active');
-                } else {
-                    pane.classList.remove('show', 'active');
-                }
-            });
-
-            if (getQueryParam('tab') !== tabId) {
-                history.pushState(null, '', `/profile?tab=${tabId}`);
-            }
-        }
-
-        let activeTab = getQueryParam('tab') || 'dashboard';
-        setActiveTab(activeTab);
-
-        document.querySelectorAll('.dashboard-list .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const tabId = this.getAttribute('href').split('=')[1];
-                setActiveTab(tabId);
-            });
-        });
-
-        window.addEventListener('popstate', function() {
-            const newActiveTab = getQueryParam('tab') || 'dashboard';
-            setActiveTab(newActiveTab);
-        });
-
-        document.querySelectorAll('.delete-address-button').forEach(button => {
-            button.addEventListener('click', async function() {
-                const userId = this.dataset.userId;
-                const addressId = this.dataset.addressId;
-        
-                const result = await Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'Do you really want to delete this address?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'No, keep it'
-                });
-
-                if (result.isConfirmed) {
-                    try {
-                        const response = await fetch(`/delete-address/${addressId}`, {
-                            method: 'DELETE'
-                        });
-
-                        const result = await response.json();
-                        if (response.ok) {
-                            await Swal.fire('Deleted!', result.message, 'success');
-                            this.closest('.address-item').remove();
-                        } else {
-                            Swal.fire('Failed!', 'Failed to delete address: ' + result.message, 'error');
-                        }
-                    } catch (error) {
-                        Swal.fire('Error!', 'An error occurred while deleting the address.', 'error');
-                        console.error(error);
-                    }
-                }
-            });
-        });
-    </script>
-
-    <%- include('user-partials/scripts.ejs') %>
+<%- include('user-partials/scripts.ejs') %>

@@ -4,6 +4,7 @@ const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
+const WalletModel = require("../../model/wallet-model");
 const bcrypt = require("bcryptjs");
 // require("dotenv").config();
 // const { sentOtp } = require("../../config/nodeMailer");
@@ -20,18 +21,28 @@ const securePassword = async (password) => {
 };
 
 // Profile
-const profile = async(req,res)=>{
+const profile = async (req, res) => {
     try {
-      const userId = req.session.userId;
-      const userInfo = await UserModel.findById(userId);
-      const addressDocument = await AddressModel.findOne({ user: userId });
-      const orderDetails = await OrderModel.find({ user: userId }).sort({createdAt: -1});
+        const userId = req.session.userId;
+        const userInfo = await UserModel.findById(userId);
+        const addressDocument = await AddressModel.findOne({ user: userId });
+        const orderDetails = await OrderModel.find({ user: userId }).sort({ createdAt: -1 });
+        const wallet = await WalletModel.findOne({ owner: userId });
+        if(!wallet) {
+            console.log("userid",userId);
+            const userWallet = new WalletModel({
+                owner: userId,
+                balance: 0,
+                transactions: []
+            })
+    
+            await userWallet.save();
+        }
+        const addresses = addressDocument ? addressDocument.addresses : [];
 
-      const addresses = addressDocument ? addressDocument.addresses : [];
-
-      res.render('user/profile',{userInfo,addresses,userId,orderDetails,pageTitle: "Profile Page"});
+        res.render('user/profile', { userInfo, addresses, userId, orderDetails, wallet, pageTitle: "Profile Page" });
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
 };
 
@@ -41,7 +52,7 @@ const editProfile = async (req, res) => {
         const userId = req.session.userId;
         const userInfo = await UserModel.findById(userId);
 
-        res.render("user/edit-profile", { userInfo, pageTitle: "Edit Profile Page"});
+        res.render("user/edit-profile", { userInfo, pageTitle: "Edit Profile Page" });
     } catch (error) {
         console.log(error);
     }
@@ -76,7 +87,7 @@ const editProfilePatch = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const userId = req.session.userId;
-        res.render("user/change-password", { pageTitle: "Change Password Page"});
+        res.render("user/change-password", { pageTitle: "Change Password Page" });
     } catch (error) {
         console.error(error);
     }
@@ -109,7 +120,7 @@ const changePasswordPost = async (req, res) => {
             userData.password
         );
         if (!isCurrentPasswordValid) {
-            return res .status(400).json({ message: "Current password is incorrect." });
+            return res.status(400).json({ message: "Current password is incorrect." });
         }
         let newPasswordHash = await securePassword(newPassword);
 
@@ -120,7 +131,7 @@ const changePasswordPost = async (req, res) => {
         );
 
         if (!updatedUser) {
-            return res.status(500).json({ message: "An error occurred while updating the password."});
+            return res.status(500).json({ message: "An error occurred while updating the password." });
         }
 
         return res.status(200).json({
@@ -137,7 +148,7 @@ const changePasswordPost = async (req, res) => {
 const addAddress = (req, res) => {
     try {
         const userId = req.session.userId;
-        res.render("user/add-address", { userId, pageTitle: "Add Address Page"});
+        res.render("user/add-address", { userId, pageTitle: "Add Address Page" });
     } catch (error) {
         console.error(error);
         res.status(500).json("Internal Server Error");
@@ -198,7 +209,7 @@ const editAddress = async (req, res) => {
             return res.status(404).render('error', { message: 'Address not found.', pageTitle: "Edit Address Page" });
         }
 
-        res.render('user/edit-address', { address, userId, addressId, pageTitle: "Edit Address Page"});
+        res.render('user/edit-address', { address, userId, addressId, pageTitle: "Edit Address Page" });
     } catch (error) {
         console.error('Error fetching address:', error);
         res.status(500).render('error', { message: 'An error occurred while fetching the address.', pageTitle: "Edit Address Page" });
