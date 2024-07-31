@@ -2,6 +2,22 @@
     <%- include('user-partials/header.ejs') %>
     <!-- End Header Area -->
 
+    <style>
+        .coupon-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .coupon-item .d-flex {
+            margin-bottom: 10px;
+        }
+
+        .coupon-item p span {
+            display: inline-block;
+            margin-right: 15px;
+        }
+    </style>
+
     <!-- Start Navbar Area -->
     <%- include('user-partials/navbar.ejs') %>
     <!-- End Navbar Area -->
@@ -109,35 +125,69 @@
                                             <% for (let i = 0; i < selectedItems.length; i++) { %>
                                             <tr>
                                                 <td> <%=selectedItems[i].productId.productName%> <strong> × <%=selectedItems[i].quantity%></strong></td>
-                                                <td> Rs.<%=selectedItems[i].productId.afterDiscount%>.00</td>
+                                                <td> Rs.<%=selectedItems[i].price%>.00</td>
                                             </tr>
                                             <% } %>
                                         <% } %>
                                     </tbody>
+                                    
+                                </table>
+                            </div>
+                            <div class="order_table table-responsive">
+                                <table>
                                     <tfoot>
-                                        <!-- <tr>
-                                            <th>Cart Subtotal</th>
-                                            <td>$215.00</td>
-                                        </tr>
                                         <tr>
-                                            <th>Shipping</th>
-                                            <td><strong>$5.00</strong></td>
-                                        </tr> -->
+                                            <th>Cart Subtotal</th>
+                                            <td id="subTotal"><strong>Rs.<%=billTotal%>.00</strong></td>
+                                        </tr>
+                                        <tr id="discountBox">
+                                            <th>Discount</th>
+                                            <td id="discountBoxAmount"><strong>Rs.0.00</strong></td>
+                                        </tr>
                                         <tr class="order_total">
                                             <th>Order Total</th>
-                                            <td><strong>Rs.<%=billTotal%>.00</strong></td>
+                                            <td id="totalAmount"><strong>Rs.<%=billTotal%>.00</strong></td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
+                            
                             <div class="coupon_code" data-aos="fade-up" data-aos-delay="200">
                                 <h3>Coupon</h3>
                                 <div class="coupon_inner">
                                     <p>Enter your coupon code if you have one.</p>
-                                    <input class="mb-2" placeholder="Coupon code" type="text">
-                                    <button type="submit" class="btn btn-md btn-golden">
+                                    <input class="mb-2" id="couponInput" placeholder="Coupon code" type="text">
+                                    <button type="button" class="btn btn-md btn-golden" id="applyCouponBtn">
                                         Apply coupon
                                     </button>
+                                    <button type="button" class="btn btn-md btn-golden" id="removeCouponBtn" style="display: none;">
+                                        Remove coupon
+                                    </button>
+                                    <button type="button" class="btn btn-md btn-golden" id="showCouponsBtn">
+                                        Available Coupons
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Available Coupons Modal -->
+                            <div class="modal fade" id="availableCouponsModal" tabindex="-1" aria-labelledby="availableCouponsModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="availableCouponsModalLabel">Available Coupons</h5>
+                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div id="couponList">
+                                                <!-- Coupons will be dynamically added here -->
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-md btn-black-default-hover" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="payment_method">
@@ -179,6 +229,133 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const showCouponsBtn = document.getElementById('showCouponsBtn');
+            const applyCouponBtn = document.getElementById('applyCouponBtn');
+            const removeCouponBtn = document.getElementById('removeCouponBtn');
+            const couponInput = document.getElementById('couponInput');
+            const couponList = document.getElementById('couponList');
+            const availableCouponsModal = new bootstrap.Modal(document.getElementById('availableCouponsModal'));
+            const discountBox = document.getElementById('discountBox');
+            const discountBoxAmount = document.getElementById('discountBoxAmount');
+            let appliedCouponCode = '';
+
+            showCouponsBtn.addEventListener('click', async function() {
+                try {
+                    const cartTotal = calculateCartTotal();
+                    const response = await fetch(`/api/available-coupons?cartTotal=${cartTotal}`);
+                    const coupons = await response.json();
+                    displayCoupons(coupons);
+                    availableCouponsModal.show();
+                } catch (error) {
+                    console.error('Error fetching coupons:', error);
+                    alert('Failed to fetch available coupons. Please try again.');
+                }
+            });
+
+            function calculateCartTotal() {
+                // Implement this function to calculate the current cart total
+                // For example:
+                return parseFloat(document.getElementById('subTotal').textContent.replace('Rs.', '').trim());
+            }
+
+            function displayCoupons(coupons) {
+                couponList.innerHTML = '';
+                coupons.forEach(coupon => {
+                    const couponElement = document.createElement('div');
+                    couponElement.className = 'coupon-item mb-3 p-3 border rounded';
+                    couponElement.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">${coupon.couponCode}</h6>
+                            <button class="btn btn-md btn-golden copy-coupon" data-code="${coupon.couponCode}">Copy Code</button>
+                        </div>
+                        <p>${coupon.description}</p>
+                        <p><span>Discount: ₹${coupon.discountAmount}</span> | <span>Expires: ${new Date(coupon.expirationDate).toLocaleDateString()}</span></p>
+                        <p><span>Min Purchase: ₹${coupon.minimumAmount}</span> | <span>Max Purchase: ₹${coupon.maximumAmount}</span></p>
+                    `;
+                    couponList.appendChild(couponElement);
+                });
+
+                document.querySelectorAll('.copy-coupon').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const code = this.getAttribute('data-code');
+                        navigator.clipboard.writeText(code).then(() => {
+                            alert('Coupon code copied to clipboard!');
+                            couponInput.value = code;
+                            availableCouponsModal.hide();
+                        }).catch(err => {
+                            console.error('Failed to copy code: ', err);
+                            couponInput.value = code;
+                            availableCouponsModal.hide();
+                        });
+                    });
+                });
+            }
+
+            applyCouponBtn.addEventListener('click', async function() {
+                const code = couponInput.value.trim();
+                if (code) {
+                    try {
+                        const response = await fetch('/api/apply-coupon', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ code }),
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('Coupon applied successfully!');
+                            applyCouponBtn.style.display = 'none';
+                            removeCouponBtn.style.display = 'inline-block';
+                            discountBoxAmount.innerHTML = `<strong>- Rs.${result.discountAmount}.00</strong>`;
+                            updateCartTotal(result.newTotal);
+                            appliedCouponCode = code; // Store the applied coupon code
+                        } else {
+                            alert(result.message || 'Failed to apply coupon. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error applying coupon:', error);
+                        alert('An error occurred while applying the coupon. Please try again.');
+                    }
+                } else {
+                    alert('Please enter a coupon code.');
+                }
+            });
+
+            removeCouponBtn.addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/remove-coupon', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Coupon removed successfully!');
+                        couponInput.value = '';
+                        applyCouponBtn.style.display = 'inline-block';
+                        removeCouponBtn.style.display = 'none';
+                        discountBoxAmount.innerHTML = `<strong>Rs.0.00</strong>`;
+                        updateCartTotal(result.newTotal);
+                        appliedCouponCode = ''; // Clear the applied coupon code
+                    } else {
+                        alert(result.message || 'Failed to remove coupon. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error removing coupon:', error);
+                    alert('An error occurred while removing the coupon. Please try again.');
+                }
+            });
+
+            function updateCartTotal(newTotal) {
+                // Update the cart total displayed on the page
+                const totalAmountElement = document.getElementById('totalAmount');
+                if (totalAmountElement) {
+                    totalAmountElement.innerHTML = `<strong>Rs.${newTotal.toFixed(2)}</strong>`;
+                }
+            }
+
             const checkoutForm = document.getElementById('checkoutForm');
     
             if (checkoutForm) {
@@ -204,6 +381,7 @@
                     const data = {
                         addressId,
                         paymentOption,
+                        couponCode: appliedCouponCode
                     };
 
                     try {

@@ -4,6 +4,7 @@ const admin = require('../controller/admin/admin-controller')
 const product = require('../controller/admin/product-controller')
 const category = require('../controller/admin/category-controller')
 const order = require('../controller/admin/order-controller')
+const coupon = require('../controller/admin/coupon-controller')
 const { isAdmin } = require('../middlewares/auth')
 const { productUpload, categoryUpload } = require('../config/multerConfig')
 
@@ -58,5 +59,9 @@ router.get('/error',(req,res)=>{
 router.get('/admin-404',(req,res)=>{
     res.render('admin-404')
 })
+
+router.get("/admin/coupon-management",coupon.couponManagement);
+router.post('/api/admin/add-coupon', coupon.addCoupon);
+router.delete('/api/admin/delete-coupon/:id', coupon.deleteCoupon);
 
 module.exports = router;

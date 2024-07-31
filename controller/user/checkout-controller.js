@@ -5,7 +5,8 @@ const CategoryModel = require("../../model/category-model");
 const CartModel = require("../../model/cart-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
-const { generateUniqueOrderID } = require('../../utils/helpers');
+const CouponModel = require('../../model/coupon-model');
+const { generateUniqueOrderID, updateExpiredCoupons } = require('../../utils/helpers');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
@@ -16,19 +17,18 @@ const razorpay = new Razorpay({
 
 const orderCheckout = async (req, res) => {
     try {
-        let UserExist = req.session.userId ? true : false;
-
+        const userId = req.session.userId;
         let addressList = await AddressModel.findOne({
-            user: req.session.userId,
+            user: userId,
         });
         if (!addressList) {
             addressList = null;
         }
-        const userDetails = await UserModel.findOne({
-            _id: req.session.userId,
-        });
+        await updateExpiredCoupons();
+        const coupons = await CouponModel.find({isActive:true});
+        const userDetails = await UserModel.findById(userId);
         const category = await CategoryModel.find();
-        const cartCheckout = await CartModel.findOne({ owner: req.session.userId }).populate({ path: "items.productId", model: "Products" });
+        const cartCheckout = await CartModel.findOne({ owner: userId }).populate({ path: "items.productId", model: "Products" });
         if (!cartCheckout || cartCheckout.items.length === 0) {
             return res.status(404).render("404", { errorMessage: 'Cart not found or empty' });
         }
@@ -53,7 +53,7 @@ const orderCheckout = async (req, res) => {
                     cartCheckout.items.map(async (prod, i) => {
                         if (
                             prod.productId + "" ===
-                            selectedItems[index].productId + ""
+                            selectedItems[i].productId + ""
                         ) {
                             cartCheckout.items[i].quantity = stock.countInStock;
                             console.log("before saving    ==");
@@ -67,39 +67,39 @@ const orderCheckout = async (req, res) => {
                 flag = 0;
 
                 res.render("user/checkout", {
-                    UserExist: UserExist,
                     category,
                     addressList,
                     selectedItems,
                     billTotal,
                     itemCount,
                     userDetails,
+                    coupons,
                     err: true,
                     pageTitle: "checkout",
                 });
             } else {
                 res.render("user/checkout", {
-                    UserExist: UserExist,
                     category,
                     addressList,
                     selectedItems,
                     billTotal,
                     itemCount,
                     userDetails,
+                    coupons,
                     err: "",
                     pageTitle: "checkout",
                 });
             }
         });
     } catch (err) {
-        console.log("catch block");
         console.log(err);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
 const orderCheckoutPost = async (req, res, next) => {
     try {
-        const { paymentOption, addressId } = req.body;
+        const { paymentOption, addressId, couponCode } = req.body;
         if (!paymentOption || !addressId) {
             return res
                 .status(400)
@@ -143,7 +143,38 @@ const orderCheckoutPost = async (req, res, next) => {
 
         const selectedItems = cart.items;
         const order_id = await generateUniqueOrderID();
-        let billTotal = selectedItems.reduce((total, item) => total + (parseFloat(item.productId.afterDiscount) * parseInt(item.quantity)), 0);
+        let billTotal = selectedItems.reduce((total, item) => {
+            const price = item.productId.discountPrice > 0 ? item.productId.afterDiscount : item.productId.price;
+            return total + (parseFloat(price) * parseInt(item.quantity));
+        }, 0);
+
+        // Apply coupon if provided
+        let couponDiscount = 0;
+        let appliedCoupon = null;
+        if (couponCode) {
+            await updateExpiredCoupons();
+            appliedCoupon = await CouponModel.findOne({ couponCode: couponCode });
+            if (appliedCoupon && 
+                appliedCoupon.isActive && 
+                !appliedCoupon.isDeleted &&
+                billTotal >= appliedCoupon.minimumAmount &&
+                billTotal <= appliedCoupon.maximumAmount) {
+                
+                couponDiscount = appliedCoupon.discountAmount;
+                billTotal -= couponDiscount;
+
+                // Update maxUsers
+                if (appliedCoupon.maxUsers !== null) {
+                    appliedCoupon.maxUsers--;
+                    if (appliedCoupon.maxUsers <= 0) {
+                        appliedCoupon.isActive = false;
+                    }
+                    await appliedCoupon.save();
+                }
+            } else {
+                return res.status(400).json({ success: false, error: "Invalid or expired coupon" });
+            }
+        }
 
         if (billTotal > 500000) {
             return res.status(400).json({ success: false, error: "Total bill exceeds the allowed limit of 500,000 rupees" });
@@ -162,6 +193,7 @@ const orderCheckoutPost = async (req, res, next) => {
             billTotal: billTotal
         };
         for (const item of selectedItems) {
+
             orderData.items.push({
                 productId: item.productId._id,
                 image: item.productId.image,
@@ -185,7 +217,6 @@ const orderCheckoutPost = async (req, res, next) => {
                 return res.status(400).json({ success: false, error: "Product not found" });
             }
         }
-
         const order = new OrderModel(orderData);
         await order.save();
 
@@ -267,18 +298,6 @@ const handlePaymentSuccess = async (req, res, next) => {
         order.paymentStatus = "Success";
         await order.save();
 
-        // // Update product stock
-        // for (const item of order.items) {
-        //     const product = await ProductModel.findById(item.productId);
-        //     if (product) {
-        //         product.countInStock -= item.quantity;
-        //         await product.save();
-        //     }
-        // }
-
-        // Clear the cart
-        // await CartModel.deleteOne({ owner: order.user });
-
         return res.status(200).json({ success: true, message: "Payment successful", orderId: order._id });
     } catch (err) {
         console.error(err);
@@ -296,7 +315,6 @@ const handlePaymentFailure = async (req, res, next) => {
 
         order.paymentStatus = "Failed";
         await order.save();
-        console.log("orderod",order._id);
         return res.status(200).json({ success: true, message: "Payment failure recorded", orderId: order._id });
     } catch (err) {
         console.error(err);
@@ -308,7 +326,6 @@ const orderConfirmGet = async (req, res) => {
     const orderId = req.params.orderId;
     const orderDetails = await OrderModel.findById(orderId)
     const userDetails = await UserModel.findById(req.session.userId)
-    console.log(userDetails.fullname)
     const userName = userDetails.fullname;
     res.render("user/order", { orderDetails, userName, pageTitle: "Order Confirmation" })
 }
@@ -359,6 +376,87 @@ const cancelOrderRequest = async (req, res) => {
     }
 };
 
+const availableCoupons = async (req, res) => {
+    try {
+        const cartTotal = parseFloat(req.query.cartTotal);
+
+        if (isNaN(cartTotal)) {
+            return res.status(400).json({ message: 'Invalid cart total' });
+        }
+        await updateExpiredCoupons();
+        const coupons = await CouponModel.find({
+            isActive: true,
+            isDeleted: false,
+            minimumAmount: { $lte: cartTotal },
+            maximumAmount: { $gte: cartTotal }
+        }).select('couponCode description discountAmount minimumAmount maximumAmount expirationDate').lean();
+
+        res.json(coupons);
+    } catch (error) {
+        console.error('Error fetching available coupons:', error);
+        res.status(500).json({ message: 'Failed to fetch available coupons' });
+    }
+};
+
+const applyCoupon = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const userId = req.session.userId;
+        const cart = await CartModel.findOne({ owner: userId });
+        let cartTotal = cart.billTotal;
+        await updateExpiredCoupons();
+        const coupon = await CouponModel.findOne({ 
+            couponCode: code, 
+            isActive: true, 
+            isDeleted: false,
+        });
+
+        if (!coupon) {
+            return res.json({ success: false, message: 'Invalid or expired coupon' });
+        }
+
+        if (cartTotal < coupon.minimumAmount) {
+            return res.json({ success: false, message: `Minimum purchase amount of ₹${coupon.minimumAmount} required` });
+        }
+
+        if (cartTotal > coupon.maximumAmount) {
+            return res.json({ success: false, message: `Maximum purchase amount is ₹${coupon.maximumAmount}` });
+        }
+
+        const discountedTotal = cartTotal - coupon.discountAmount;
+
+        // Store the applied coupon and new total in the session
+        req.session.appliedCoupon = coupon;
+        req.session.cartTotal = discountedTotal;
+
+        res.json({ success: true, message: 'Coupon applied successfully', newTotal: discountedTotal, discountAmount: coupon.discountAmount });
+    } catch (error) {
+        console.error('Error applying coupon:', error);
+        res.status(500).json({ success: false, message: 'Failed to apply coupon' });
+    }
+};
+
+const removeCoupon = async (req, res) => {
+    try {
+        const appliedCoupon = req.session.appliedCoupon;
+        if (!appliedCoupon) {
+            return res.json({ success: false, message: 'No coupon applied' });
+        }
+
+        let cartTotal = req.session.cartTotal || 0;
+
+        const originalTotal = cartTotal + appliedCoupon.discountAmount;
+
+        // Remove the applied coupon from the session
+        delete req.session.appliedCoupon;
+        req.session.cartTotal = originalTotal;
+
+        res.json({ success: true, message: 'Coupon removed successfully', newTotal: originalTotal });
+    } catch (error) {
+        console.error('Error removing coupon:', error);
+        res.status(500).json({ success: false, message: 'Failed to remove coupon' });
+    }
+};
 
 module.exports = {
     orderCheckout,
@@ -368,4 +466,7 @@ module.exports = {
     handlePaymentFailure,
     orderDetailsGet,
     cancelOrderRequest,
+    availableCoupons,
+    applyCoupon,
+    removeCoupon,
 };

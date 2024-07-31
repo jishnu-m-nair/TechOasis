@@ -119,52 +119,56 @@
             <div class="col-md-8">
                 <div class="card div-container">
                     <div class="invoice p-5">
-                        <% if (orderDetails.status === "Pending" || orderDetails.status === "Processing" ) { %>
-                        <h5>Your order Confirmed!</h5>
-                        <div class="d-flex justify-content-start">
-                            <span class="font-weight-bold pr-1">
-                                    Hello ,
-                            </span>
-                            <span>
-                                You order has been confirmed and will be
-                                shipped in next two days!
-                            </span>
-                        </div>
-                        <% } else if (orderDetails.status === "Cancelled") { %>
-                            <h5>Order Cancelled!</h5>
+                        <% if(orderDetails.paymentStatus === "Failed") {%>
+                            <span class="text-danger">Your Payment is failed, Please retry the Payment</span>
+                        <% } else { %>
+                            <% if (orderDetails.status === "Pending" || orderDetails.status === "Processing" ) { %>
+                            <h5>Your order Confirmed!</h5>
                             <div class="d-flex justify-content-start">
                                 <span class="font-weight-bold pr-1">
                                         Hello ,
                                 </span>
                                 <span>
-                                    This order has been cancelled
+                                    You order has been confirmed and will be
+                                    shipped in next two days!
                                 </span>
                             </div>
-                        <% } else if (orderDetails.status === "Shipped") { %>
-                            <h5>Order has been shipped</h5>
-                            <div class="d-flex justify-content-start">
-                                <span class="font-weight-bold pr-1">
-                                        Hello ,
-                                </span>
-                                <span>
-                                    Order is shipped, it will reach you soon
-                                </span>
-                            </div>
-                        <% } else if (orderDetails.status === "Delivered") { %>
-                            <h5>Order is Delivered</h5>
-                            <div class="d-flex justify-content-start">
-                                <span class="font-weight-bold pr-1">
-                                        Hello ,
-                                </span>
-                                <span>
-                                    This order has been Delivered
-                                </span>
-                            </div>
-                        <% } %>
-                        
-                        <br>
-                        <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
-                            <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                            <% } else if (orderDetails.status === "Cancelled") { %>
+                                <h5>Order Cancelled!</h5>
+                                <div class="d-flex justify-content-start">
+                                    <span class="font-weight-bold pr-1">
+                                            Hello ,
+                                    </span>
+                                    <span>
+                                        This order has been cancelled
+                                    </span>
+                                </div>
+                            <% } else if (orderDetails.status === "Shipped") { %>
+                                <h5>Order has been shipped</h5>
+                                <div class="d-flex justify-content-start">
+                                    <span class="font-weight-bold pr-1">
+                                            Hello ,
+                                    </span>
+                                    <span>
+                                        Order is shipped, it will reach you soon
+                                    </span>
+                                </div>
+                            <% } else if (orderDetails.status === "Delivered") { %>
+                                <h5>Order is Delivered</h5>
+                                <div class="d-flex justify-content-start">
+                                    <span class="font-weight-bold pr-1">
+                                            Hello ,
+                                    </span>
+                                    <span>
+                                        This order has been Delivered
+                                    </span>
+                                </div>
+                            <% } %>
+                            
+                            <br>
+                            <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
+                                <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                            <% } %>
                         <% } %>
 
                         <!-- Modal for order cancellation -->
