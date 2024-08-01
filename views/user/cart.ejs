@@ -81,9 +81,7 @@
                                         </td>
                                         <td class="product-price">
                                             <span>
-                                                Rs.<%=
-                                                cart.items[i].productId.price
-                                                %>.00
+                                                Rs.<%= cart.items[i].productId.price.toFixed(2) %>
                                             </span>
                                         </td>
                                         <td>
@@ -111,7 +109,7 @@
                                         </td>
                                         <td class="product_total">
                                             <span
-                                                id="carttotal-<%= cart.items[i].productId._id %>">Rs.<%= cart.items[i].price %>.00</span>
+                                                id="carttotal-<%= cart.items[i].productId._id %>">Rs.<%= cart.items[i].price.toFixed(2) %></span>
                                         </td>
                                     </tr>
                                     <% } %> <% } %>
@@ -130,26 +128,7 @@
     <div class="coupon_area">
         <div class="container">
             <div class="row">
-                <div class="col-lg-6 col-md-6">
-                    <div
-                        class="coupon_code left"
-                        data-aos="fade-up"
-                        data-aos-delay="200"
-                    >
-                        <h3>Coupon</h3>
-                        <div class="coupon_inner">
-                            <p>Enter your coupon code if you have one.</p>
-                            <input
-                                class="mb-2"
-                                placeholder="Coupon code"
-                                type="text"
-                            />
-                            <button type="submit" class="btn btn-md btn-golden">
-                                Apply coupon
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div class="col-lg-6 col-md-6"></div>
                 <div class="col-lg-6 col-md-6">
                     <div class="coupon_code right" data-aos="fade-up" data-aos-delay="400">
                         <h3>Cart Totals</h3>

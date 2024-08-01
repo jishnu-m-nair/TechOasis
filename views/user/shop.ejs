@@ -220,12 +220,12 @@
                                                                         <% if(product.countInStock === 0) { %>
                                                                             <a class="text-danger">Out Of Stock</a>
                                                                         <% } else { %>
-                                                                            <a onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
+                                                                            <a href="#" onclick="addProductCart('<%=product._id%>')">Add to Cart</a>
                                                                         <% } %>
                                                                     </div>
                                                                     <div class="action-link-right">
                                                                         <a href="#" data-bs-toggle="modal" data-bs-target="#modalQuickview"><i class="icon-magnifier"></i></a>
-                                                                        <a href="#"><i class="icon-heart"></i></a>
+                                                                        <a href="#" onclick="addToWishlist('<%=product._id%>')"><i class="icon-heart"></i></a>
                                                                         <a href="#"><i class="icon-shuffle"></i></a>
                                                                     </div>
                                                                 </div>
@@ -349,6 +349,51 @@
                 console.error("Error adding product to cart:", error);
             }
         }
+        
+        async function addToWishlist(productId) {
+            event.preventDefault();
+            try {
+                let res = await fetch("/api/add-wishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+    
+                if (res.status === 400) {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Product already in the Wishlist",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else if (res.status === 200) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "bottom",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: "black",
+                        color: "white",
+                        didOpen: (toast) => {
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
+    
+                    Toast.fire({
+                        icon: "success",
+                        title: "Added to Wishlist",
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+            }
+        }
 
         $(document).ready(function() {
             const $categoryForm = $('#categoryFilter');
@@ -433,12 +478,12 @@
                                             <div class="action-link-left">
                                                 ${product.countInStock === 0 
                                                     ? '<a class="text-danger">Out Of Stock</a>' 
-                                                    : `<a onclick="addProductCart('${product._id}')">Add to Cart</a>`
+                                                    : `<a href="#" onclick="addProductCart('${product._id}')">Add to Cart</a>`
                                                 }
                                             </div>
                                             <div class="action-link-right">
                                                 <a href="#"><i class="icon-magnifier"></i></a>
-                                                <a href="#"><i class="icon-heart"></i></a>
+                                                <a href="#" onclick="addToWishlist('${product._id}')"><i class="icon-heart"></i></a>
                                                 <a href="#"><i class="icon-shuffle"></i></a>
                                             </div>
                                         </div>

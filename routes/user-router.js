@@ -4,6 +4,7 @@ const user = require('../controller/user/user-controller')
 const profile = require('../controller/user/profile-controller')
 const cart = require('../controller/user/cart-controller')
 const checkout = require('../controller/user/checkout-controller')
+const wishlist = require('../controller/user/wishlist-controller');
 const passport = require('passport');
 const Razorpay = require('razorpay');
 const { isLoggedIn, isLoggedOut, isBlockedUser } = require('../middlewares/auth')
@@ -90,5 +91,10 @@ router.post('/api/remove-coupon', checkout.removeCoupon);
 router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)
 router.get('/order-details/:orderId', isLoggedIn, isBlockedUser, checkout.orderDetailsGet)
 router.post('/api/cancel-order', isLoggedIn, isBlockedUser, checkout.cancelOrderRequest);
+
+// wishlist
+router.get('/wishlist', isLoggedIn, isBlockedUser, wishlist.loadWishlist);
+router.post('/api/add-to-wishlist', isLoggedIn, isBlockedUser, wishlist.addToWishlist);
+router.post('/api/remove-from-wishlist', isLoggedIn, isBlockedUser, wishlist.removeWishlist);
 
 module.exports = router;

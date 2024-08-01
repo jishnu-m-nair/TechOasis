@@ -1,0 +1,206 @@
+<!-- Start Header Area -->
+<%- include('user-partials/header.ejs') %>
+<!-- End Header Area -->
+
+<!-- Start Navbar Area -->
+<%- include('user-partials/navbar.ejs') %>
+<!-- End Navbar Area -->
+
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--golden">
+    <div class="breadcrumb-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="breadcrumb-title">Wishlist</h3>
+                    <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                        <nav aria-label="breadcrumb">
+                            <ul>
+                                <li><a href="/home">Home</a></li>
+                                <li class="active" aria-current="page">Wishlist</li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ...:::: End Breadcrumb Section:::... -->
+
+<!-- ...:::: Start Wishlist Section:::... -->
+    <div class="wishlist-section">
+        <!-- Start Cart Table -->
+        <div class="wishlish-table-wrapper" data-aos="fade-up" data-aos-delay="0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table_desc">
+                            <div class="table_page table-responsive">
+                                <table>
+                                    <!-- Start Wishlist Table Head -->
+                                    <thead>
+                                        <tr>
+                                            <th class="product_remove">Delete</th>
+                                            <th class="product_thumb">Image</th>
+                                            <th class="product_name">Product</th>
+                                            <th class="product-price">Price</th>
+                                            <th class="product_stock">Stock Status</th>
+                                            <th class="product_addcart">Add To Cart</th>
+                                        </tr>
+                                    </thead> <!-- End Cart Table Head -->
+                                    <tbody>
+                                        <% if (wishlist && wishlist.products && wishlist.products.length > 0) { %>
+                                            <% wishlist.products.forEach(product => { %>
+                                                <!-- Start Wishlist Single Item-->
+                                                <tr>
+                                                    <td class="product_remove">
+                                                        <a href="#" onclick="removeProductWishlist('<%= product._id %>')"><i class="fa fa-trash-o"></i></a>
+                                                    </td>
+                                                    <td class="product_thumb">
+                                                        <a href="/product-details/<%= product._id %>">
+                                                            <img src="<%= product.image %>" alt="<%= product.prodctName %>">
+                                                        </a>
+                                                    </td>
+                                                    <td class="product_name">
+                                                        <a href="/product-details/<%= product._id %>"><%= product.productName %></a>
+                                                    </td>
+                                                    <td class="product-price">₹<%= product.price.toFixed(2) %></td>
+                                                    <td class="product_stock">
+                                                        <%= product.countInStock > 0 ? 'In Stock' : 'Out of Stock' %>
+                                                    </td>
+                                                    <td class="product_addcart">
+                                                        <a href="#" onclick="addProductCart('<%= product._id %>')" class="btn btn-md btn-golden" data-product-id="<%= product._id %>">
+                                                            Add To Cart
+                                                        </a>
+                                                    </td>
+                                                </tr> 
+                                                <!-- End Wishlist Single Item-->
+                                            <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center">Your wishlist is empty</td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Cart Table -->
+    </div>
+    <!-- ...:::: End Wishlist Section:::... -->
+
+<!-- Start Footer Section -->
+<%- include('user-partials/footer.ejs') %>
+<!-- End Footer Section -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    async function removeProductWishlist(productId) {
+        swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to remove this product from your wishlist?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/api/remove-from-wishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            const error = new Error(
+                                "Network response was not ok."
+                            );
+                            Swal.fire({
+                                title: "Error",
+                                text: error.message,
+                                icon: "error",
+                                showConfirmButton: true,
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        swal.fire({
+                            title: "Product Removed",
+                            icon: "success",
+                            timer: 1500,
+                            timerProgressBar: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                    .catch((error) => {
+                        swal.fire(
+                            "Error",
+                            "An error occurred while removing the product.",
+                            "error"
+                        );
+                        console.error("Fetch Error:", error);
+                    });
+            }
+        });
+    }
+
+    async function addProductCart(productId) {
+        event.preventDefault();
+        try {
+            let res = await fetch("/add-to-cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    productId,
+                }),
+            });
+
+            if (res.status === 400) {
+                await Swal.fire({
+                    title: "Error",
+                    text: "Product already in the Cart",
+                    icon: "error",
+                    showConfirmButton: true,
+                });
+            } else if (res.status === 200) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "bottom",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: "black",
+                    color: "white",
+                    didOpen: (toast) => {
+                        toast.addEventListener("mouseenter", Swal.stopTimer);
+                        toast.addEventListener("mouseleave", Swal.resumeTimer);
+                    },
+                });
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Added to cart",
+                });
+            }
+        } catch (error) {
+            console.error("Error adding product to cart:", error);
+        }
+    }
+</script>
+
+<%- include('user-partials/scripts.ejs') %>
