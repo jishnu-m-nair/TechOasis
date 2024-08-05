@@ -107,7 +107,7 @@
                                 <option value="Delivered">Delivered</option>
                                 <option value="Cancelled">Cancelled</option> -->
                             </select>
-                            <% if(orderDetail.status !== "Delivered" && orderDetail.status !== "Cancelled") { %>
+                            <% if( orderDetail.status !== "Cancelled" && orderDetail.status !== "Returned" && orderDetail.status !== "Delivered") { %>
                                 <a class="btn btn-primary" id="saveStatusBtn" href="#">Save</a>
                             <% } %>
                             <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
@@ -141,7 +141,7 @@
                                 <div class="text">
                                     <h6 class="mb-1">Order info</h6>
                                     <p class="mb-1">
-                                        Pay method: <%= orderDetail.paymentMethod %> <br> Status: <%= orderDetail.status %>
+                                        Pay method: <%= orderDetail.paymentMethod %> <br> Payment Status: <%= orderDetail.paymentStatus %> <br> Status: <%= orderDetail.status %>
                                     </p>
                                     <!-- <a href="#">Download info</a> -->
                                 </div>
@@ -203,7 +203,7 @@
                                     <p><strong style="font-weight: 700;"> Bill Total:</strong> <%= orderDetail.billTotal %></p>
                                 </p>
                             </div>
-                            <% if(orderDetail.requests.length > 0) { %>
+                            <% if(orderDetail.requests.length > 0 && orderDetail.requests[0].type === "Cancel" ) { %>
                             <div class="h-25 pt-4">
                                 <div class="mb-3">
                                     <h6 class="mb-15">Cancel Request</h6>
@@ -220,6 +220,23 @@
                                 <button class="btn btn-primary" id="saveRequestStatus">Update</button>
                                 <% } %>
                             </div>
+                            <% } else if(orderDetail.requests.length > 0 && orderDetail.requests[0].type === "Return" ) { %>
+                                <div class="h-25 pt-4">
+                                    <div class="mb-3">
+                                        <h6 class="mb-15">Return Request</h6>
+                                    </div>
+                                    <p><strong style="font-weight: 700;"> Reason :</strong> <%= orderDetail.requests[0].reason %></p>
+                                    <% let requestStatus = orderDetail.requests[0].status; %>
+            
+                                    <select class="form-control mb-3" id="returnRequestStatus" <%= requestStatus === 'Accepted' || requestStatus === 'Rejected' ? 'disabled' : '' %>>
+                                        <option value="Pending" <%= requestStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="Rejected" <%= requestStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+                                        <option value="Accepted" <%= requestStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
+                                    </select>
+                                    <% if(requestStatus === 'Pending') { %>
+                                    <button class="btn btn-primary" id="saveReturnRequestStatus">Update</button>
+                                    <% } %>
+                                </div>
                             <% } %>
                         </div>
                         <!-- col// -->
@@ -255,17 +272,21 @@
         const currentStatus = "<%= orderDetail.status %>";
         const orderDetail = JSON.parse('<%- JSON.stringify(orderDetail) %>');
         const orderId = "<%= orderDetail._id %>";
+        const saveStatusBtn = document.getElementById('saveStatusBtn');
+        const saveRequestStatusBtn = document.getElementById('saveRequestStatus');
+        const saveReturnRequestStatusBtn = document.getElementById('saveReturnRequestStatus');
     
-        const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
+        const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled","Returned"];
     
         const statusDropdown = document.getElementById('statusDropdown');
     
         statusOptions.forEach(status => {
-            if (currentStatus === "Pending" || 
-                (currentStatus === "Processing" && status !== "Pending") || 
-                (currentStatus === "Shipped" && status !== "Pending" && status !== "Processing") || 
-                (currentStatus === "Delivered" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Cancelled") || 
-                (currentStatus === "Cancelled" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Delivered")) {
+            if ((currentStatus === "Pending" && status !== "Returned" && status !== "Cancelled") || 
+                (currentStatus === "Processing" && status !== "Pending" && status !== "Returned" && status !== "Cancelled") || 
+                (currentStatus === "Shipped" && status !== "Pending" && status !== "Processing" && status !== "Returned" && status !== "Cancelled") || 
+                (currentStatus === "Delivered" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Cancelled" && status !== "Returned") ||
+                (currentStatus === "Cancelled" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Delivered" && status !== "Returned") ||
+                (currentStatus === "Returned" && status !== "Pending" && status !== "Processing" && status !== "Shipped" && status !== "Cancelled" && status !== "Delivered")) {
                 
                 const option = document.createElement('option');
                 option.value = status;
@@ -277,101 +298,153 @@
             }
         });
     
-        document.getElementById('saveStatusBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-    
-            const newStatus = statusDropdown.value;
-    
-            try {
-            const response = await fetch('/api/update-order-status', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ orderId, newStatus })
-            });
+        if(saveStatusBtn) {
+            saveStatusBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+        
+                const newStatus = statusDropdown.value;
+        
+                try {
+                    const response = await fetch('/api/update-order-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId, newStatus })
+                    });
 
-            if (!response.ok) {
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
+                    if (!response.ok) {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const result = await response.json();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error updating order status: ' + result.message,
+                            });
+                        } else {
+                            const text = await response.text();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error updating order status: ' + text,
+                            });
+                        }
+                        return;
+                    }
+
                     const result = await response.json();
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error updating order status: ' + result.message,
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order status updated successfully',
                     });
-                } else {
-                    const text = await response.text();
+                } catch (error) {
+                    console.error('Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Error updating order status: ' + text,
+                        text: 'An unexpected error occurred',
                     });
                 }
-                return;
-            }
-
-            const result = await response.json();
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Order status updated successfully',
-            });
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An unexpected error occurred',
             });
         }
-        });
 
-        document.getElementById('saveRequestStatus').addEventListener('click', async function() {
-            console.log(orderDetail,"hiiii")
-            console.log(orderDetail.requests,"helooo");
-        let requestId =null;
-        if(orderDetail.requests.length > 0){
-            requestId = orderDetail.requests[0]._id;
-        }
-        const status = document.getElementById('cancelRequestStatus').value;
-        console.log(orderId,"orderId")
-        console.log(status,"status")
-        console.log(requestId,"reqId")
-        try {
-            const response = await fetch('/api/update-cancel-req', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ orderId, requestId, status }),
+        if(saveRequestStatusBtn) {
+            saveRequestStatusBtn.addEventListener('click', async function() {
+                console.log(orderDetail,"hiiii")
+                console.log(orderDetail.requests,"helooo");
+                let requestId =null;
+                if(orderDetail.requests.length > 0){
+                    requestId = orderDetail.requests[0]._id;
+                }
+                const status = document.getElementById('cancelRequestStatus').value;
+                console.log(orderId,"orderId")
+                console.log(status,"status")
+                console.log(requestId,"reqId")
+                try {
+                    const response = await fetch('/api/update-cancel-req', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderId, requestId, status }),
+                    });
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Request status updated successfully',
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        const errorData = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Error: ${errorData.message}`,
+                        });
+
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred. Please try again later.',
+                    });
+                }
             });
+        }
 
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Request status updated successfully',
-                }).then(() => {
-                    location.reload();
-                });
-            } else {
-                const errorData = await response.json();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: `Error: ${errorData.message}`,
-                });
+        if(saveReturnRequestStatusBtn) {
+            saveReturnRequestStatusBtn.addEventListener('click', async function() {
+                console.log(orderDetail,"hiiii")
+                console.log(orderDetail.requests,"helooo");
+                let requestId =null;
+                if(orderDetail.requests.length > 0){
+                    requestId = orderDetail.requests[0]._id;
+                }
+                const status = document.getElementById('returnRequestStatus').value;
+                console.log(orderId,"orderId")
+                console.log(status,"status")
+                console.log(requestId,"reqId")
+                try {
+                    const response = await fetch('/api/update-return-req', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderId, requestId, status }),
+                    });
 
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred. Please try again later.',
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Request status updated successfully',
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        const errorData = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Error: ${errorData.message}`,
+                        });
+
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred. Please try again later.',
+                    });
+                }
             });
         }
-    });
     </script>
 
 </body>

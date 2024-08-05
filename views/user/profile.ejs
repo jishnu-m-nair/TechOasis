@@ -262,7 +262,7 @@
                         <%= order.status%>
                       </span>
                     </td>
-                    <% } else if(order.status==="Cancelled" ) { %>
+                    <% } else if(order.status==="Cancelled" || order.status==="Returned" ) { %>
                     <td><span class="text-danger">
                         <%= order.status%>
                       </span>

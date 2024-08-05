@@ -146,6 +146,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Total</th>
+                                    <th scope="col">Payment Status</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Cancel Req</th>
                                     <th scope="col">Date</th>
@@ -160,7 +161,13 @@
                                     <td><%=order.user.email%></td>
                                     <td>₹<%=order.billTotal%></td>
 
-                                    <% if(order.status === "Pending" || order.status === "Cancelled") { %>
+                                    <% if(order.paymentStatus === "Success") { %>
+                                        <td><span class="badge rounded-pill alert-success"><%=order.paymentStatus%></span></td>
+                                    <% } else { %>
+                                        <td><span class="badge rounded-pill alert-danger"><%=order.paymentStatus%></span></td>
+                                    <% } %>
+
+                                    <% if(order.status === "Pending" || order.status === "Cancelled" || order.status === "Returned" ) { %>
                                     <td><span class="badge rounded-pill alert-danger"><%=order.status%></span></td>
                                     <% } else if(order.status === "Delivered") { %>
                                     <td><span class="badge rounded-pill alert-success"><%=order.status%></span></td>

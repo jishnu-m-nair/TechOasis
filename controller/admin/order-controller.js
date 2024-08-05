@@ -12,7 +12,8 @@ const orderManagement = async (req,res) =>{
         const allOrders = await OrderModel.find({})
             .populate("user",'fullname email')
             .skip(perPage * (page - 1))
-            .limit(perPage);
+            .limit(perPage)
+            .sort({createdAt:-1});
 
         if(!allOrders) {
             return res.status(400).render('admin-404',{ errorMessage : "Order data does not exists" });
@@ -73,6 +74,9 @@ const updateOrderStatus = async (req, res) => {
         }
 
         order.status = newStatus;
+        if(order.paymentMethod === "COD") {
+            order.paymentStatus = "Success";
+        }
         await order.save();
 
         res.status(200).json({ 
@@ -130,10 +134,52 @@ const updateCancelStatus = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+const updateReturnStatus = async (req, res) => {
+    const { orderId, requestId, status } = req.body;
+
+    try {
+        const order = await OrderModel.findOneAndUpdate(
+            { _id: orderId, 'requests._id': requestId },
+            { $set: { 'requests.$.status': status } },
+            { new: true }
+        );
+        if (!order) {
+            return res.status(404).json({ message: 'Order or request not found' });
+        }
+
+        if (status === 'Accepted') {
+            order.status = 'Returned';
+            for (const item of order.items) {
+                await ProductModel.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { countInStock: item.quantity } },
+                    { new: true }
+                );
+            }
+
+            await order.save();
+            if(order.paymentMethod === "Razorpay") {
+                const wallet = await WalletModel.findOne({owner:order.user});
+                wallet.balance += order.billTotal;
+                wallet.transactions.push({ 
+                    amount: order.billTotal, 
+                    type: "credit", 
+                    reason: `Refund from returning of orderId: ${order.oId}`
+                });
+                await wallet.save();
+            }
+        }
+
+        res.status(200).json({ message: 'Request status updated successfully', order });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 module.exports = {
     orderManagement,
     orderDetailed,
     updateOrderStatus,
-    updateCancelStatus
+    updateCancelStatus,
+    updateReturnStatus
 }

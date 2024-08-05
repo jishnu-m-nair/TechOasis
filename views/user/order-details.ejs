@@ -168,10 +168,36 @@
                             <br>
                             <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
                                 <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                            <% } else if(orderDetails.status === "Delivered") { %>
+                                <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#returnOrderModal">Return Order</a>
                             <% } %>
                         <% } %>
 
-                        <!-- Modal for order cancellation -->
+                        <!-- Modal for order return -->
+                        <div class="modal fade" id="returnOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="returnOrderForm">
+                                            <div class="form-group">
+                                                <label for="returnReason">Reason for Return</label>
+                                                <textarea class="form-control" id="returnReason" rows="3" required></textarea>
+                                            </div>
+                                            <input type="hidden" id="orderId" value="<%= orderDetails._id %>">
+                                            <button type="submit" class="btn btn-md btn-golden">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal for order cancel -->
                         <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -360,7 +386,32 @@
                 alert('An error occurred. Please try again later.');
             }
         });
+        document.getElementById('returnOrderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+    
+            const orderId = document.getElementById('orderId').value;
+            const reason = document.getElementById('returnReason').value;
+    
+            try {
+                const response = await fetch('/api/return-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderId, reason }),
+                });
+    
+                if (response.ok) {
+                    alert('Return request submitted successfully');
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message}`);
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again later.');
+            }
+        });
     </script>
 
     <%- include('user-partials/scripts.ejs') %>
-

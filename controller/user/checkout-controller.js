@@ -345,7 +345,8 @@ const orderDetailsGet = async (req, res) => {
         }
     } catch (err) {
         console.log('Error displaying orders:', err.message);
-        res.status(500).json({ message: 'Internal server error' });
+        console.log("erroororor")
+        res.status(500).json({ "err.message": 'Internal server error' });
     }
 }
 
@@ -371,6 +372,33 @@ const cancelOrderRequest = async (req, res) => {
         await order.save();
 
         res.status(200).json({ message: 'Cancellation request submitted successfully', order });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const returnOrderRequest = async (req, res) => {
+    const { orderId, reason } = req.body;
+
+    if (!orderId || !reason) {
+        return res.status(400).json({ message: 'Order ID and reason are required' });
+    }
+
+    try {
+        const order = await OrderModel.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        order.requests.push({
+            type: 'Return',
+            status: 'Pending',
+            reason: reason,
+        });
+
+        await order.save();
+
+        res.status(200).json({ message: 'Return request submitted successfully', order });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -466,6 +494,7 @@ module.exports = {
     handlePaymentFailure,
     orderDetailsGet,
     cancelOrderRequest,
+    returnOrderRequest,
     availableCoupons,
     applyCoupon,
     removeCoupon,
