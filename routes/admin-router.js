@@ -64,4 +64,8 @@ router.get("/admin/coupon-management",coupon.couponManagement);
 router.post('/api/admin/add-coupon', coupon.addCoupon);
 router.delete('/api/admin/delete-coupon/:id', coupon.deleteCoupon);
 
+router.get("/admin/sales-report",admin.getSalesReportPage);
+router.post('/api/admin/load-sales', admin.loadSales);
+router.post('/api/admin/generate-sales-report', admin.generateSalesReport);
+
 module.exports = router;
