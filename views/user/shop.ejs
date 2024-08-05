@@ -353,7 +353,7 @@
         async function addToWishlist(productId) {
             event.preventDefault();
             try {
-                let res = await fetch("/api/add-wishlist", {
+                let res = await fetch("/api/add-to-wishlist", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
