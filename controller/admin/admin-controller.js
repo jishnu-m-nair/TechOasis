@@ -2,9 +2,7 @@ const UserModel = require("../../model/user-model");
 const AdminModel = require("../../model/admin-model");
 const OrderModel = require("../../model/order-model");
 const bcrypt = require("bcryptjs");
-const ExcelJS = require('exceljs');
-const PDFDocument = require('pdfkit');
-const { securePassword } = require('../../utils/helpers');
+const { securePassword, formatDate } = require('../../utils/helpers');
 
 //admin login
 const adminLogin = async (req, res) => {
@@ -197,143 +195,96 @@ const filterUsers = async (req, res) => {
     }
 };
 
-// sales report
+
 const getSalesReportPage = async (req, res) => {
     try {
+        const order = await OrderModel.find({ status: 'Delivered' }).populate('user');
+
         res.render('admin/sales-report', {
             pagetitle: "Sales Report",
-            page: "sales-report"
+            page: "sales-report",
+            order
         });
     } catch (error) {
-        console.error('Error rendering sales report page:', error.message);
+        console.error('Error in getSalesReportPage:', error);
         res.status(500).send('Internal Server Error');
     }
-};
-
-const loadSales = async (req, res) => {
-    try {
-        const perPage = 10;
-        const page = parseInt(req.body.page) || 1;
-
-        const totalOrders = await OrderModel.countDocuments({ status: "Delivered" });
-        const totalPages = Math.ceil(totalOrders / perPage);
-
-        const orders = await OrderModel
-            .find({ status: "Delivered" })
-            .populate('user')
-            .skip(perPage * (page - 1))
-            .limit(perPage)
-            .sort({ orderDate: -1 });
-
-        res.json({ orders, currentPage: page, totalPages });
-    } catch (err) {
-        console.error('Error loading sales:', err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
+}
 
 const generateSalesReport = async (req, res) => {
     try {
-        const { type, startDate, endDate, format } = req.body;
+        const { reportType, startDate, endDate } = req.body;
         let query = { status: "Delivered" };
+        let reportStartDate, reportEndDate;
 
-        if (type === 'custom' && startDate && endDate) {
-            query.orderDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
-        } else if (type === 'daily') {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            query.orderDate = { $gte: today };
-        } else if (type === 'weekly') {
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            query.orderDate = { $gte: oneWeekAgo };
-        } else if (type === 'monthly') {
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            query.orderDate = { $gte: oneMonthAgo };
-        } else if (type === 'yearly') {
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-            query.orderDate = { $gte: oneYearAgo };
+        switch (reportType) {
+            case 'daily':
+                reportStartDate = new Date();
+                reportStartDate.setHours(0, 0, 0, 0);
+                reportEndDate = new Date();
+                query.orderDate = { $gte: reportStartDate };
+                break;
+            case 'weekly':
+                reportStartDate = new Date();
+                reportStartDate.setDate(reportStartDate.getDate() - 7);
+                reportEndDate = new Date();
+                query.orderDate = { $gte: reportStartDate };
+                break;
+            // case 'monthly':
+            //     reportStartDate = new Date();
+            //     reportStartDate.setMonth(reportStartDate.getMonth() - 1);
+            //     reportEndDate = new Date();
+            //     query.orderDate = { $gte: reportStartDate };
+            //     break;
+            case 'yearly':
+                reportStartDate = new Date();
+                reportStartDate.setFullYear(reportStartDate.getFullYear() - 1);
+                reportEndDate = new Date();
+                query.orderDate = { $gte: reportStartDate };
+                break;
+            case 'custom':
+                if (startDate && endDate) {
+                    reportStartDate = new Date(startDate);
+                    reportEndDate = new Date(endDate);
+                    query.orderDate = {
+                        $gte: reportStartDate,
+                        $lte: reportEndDate
+                    };
+                }
+                break;
+            default:
+                reportStartDate = new Date();
+                reportStartDate.setMonth(reportStartDate.getMonth() - 1);
+                reportEndDate = new Date();
+                query.orderDate = { $gte: reportStartDate };
+                break;
         }
 
-        const orders = await OrderModel.find(query).populate('user').sort({ orderDate: -1 });
+        const orders = await OrderModel.find(query)
+            .populate('user', 'email')
+            .sort({ orderDate: -1 });
 
-        const totalSales = orders.reduce((sum, order) => sum + order.billTotal, 0);
         const totalOrders = orders.length;
-        const totalPages = Math.ceil(totalOrders / 10);
+        const totalSales = orders.reduce((sum, order) => sum + order.billTotal, 0);
 
-        if (format === 'pdf') {
-            return generatePDF(orders, res);
-        } else if (format === 'excel') {
-            return generateExcel(orders, res);
-        } else {
-            return res.json({
-                orders,
-                totalSales,
-                totalOrders,
-                currentPage: 1,
-                totalPages
-            });
-        }
-    } catch (error) {
-        console.error('Error generating sales report:', error.message);
-        res.status(500).json({ error: 'Error generating sales report' });
-    }
-};
-
-const generatePDF = (orders, res) => {
-    const doc = new PDFDocument();
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
-    doc.pipe(res);
-
-    doc.fontSize(18).text('Sales Report', { align: 'center' });
-    doc.moveDown();
-
-    orders.forEach((order, index) => {
-        doc.fontSize(12).text(`Order #${index + 1}`);
-        doc.text(`Order ID: ${order.oId}`);
-        doc.text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`);
-        doc.text(`Email: ${order.user.email}`);
-        doc.text(`Total: INR ${order.billTotal}`);
-        doc.text(`Status: ${order.status}`);
-        doc.text(`Payment Method: ${order.paymentMethod}`);
-        doc.moveDown();
-    });
-
-    doc.end();
-};
-
-const generateExcel = (orders, res) => {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Sales Report');
-
-    worksheet.columns = [
-        { header: 'Order ID', key: 'orderId', width: 15 },
-        { header: 'Date', key: 'date', width: 15 },
-        { header: 'Email', key: 'email', width: 30 },
-        { header: 'Total', key: 'total', width: 15 },
-        { header: 'Status', key: 'status', width: 15 },
-        { header: 'Payment Method', key: 'paymentMethod', width: 20 },
-    ];
-
-    orders.forEach(order => {
-        worksheet.addRow({
-            orderId: order.oId,
-            date: new Date(order.orderDate).toLocaleDateString(),
-            email: order.user.email,
-            total: order.billTotal,
-            status: order.status,
-            paymentMethod: order.paymentMethod
+        const reportDate = formatDate(new Date());
+        const fromDate = formatDate(reportStartDate);
+        const toDate = formatDate(reportEndDate);
+        res.json({
+            success: true,
+            orders,
+            totalOrders,
+            totalSales,
+            fromDate,
+            toDate,
+            reportDate
+            
         });
-    });
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
-
-    workbook.xlsx.write(res).then(() => res.end());
-};
+    } catch (error) {
+        console.error('Error in generateSalesReport:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+}
 
 module.exports = {
     adminLogin,
@@ -344,8 +295,5 @@ module.exports = {
     blockUser,
     filterUsers,
     getSalesReportPage,
-    loadSales,
-    generateSalesReport,
-    generatePDF,
-    generateExcel
+    generateSalesReport
 };
