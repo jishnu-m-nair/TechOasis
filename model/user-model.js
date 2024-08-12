@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema({
    googleId: {
       type: String,
    },
+   referralCode: {
+      type: String,
+   },
+   referredBy: {
+      type: String,
+   },
 
    //Timestamps//
    createdAt: {

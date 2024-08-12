@@ -4,7 +4,7 @@ const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
 const OrderModel = require("../../model/order-model");
 const WalletModel = require("../../model/wallet-model");
-const { securePassword } = require("../../utils/helpers");
+const { securePassword, generateReferralCode } = require("../../utils/helpers");
 
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
@@ -199,34 +199,54 @@ const signup = (req, res) => {
 
 const signupPost = async (req, res, next) => {
     try {
-        const { fullname, email, password, phone } = req.body;
+        const { fullname, email, password, phone, } = req.body;
         const existingUser = await UserModel.findOne({ email });
-        
+
         if (existingUser && existingUser.email === email) {
-            res.render("user/signup", {
+            return res.render("user/signup", {
                 errorMessage: "Email is already registered!",
                 formData: req.body,
                 pageTitle: "Signup Page"
             });
-        } else {
-            let passwordHash = await securePassword(password);
-            if(!passwordHash){
-                return res.render('500',{ errorMessage: "Password hashing has a problem" })
-            }
-
-            let user = {
-                fullname,
-                email,
-                password: passwordHash,
-                phone,
-                isVerified: false,
-            };
-            req.session.userDetails = {};
-            req.session.userDetails = user;
-            req.session.otp = sentOtp(email);
-            req.session.otpExpiry = Date.now() + 60000;
-            res.redirect("/signup-otp");
         }
+        let referralCode = req.body.referralCode;
+        referralCode = referralCode.toUpperCase();
+        console.log(referralCode,"referal")
+        let referrer = null;
+        if (referralCode) {
+            referrer = await UserModel.findOne({ referralCode });
+            if (!referrer) {
+                return res.render("user/signup", {
+                    errorMessage: "Invalid referral code!",
+                    formData: req.body,
+                    pageTitle: "Signup Page"
+                });
+            }
+        }
+
+        let passwordHash = await securePassword(password);
+        if(!passwordHash){
+            return res.render('500',{ errorMessage: "Password hashing has a problem" })
+        }
+
+        const newReferralCode = await generateReferralCode(8);
+
+        console.log(newReferralCode,"newreferral")
+        let user = {
+            fullname,
+            email,
+            password: passwordHash,
+            phone,
+            isVerified: false,
+            referralCode: newReferralCode,
+            referredBy: referrer ? referrer._id : ''
+        };
+        req.session.userDetails = {};
+        req.session.userDetails = user;
+        req.session.referralCode = referralCode;
+        req.session.otp = sentOtp(email);
+        req.session.otpExpiry = Date.now() + 60000;
+        res.redirect("/signup-otp");
     } catch (e) {
         console.error(e);
         res.redirect("/signup");
@@ -263,13 +283,46 @@ const signupOtpPost = async (req, res) => {
         req.session.email = user.email;
         req.session.userId = user._id;
 
-        const userWallet = new WalletModel({
-            owner: user._id,
-            balance: 0,
-            transactions: []
-        })
+        const referralCode = req.session.referralCode
+        if (referralCode) {
+            const referringUser = await UserModel.findOne({ referralCode });
+            if (referringUser) {
+                const userWallet = new WalletModel({
+                    owner: user._id,
+                    balance: 100,
+                    transactions: [{
+                        amount: 100,
+                        type: "credit",
+                        reason: `Welcome bonus`
+                    }]
+                });
+                await userWallet.save();
+        
+                const referrerWallet = await WalletModel.findOne({ owner: referringUser._id });
+                if (referrerWallet) {
+                    referrerWallet.balance += 500;
+                    referrerWallet.transactions.push({ 
+                        amount: 500, 
+                        type: "credit", 
+                        reason: `Bonus for referring ${user.fullname}`
+                    });
+                    await referrerWallet.save();
+                }
+            }
+        } else {
+            const userWallet = new WalletModel({
+                owner: user._id,
+                balance: 0,
+                transactions: []
+            })
+            await userWallet.save();
+        }
 
-        await userWallet.save();
+        delete req.session.userDetails;
+        delete req.session.referralCode;
+        delete req.session.otp;
+        delete req.session.otpExpiry;
+        
 
         res.status(200).json({ message: "",redirectUrl:"/home" });
     } catch (error) {

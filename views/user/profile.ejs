@@ -204,6 +204,12 @@
                     <%= userInfo.email %>
                   </p>
                 </div>
+				<div class="d-flex">
+					<span>Referral Code:</span>
+					<p>
+					  <%= userInfo.referralCode %>
+					</p>
+				  </div>
                 <div class="d-flex">
                   <span>Mobile:</span>
                   <% if(userInfo.phone==null) { %>
@@ -255,7 +261,7 @@
                       <%=i + 1%>
                     </td>
                     <td>
-                    <%- new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
+                      <%- new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
                     </td>
                     <% if(order.status==="Delivered" ) { %>
                     <td><span class="text-success">

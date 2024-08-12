@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const CouponModel = require("../model/coupon-model");
+const UserModel = require("../model/user-model");
 
 const securePassword = async (password) => {
     try {
@@ -58,9 +59,31 @@ function formatDate(date) {
     return `${day}/${month}/${year}`;
 }
 
+async function generateReferralCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let referralCode = '';
+    let isUnique = false;
+
+    while (!isUnique) {
+        referralCode = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            referralCode += characters[randomIndex];
+        }
+
+        const existingUser = await UserModel.findOne({ referralCode });
+
+        if (!existingUser) {
+            isUnique = true;
+        }
+    }
+    return referralCode;
+}
+
 module.exports = {
     securePassword,
     generateUniqueOrderID,
     updateExpiredCoupons,
-    formatDate
+    formatDate,
+    generateReferralCode
 }

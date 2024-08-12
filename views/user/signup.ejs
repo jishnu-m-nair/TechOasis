@@ -132,6 +132,11 @@
                                     </span>
                                 </div>
                             </div>
+                            <div class="default-form-box">
+                                <label>Referral Code</label>
+                                <span id="referralError" class="text-red"></span>
+                                <input type="text" placeholder="Referral Code" name="referralCode" id="referralCode" maxlength="8" style="border: 1px solid #000!important;">
+                            </div>
                             <div>
                                 <span class="text-red"><%= errorMessage %></span>
                             </div>
@@ -188,12 +193,14 @@
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password1');
+    const referralCode = document.getElementById('referralCode');
 
     const nameError = document.getElementById('nameError');
     const phoneError = document.getElementById('phoneError');
     const emailError = document.getElementById('emailError');
     const passwordMessage = document.getElementById('passwordMessage');
     const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+    const referralCodeError = document.getElementById('referralError');
 
     // Add touched class on focus
     form.addEventListener('focus', function(event) {
@@ -230,6 +237,9 @@
                 break;
             case 'password1':
                 validateConfirmPassword();
+                break;
+            case 'referralCode':
+                validateReferralCode();
                 break;
         }
 
@@ -331,8 +341,29 @@
         }
     }
 
+    function validateReferralCode() {
+        const referralCodeValue = referralCode.value.trim();
+
+        if (!referralCodeValue) {
+            referralCodeError.textContent = '';
+            referralCode.style.borderColor = 'green';
+            return true;
+        }
+
+        if (!/^[A-Za-z0-9]+$/.test(referralCodeValue)) {
+            referralCodeError.textContent = 'Referral code must contain only letters and numbers';
+            referralCode.style.borderColor = 'red';
+            return false;
+        }
+
+        referralCodeError.textContent = '';
+        referralCode.style.borderColor = 'green';
+        return true;
+    }
+
+
     function isFormValid() {
-        return validateFullname() && validatePhone() && validateEmail() && validatePassword() && validateConfirmPassword();
+        return validateFullname() && validatePhone() && validateEmail() && validatePassword() && validateConfirmPassword() && validateReferralCode();
     }
 </script>
     
