@@ -120,13 +120,16 @@
                 <div class="card div-container">
                     <div class="invoice p-5">
                         <% if(orderDetails.paymentStatus === "Failed") {%>
-                            <span class="text-danger">Your Payment is failed, Please retry the Payment</span>
+                            <span class="text-danger">Hello <%= userName %>, Your payment has failed. Please retry the payment.</span>
+                            <br><br>
+                            <input type="hidden" id="orderId" value="<%= orderDetails._id %>">
+                            <button id="retryPayment" class="btn btn-md btn-golden">Retry Payment</button>
                         <% } else { %>
                             <% if (orderDetails.status === "Pending" || orderDetails.status === "Processing" ) { %>
                             <h5>Your order Confirmed!</h5>
                             <div class="d-flex justify-content-start">
                                 <span class="font-weight-bold pr-1">
-                                        Hello ,
+                                        Hello <%= userName %>,
                                 </span>
                                 <span>
                                     You order has been confirmed and will be
@@ -137,17 +140,27 @@
                                 <h5>Order Cancelled!</h5>
                                 <div class="d-flex justify-content-start">
                                     <span class="font-weight-bold pr-1">
-                                            Hello ,
+                                            Hello <%= userName %>,
                                     </span>
                                     <span>
                                         This order has been cancelled
+                                    </span>
+                                </div>
+                            <% } else if (orderDetails.status === "Returned") { %>
+                                <h5>Order Returned!</h5>
+                                <div class="d-flex justify-content-start">
+                                    <span class="font-weight-bold pr-1">
+                                            Hello <%= userName %>,
+                                    </span>
+                                    <span>
+                                        This order has been returned
                                     </span>
                                 </div>
                             <% } else if (orderDetails.status === "Shipped") { %>
                                 <h5>Order has been shipped</h5>
                                 <div class="d-flex justify-content-start">
                                     <span class="font-weight-bold pr-1">
-                                            Hello ,
+                                            Hello <%= userName %>,
                                     </span>
                                     <span>
                                         Order is shipped, it will reach you soon
@@ -157,7 +170,7 @@
                                 <h5>Order is Delivered</h5>
                                 <div class="d-flex justify-content-start">
                                     <span class="font-weight-bold pr-1">
-                                            Hello ,
+                                            Hello <%= userName %>,
                                     </span>
                                     <span>
                                         This order has been Delivered
@@ -166,7 +179,7 @@
                             <% } %>
                             
                             <br>
-                            <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered") { %>
+                            <% if(orderDetails.status !== "Cancelled" && orderDetails.status !== "Delivered" && orderDetails.status !== "Returned") { %>
                                 <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
                             <% } else if(orderDetails.status === "Delivered") { %>
                                 <a href="#" class="btn btn-danger"  data-toggle="modal" data-target="#returnOrderModal">Return Order</a>
@@ -358,6 +371,7 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         document.getElementById('cancelOrderForm').addEventListener('submit', async function(event) {
@@ -412,6 +426,93 @@
                 alert('An error occurred. Please try again later.');
             }
         });
+
     </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        document.getElementById('retryPayment').addEventListener('click', function() {
+            const orderId = document.getElementById('orderId').value;
+            fetch(`/retry-payment/${orderId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    var options = {
+                        "key": "rzp_test_3kT5huAqqRlFe6",
+                        "amount": data.amount,
+                        "currency": data.currency,
+                        "name": "TECHOASIS",
+                        "description": `Retry Payment for Order ${data.oId}`,
+                        "order_id": data.orderId,
+                        "handler": function (response) {
+                            fetch('/success-retry-payment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: orderId
+                                }),
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    throw new Error('Payment verification failed');
+                                }
+                            })
+                            .then(data => {
+                                Swal.fire({
+                                    title: 'Payment Successful',
+                                    text: 'Your payment was successful and the order has been updated.',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    title: 'Payment Failed',
+                                    text: 'An error occurred while confirming the payment. Please contact support.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            });
+                        },
+                        "prefill": {
+                            "name": "TechOasis",
+                            "email": "techoasis@example.com",
+                            "contact": "9999999999"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+
+                    rzp1.on('payment.failed', async function (response){
+                        rzp1.close();
+                        Swal.fire({
+                            title: 'Payment Failed!',
+                            text: 'Your payment has failed. Please try again.',
+                            icon: 'error',
+                            timer: 4000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to initiate payment. Please try again.');
+                });
+            });
+        </script>
 
     <%- include('user-partials/scripts.ejs') %>

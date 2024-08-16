@@ -83,6 +83,8 @@ router.get('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckout)
 router.post('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckoutPost)
 router.post('/payment-success',isLoggedIn, isBlockedUser,checkout.handlePaymentSuccess)
 router.post('/payment-failure',isLoggedIn, isBlockedUser,checkout.handlePaymentFailure)
+router.post('/retry-payment/:orderId',isLoggedIn, isBlockedUser,checkout.retryPayment)
+router.post('/success-retry-payment', isLoggedIn, isBlockedUser, checkout.successRetryPayment);
 router.get('/api/available-coupons', checkout.availableCoupons);
 router.post('/api/apply-coupon', checkout.applyCoupon);
 router.post('/api/remove-coupon', checkout.removeCoupon);

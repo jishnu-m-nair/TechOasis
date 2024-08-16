@@ -338,7 +338,9 @@ const orderDetailsGet = async (req, res) => {
         let orderDetails = await OrderModel.findById(orderId);
 
         if (orderDetails) {
-            res.render('user/order-details', { orderDetails, pageTitle: "Order Page" });
+            const userDetails = await UserModel.findById(userId)
+            const userName = userDetails.fullname;
+            res.render('user/order-details', { orderDetails, userName, pageTitle: "Order Page" });
 
         } else {
             res.send("no orders available in this id");
@@ -349,6 +351,57 @@ const orderDetailsGet = async (req, res) => {
         res.status(500).json({ "err.message": 'Internal server error' });
     }
 }
+
+const retryPayment = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await OrderModel.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount: order.billTotal * 100, // Amount in paise
+            currency: 'INR',
+            receipt: order.oId,
+            payment_capture: 1
+        });
+
+        res.json({
+            orderId: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            oId: order.oId
+        });
+    } catch (error) {
+        console.error('Error retrying payment:', error);
+        res.status(500).json({ error: 'Failed to create new payment order' });
+    }
+};
+
+const successRetryPayment = async (req, res) => {
+    try {
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, orderId } = req.body;
+
+            const order = await OrderModel.findById(orderId);
+
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+
+            order.paymentStatus = "Success";
+            order.status = "Processing";
+            order.razorpayOrderId = razorpay_order_id;
+
+            await order.save();
+
+            res.status(200).json({ message: 'Payment successful and order updated' });
+    } catch (error) {
+        console.error('Error in successRetryPayment:', error);
+        res.status(500).json({ error: 'Failed to process successful payment' });
+    }
+};
 
 const cancelOrderRequest = async (req, res) => {
     const { orderId, reason } = req.body;
@@ -493,6 +546,8 @@ module.exports = {
     handlePaymentSuccess,
     handlePaymentFailure,
     orderDetailsGet,
+    retryPayment,
+    successRetryPayment,
     cancelOrderRequest,
     returnOrderRequest,
     availableCoupons,
