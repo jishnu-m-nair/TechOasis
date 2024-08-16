@@ -115,6 +115,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- custom scripts -->
     <script>
+        const queryString = window.location.search;
+        const params = new URLSearchParams(queryString);
+        const source = params.get('source');
+
         document.addEventListener('DOMContentLoaded', () => {
             const addressForm = document.getElementById('editAddressForm');
         
@@ -209,7 +213,7 @@
                 
         
                 try {
-                    const response = await fetch('/edit-address/<%= userId %>/<%= address._id %>', {
+                    const response = await fetch('/edit-address/<%= address._id %>', {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json'
@@ -224,7 +228,8 @@
                             city,
                             district,
                             state,
-                            country
+                            country,
+                            source
                         })
                     });
         
@@ -237,7 +242,7 @@
                             icon: 'success',
                             confirmButtonText: 'OK'
                         });
-                        window.location.href = data.redirectUrl; // Redirect to profile
+                        window.location.href = data.redirectUrl; // Redirect to profile or checkout
                     } else {
                         await Swal.fire({
                             title: 'Error',

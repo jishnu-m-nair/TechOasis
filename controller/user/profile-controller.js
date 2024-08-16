@@ -157,7 +157,7 @@ const addAddress = (req, res) => {
 
 const addAddressPost = async (req, res) => {
     try {
-        const { userId, addressType, houseNo, street, landmark, pincode, city, district, state, country } = req.body;
+        const { userId, addressType, houseNo, street, landmark, pincode, city, district, state, country, source } = req.body;
 
         let addressRecord = await AddressModel.findOne({ user: userId });
 
@@ -184,7 +184,9 @@ const addAddressPost = async (req, res) => {
         addressRecord.addresses.push(newAddress);
         await addressRecord.save();
 
-        res.status(200).json({ message: 'Address added successfully', redirectUrl: '/profile?tab=address' });
+        const redirectUrl = source === 'checkout' ? '/checkout' : '/profile?tab=address';
+
+        res.status(200).json({ message: 'Address added successfully', redirectUrl });
     } catch (error) {
         console.error('Error adding address:', error);
         res.status(500).json({ message: 'An error occurred while adding the address.' });
@@ -217,8 +219,8 @@ const editAddress = async (req, res) => {
 };
 
 const editAddressPatch = async (req, res) => {
-    const { addressType, houseNo, street, landmark, pincode, city, district, state, country } = req.body;
-    const userId = req.params.userId;
+    const { addressType, houseNo, street, landmark, pincode, city, district, state, country, source } = req.body;
+    const userId = req.session.userId;
     const addressId = req.params.addressId;
     try {
         const updateObject = {
@@ -244,7 +246,8 @@ const editAddressPatch = async (req, res) => {
             return res.status(404).json({ message: 'Address or user not found' });
         }
 
-        res.status(200).json({ message: 'Address updated successfully', redirectUrl: '/profile?tab=address' });
+        const redirectUrl = source === 'checkout' ? '/checkout' : '/profile?tab=address';
+        res.status(200).json({ message: 'Address updated successfully', redirectUrl });
     } catch (error) {
         console.error('Error updating address:', error);
         res.status(500).json({ message: 'Server error' });

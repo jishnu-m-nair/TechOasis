@@ -72,8 +72,8 @@ router.get('/change-password', isLoggedIn, isBlockedUser, profile.changePassword
 router.post('/change-password', isLoggedIn, isBlockedUser, profile.changePasswordPost);
 router.get('/add-address', isLoggedIn, isBlockedUser, profile.addAddress);
 router.post('/add-address', isLoggedIn, isBlockedUser, profile.addAddressPost);
-router.get('/edit-address/:userId/:addressId', isLoggedIn, isBlockedUser, profile.editAddress)
-router.patch('/edit-address/:userId/:addressId', isLoggedIn, isBlockedUser, profile.editAddressPatch);
+router.get('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddress)
+router.patch('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddressPatch);
 router.get('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddress)
 router.patch('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddressPatch);
 router.delete('/delete-address/:addressId', isLoggedIn, isBlockedUser, profile.deleteAddress);

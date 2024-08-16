@@ -57,7 +57,7 @@
                         <div class="col-lg-6 col-md-6">
                             <div class="tab-pane" id="address">
                                 <% if(addressList!==null && typeof addressList!=='undefined') { %>
-                                    <% if(addressList.length > 0 && addressList.addresses.length !== 0 ) { %>
+                                    <% if(addressList.addresses.length > 0 && addressList.addresses.length !== 0 ) { %>
                                         <p>The following addresses will be used on the checkout page</p>
                                     <% } else { %>
                                         <p>You have not added any address. Please add address to proceed further</p>
@@ -77,7 +77,7 @@
                                                     <div><br>
                                                         <p class="card-text"><%=addressList.addresses[i].houseNo%>,<%=addressList.addresses[i].street%>,<%=addressList.addresses[i].landmark%>,<%=addressList.addresses[i].city%>,<%=addressList.addresses[i].district%>
                                                             <%=addressList.addresses[i].state%>,Pincode-<%=addressList.addresses[i].pincode%></p>
-                                                        <a href="/edit-address/<%= addressList.addresses[i]._id %>" class="view">
+                                                        <a href="/edit-address/<%= addressList.addresses[i]._id %>?source=checkout" class="view">
                                                             <i class="fas fa-edit"></i> Edit
                                                         </a>
                                                     </div> 
@@ -95,14 +95,14 @@
                                     <% } %>
                                     <% if(addressList.addresses.length < 3 ) { %>
                                         <div class="card">
-                                            <a href="/add-address" id="addAddressLink" class="nav-link btn btn-block btn-md btn-black-default-hover">
+                                            <a href="/add-address?source=checkout" id="addAddressLink" class="nav-link btn btn-block btn-md btn-black-default-hover">
                                                 Add Address
                                             </a>
                                         </div>
                                     <% } %>
                                 <% } else{ %>
                                     <div class="card">
-                                        <a href="/add-address" id="addAddressLink" class="nav-link btn btn-block btn-md btn-black-default-hover">
+                                        <a href="/add-address?source=checkout" id="addAddressLink" class="nav-link btn btn-block btn-md btn-black-default-hover">
                                             Add Address
                                         </a>
                                     </div>

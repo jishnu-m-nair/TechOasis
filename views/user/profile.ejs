@@ -330,7 +330,7 @@
             <div class="address-container">
               <div class="d-flex justify-content-between">
                 <h2>My Addresses</h2>
-                <a class="btn btn-md btn-black-default-hover" href="/add-address">Add
+                <a class="btn btn-md btn-black-default-hover" href="/add-address?source=profile">Add
                   Address</a>
               </div>
 
@@ -361,7 +361,7 @@
                     <%= address.country %>
                   </address>
                   <div class="d-flex">
-                    <a href="/edit-address/<%= userId %>/<%= address._id %>" class="view">
+                    <a href="/edit-address/<%= address._id %>?source=profile" class="view">
                       <i class="fas fa-edit"></i> Edit
                     </a>
                     <p class="btn-seperator">|</p>

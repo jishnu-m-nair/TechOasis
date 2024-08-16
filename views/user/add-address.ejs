@@ -114,6 +114,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- custom scripts -->
 <script>
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString)
+    const source = params.get('source');
+
     document.addEventListener('DOMContentLoaded', () => {
         const addressForm = document.getElementById('addressForm');
     
@@ -221,7 +225,8 @@
                         city,
                         district,
                         state,
-                        country
+                        country,
+                        source
                     })
                 });
     
@@ -234,7 +239,7 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
-                    window.location.href = data.redirectUrl;
+                    window.location.href = data.redirectUrl; // Redirect to profile or checkout
                 } else {
                     await Swal.fire({
                         title: 'Error',
