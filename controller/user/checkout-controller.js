@@ -6,6 +6,7 @@ const CartModel = require("../../model/cart-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
 const CouponModel = require('../../model/coupon-model');
+const WalletModel = require('../../model/wallet-model');
 const { generateUniqueOrderID, updateExpiredCoupons } = require('../../utils/helpers');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
@@ -403,7 +404,7 @@ const successRetryPayment = async (req, res) => {
     }
 };
 
-const cancelOrderRequest = async (req, res) => {
+const cancelOrder = async (req, res) => {
     const { orderId, reason } = req.body;
 
     if (!orderId || !reason) {
@@ -418,19 +419,40 @@ const cancelOrderRequest = async (req, res) => {
 
         order.requests.push({
             type: 'Cancel',
-            status: 'Pending',
+            status: 'Accepted',
             reason: reason,
         });
 
+        order.status = 'Cancelled';
+
+        for (const item of order.items) {
+            await ProductModel.findByIdAndUpdate(
+                item.productId,
+                { $inc: { countInStock: item.quantity } },
+                { new: true }
+            );
+        }
+
+        if(order.paymentMethod === "Razorpay") {
+            const wallet = await WalletModel.findOne({owner:order.user});
+            wallet.balance += order.billTotal;
+            wallet.transactions.push({ 
+                amount: order.billTotal, 
+                type: "credit", 
+                reason: `Refund of cancellation of orderId: ${order.oId}`
+            });
+            await wallet.save();
+        }
+
         await order.save();
 
-        res.status(200).json({ message: 'Cancellation request submitted successfully', order });
+        res.status(200).json({ message: 'Order cancelled successfully', order });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-const returnOrderRequest = async (req, res) => {
+const returnOrder = async (req, res) => {
     const { orderId, reason } = req.body;
 
     if (!orderId || !reason) {
@@ -445,13 +467,31 @@ const returnOrderRequest = async (req, res) => {
 
         order.requests.push({
             type: 'Return',
-            status: 'Pending',
+            status: 'Accepted',
             reason: reason,
         });
 
+        order.status = 'Returned';
+        for (const item of order.items) {
+            await ProductModel.findByIdAndUpdate(
+                item.productId,
+                { $inc: { countInStock: item.quantity } },
+                { new: true }
+            );
+        }
+
         await order.save();
 
-        res.status(200).json({ message: 'Return request submitted successfully', order });
+        const wallet = await WalletModel.findOne({owner:order.user});
+        wallet.balance += order.billTotal;
+        wallet.transactions.push({ 
+            amount: order.billTotal, 
+            type: "credit", 
+            reason: `Refund from returning of orderId: ${order.oId}`
+        });
+        await wallet.save();
+        
+        res.status(200).json({ message: 'Order returned successfully', order });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -548,8 +588,8 @@ module.exports = {
     orderDetailsGet,
     retryPayment,
     successRetryPayment,
-    cancelOrderRequest,
-    returnOrderRequest,
+    cancelOrder,
+    returnOrder,
     availableCoupons,
     applyCoupon,
     removeCoupon,

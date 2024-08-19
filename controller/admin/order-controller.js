@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 const OrderModel = require("../../model/order-model");
-const UserModel = require("../../model/user-model");
-const ProductModel = require("../../model/product-model");
-const CategoryModel = require("../../model/category-model");
-const WalletModel = require("../../model/wallet-model");
 
 const orderManagement = async (req,res) =>{
     const perPage = 8;
@@ -93,93 +89,8 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-const updateCancelStatus = async (req, res) => {
-    const { orderId, requestId, status } = req.body;
-
-    try {
-        const order = await OrderModel.findOneAndUpdate(
-            { _id: orderId, 'requests._id': requestId },
-            { $set: { 'requests.$.status': status } },
-            { new: true }
-        );
-        if (!order) {
-            return res.status(404).json({ message: 'Order or request not found' });
-        }
-
-        if (status === 'Accepted') {
-            order.status = 'Cancelled';
-            for (const item of order.items) {
-                await ProductModel.findByIdAndUpdate(
-                    item.productId,
-                    { $inc: { countInStock: item.quantity } },
-                    { new: true }
-                );
-            }
-
-            await order.save();
-            if(order.paymentMethod === "Razorpay") {
-                const wallet = await WalletModel.findOne({owner:order.user});
-                wallet.balance += order.billTotal;
-                wallet.transactions.push({ 
-                    amount: order.billTotal, 
-                    type: "credit", 
-                    reason: `Refund of cancellation of orderId: ${order.oId}`
-                });
-                await wallet.save();
-            }
-        }
-
-        res.status(200).json({ message: 'Request status updated successfully', order });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-const updateReturnStatus = async (req, res) => {
-    const { orderId, requestId, status } = req.body;
-
-    try {
-        const order = await OrderModel.findOneAndUpdate(
-            { _id: orderId, 'requests._id': requestId },
-            { $set: { 'requests.$.status': status } },
-            { new: true }
-        );
-        if (!order) {
-            return res.status(404).json({ message: 'Order or request not found' });
-        }
-
-        if (status === 'Accepted') {
-            order.status = 'Returned';
-            for (const item of order.items) {
-                await ProductModel.findByIdAndUpdate(
-                    item.productId,
-                    { $inc: { countInStock: item.quantity } },
-                    { new: true }
-                );
-            }
-
-            await order.save();
-            if(order.paymentMethod === "Razorpay") {
-                const wallet = await WalletModel.findOne({owner:order.user});
-                wallet.balance += order.billTotal;
-                wallet.transactions.push({ 
-                    amount: order.billTotal, 
-                    type: "credit", 
-                    reason: `Refund from returning of orderId: ${order.oId}`
-                });
-                await wallet.save();
-            }
-        }
-
-        res.status(200).json({ message: 'Request status updated successfully', order });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
 module.exports = {
     orderManagement,
     orderDetailed,
-    updateOrderStatus,
-    updateCancelStatus,
-    updateReturnStatus
+    updateOrderStatus
 }

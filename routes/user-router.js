@@ -92,8 +92,8 @@ router.post('/api/remove-coupon', checkout.removeCoupon);
 // order confirmation
 router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)
 router.get('/order-details/:orderId', isLoggedIn, isBlockedUser, checkout.orderDetailsGet)
-router.post('/api/cancel-order', isLoggedIn, isBlockedUser, checkout.cancelOrderRequest);
-router.post('/api/return-order', isLoggedIn, isBlockedUser, checkout.returnOrderRequest);
+router.post('/api/cancel-order', isLoggedIn, isBlockedUser, checkout.cancelOrder);
+router.post('/api/return-order', isLoggedIn, isBlockedUser, checkout.returnOrder);
 
 // wishlist
 router.get('/wishlist', isLoggedIn, isBlockedUser, wishlist.loadWishlist);

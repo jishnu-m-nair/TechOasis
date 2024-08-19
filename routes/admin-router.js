@@ -51,8 +51,6 @@ router.post('/api/category-filter', isAdmin, category.getCategoryList);
 router.get('/admin/order-management',isAdmin,order.orderManagement);
 router.get('/admin/order-management/order-detailed/:orderId',isAdmin,order.orderDetailed);
 router.post('/api/update-order-status',isAdmin,order.updateOrderStatus);
-router.post('/api/update-cancel-req',isAdmin, order.updateCancelStatus);
-router.post('/api/update-return-req',isAdmin, order.updateReturnStatus);
 
 router.get('/error',(req,res)=>{
     res.render('admin-error')

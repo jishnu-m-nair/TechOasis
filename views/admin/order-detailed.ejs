@@ -203,41 +203,6 @@
                                     <p><strong style="font-weight: 700;"> Bill Total:</strong> <%= orderDetail.billTotal %></p>
                                 </p>
                             </div>
-                            <% if(orderDetail.requests.length > 0 && orderDetail.requests[0].type === "Cancel" ) { %>
-                            <div class="h-25 pt-4">
-                                <div class="mb-3">
-                                    <h6 class="mb-15">Cancel Request</h6>
-                                </div>
-                                <p><strong style="font-weight: 700;"> Reason :</strong> <%= orderDetail.requests[0].reason %></p>
-                                <% let requestStatus = orderDetail.requests[0].status; %>
-        
-                                <select class="form-control mb-3" id="cancelRequestStatus" <%= requestStatus === 'Accepted' || requestStatus === 'Rejected' ? 'disabled' : '' %>>
-                                    <option value="Pending" <%= requestStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                    <option value="Rejected" <%= requestStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
-                                    <option value="Accepted" <%= requestStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
-                                </select>
-                                <% if(requestStatus === 'Pending') { %>
-                                <button class="btn btn-primary" id="saveRequestStatus">Update</button>
-                                <% } %>
-                            </div>
-                            <% } else if(orderDetail.requests.length > 0 && orderDetail.requests[0].type === "Return" ) { %>
-                                <div class="h-25 pt-4">
-                                    <div class="mb-3">
-                                        <h6 class="mb-15">Return Request</h6>
-                                    </div>
-                                    <p><strong style="font-weight: 700;"> Reason :</strong> <%= orderDetail.requests[0].reason %></p>
-                                    <% let requestStatus = orderDetail.requests[0].status; %>
-            
-                                    <select class="form-control mb-3" id="returnRequestStatus" <%= requestStatus === 'Accepted' || requestStatus === 'Rejected' ? 'disabled' : '' %>>
-                                        <option value="Pending" <%= requestStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                        <option value="Rejected" <%= requestStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
-                                        <option value="Accepted" <%= requestStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
-                                    </select>
-                                    <% if(requestStatus === 'Pending') { %>
-                                    <button class="btn btn-primary" id="saveReturnRequestStatus">Update</button>
-                                    <% } %>
-                                </div>
-                            <% } %>
                         </div>
                         <!-- col// -->
                     </div>
@@ -273,8 +238,6 @@
         const orderDetail = JSON.parse('<%- JSON.stringify(orderDetail) %>');
         const orderId = "<%= orderDetail._id %>";
         const saveStatusBtn = document.getElementById('saveStatusBtn');
-        const saveRequestStatusBtn = document.getElementById('saveRequestStatus');
-        const saveReturnRequestStatusBtn = document.getElementById('saveReturnRequestStatus');
     
         const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled","Returned"];
     
@@ -345,102 +308,6 @@
                         icon: 'error',
                         title: 'Error',
                         text: 'An unexpected error occurred',
-                    });
-                }
-            });
-        }
-
-        if(saveRequestStatusBtn) {
-            saveRequestStatusBtn.addEventListener('click', async function() {
-                console.log(orderDetail,"hiiii")
-                console.log(orderDetail.requests,"helooo");
-                let requestId =null;
-                if(orderDetail.requests.length > 0){
-                    requestId = orderDetail.requests[0]._id;
-                }
-                const status = document.getElementById('cancelRequestStatus').value;
-                console.log(orderId,"orderId")
-                console.log(status,"status")
-                console.log(requestId,"reqId")
-                try {
-                    const response = await fetch('/api/update-cancel-req', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ orderId, requestId, status }),
-                    });
-
-                    if (response.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Request status updated successfully',
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        const errorData = await response.json();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: `Error: ${errorData.message}`,
-                        });
-
-                    }
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred. Please try again later.',
-                    });
-                }
-            });
-        }
-
-        if(saveReturnRequestStatusBtn) {
-            saveReturnRequestStatusBtn.addEventListener('click', async function() {
-                console.log(orderDetail,"hiiii")
-                console.log(orderDetail.requests,"helooo");
-                let requestId =null;
-                if(orderDetail.requests.length > 0){
-                    requestId = orderDetail.requests[0]._id;
-                }
-                const status = document.getElementById('returnRequestStatus').value;
-                console.log(orderId,"orderId")
-                console.log(status,"status")
-                console.log(requestId,"reqId")
-                try {
-                    const response = await fetch('/api/update-return-req', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ orderId, requestId, status }),
-                    });
-
-                    if (response.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Request status updated successfully',
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        const errorData = await response.json();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: `Error: ${errorData.message}`,
-                        });
-
-                    }
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred. Please try again later.',
                     });
                 }
             });
