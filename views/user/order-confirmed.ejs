@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="shortcut icon" href="/userassets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/userassets/css/vendor/vendor.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6e0d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 500px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .confirmation {
+            margin-bottom: 30px;
+        }
+
+        .delivery-image {
+            width: 150px;
+            animation: move 2s infinite alternate;
+        }
+
+        @keyframes move {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(10px);
+            }
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #b19365;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background-color: #24262b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="confirmation">
+            <img src="/userassets/images/delivery.png" alt="Delivery Icon" class="delivery-image">
+            <h2 class="success-message"><i class="icon-check"></i> Order Successfully Placed.</h2>
+        </div>
+
+        <div>
+            <a href="/order-details/<%=orderId %>" class="btn">View Orders</a>
+            <a href="/shop" class="btn">Continue Shopping</a>
+        </div>
+    </div>
+</body>
+
+</html>

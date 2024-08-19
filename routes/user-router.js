@@ -62,7 +62,6 @@ router.get('/cart', isLoggedIn, isBlockedUser, cart.showcart);
 router.post('/cart-delete', isLoggedIn, isBlockedUser, cart.deleteCart);
 router.post('/update-cart-quantity', isLoggedIn, isBlockedUser, cart.updateCart);
 router.get('/latest-cart', isLoggedIn, isBlockedUser, cart.latestCart);
-// router.post('/addtocartIn',cart.addToCartIn);
 
 // Profile
 router.get('/profile', isLoggedIn, isBlockedUser, profile.profile)
@@ -83,17 +82,17 @@ router.get('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckout)
 router.post('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckoutPost)
 router.post('/payment-success',isLoggedIn, isBlockedUser,checkout.handlePaymentSuccess)
 router.post('/payment-failure',isLoggedIn, isBlockedUser,checkout.handlePaymentFailure)
-router.post('/retry-payment/:orderId',isLoggedIn, isBlockedUser,checkout.retryPayment)
-router.post('/success-retry-payment', isLoggedIn, isBlockedUser, checkout.successRetryPayment);
 router.get('/api/available-coupons', checkout.availableCoupons);
 router.post('/api/apply-coupon', checkout.applyCoupon);
 router.post('/api/remove-coupon', checkout.removeCoupon);
 
-// order confirmation
-router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)
+// order
 router.get('/order-details/:orderId', isLoggedIn, isBlockedUser, checkout.orderDetailsGet)
+router.post('/retry-payment/:orderId',isLoggedIn, isBlockedUser,checkout.retryPayment)
+router.post('/success-retry-payment', isLoggedIn, isBlockedUser, checkout.successRetryPayment);
 router.post('/api/cancel-order', isLoggedIn, isBlockedUser, checkout.cancelOrder);
 router.post('/api/return-order', isLoggedIn, isBlockedUser, checkout.returnOrder);
+router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)
 
 // wishlist
 router.get('/wishlist', isLoggedIn, isBlockedUser, wishlist.loadWishlist);

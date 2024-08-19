@@ -491,11 +491,12 @@
                             .then(data => {
                                 Swal.fire({
                                     title: 'Payment Successful',
-                                    text: 'Your payment was successful and the order has been updated.',
+                                    text: 'Order is placed',
                                     icon: 'success',
+                                    timer: 2000,
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    window.location.reload();
+                                    window.location.href = `/order-confirmation/${data.orderId}`;
                                 });
                             })
                             .catch(error => {

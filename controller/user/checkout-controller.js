@@ -324,11 +324,13 @@ const handlePaymentFailure = async (req, res, next) => {
 };
 
 const orderConfirmGet = async (req, res) => {
-    const orderId = req.params.orderId;
-    const orderDetails = await OrderModel.findById(orderId)
-    const userDetails = await UserModel.findById(req.session.userId)
-    const userName = userDetails.fullname;
-    res.render("user/order", { orderDetails, userName, pageTitle: "Order Confirmation" })
+    try {
+        const orderId = req.params.orderId;
+        res.render("user/order-confirmed", { orderId })
+    } catch (error) {
+        errorMessage
+        res.render("500", { errorMessage: 'Internal server error' })
+    }
 }
 
 const orderDetailsGet = async (req, res) => {
@@ -397,7 +399,7 @@ const successRetryPayment = async (req, res) => {
 
             await order.save();
 
-            res.status(200).json({ message: 'Payment successful and order updated' });
+            res.status(200).json({ message: 'Payment successful and order updated', orderId });
     } catch (error) {
         console.error('Error in successRetryPayment:', error);
         res.status(500).json({ error: 'Failed to process successful payment' });
