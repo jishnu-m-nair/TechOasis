@@ -164,6 +164,8 @@ const editProduct = async (req, res) => {
             .lean();
 
         const categories = await CategoryModel.find().lean();
+
+        delete req.session.imagePaths;
         res.render('admin/edit-product', { categories, product, pagetitle: "Edit Product Page" });
     } catch (error) {
         console.error(error);
@@ -199,8 +201,19 @@ const editProductPost = async (req, res) => {
 
         let image = existingProduct.image;
         let images = existingProduct.images || [];
+        let deletedImages = req.session.imagePaths || []
+        if(deletedImages.length > 0) {
+            images = images.filter(image => !deletedImages.includes(image))
+        }
         if (newImages && newImages.length > 0) {
             images = [...existingProduct.images, ...newImages];
+        }
+
+        if (images && images.length == 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Select atleast 1 image'
+            })
         }
 
         if (images && images.length > 5) {
@@ -238,6 +251,7 @@ const editProductPost = async (req, res) => {
             });
         }
 
+        delete req.session.imagePaths;
         return res.status(200).json({
             success: true,
             message: 'Product updated successfully',
@@ -298,6 +312,25 @@ const productImageUpload = (req, res) => {
     }
 }
 
+const removeImage = async (req,res) => {
+    const { imagePath } = req.body;
+
+    try {
+        let imagePaths = req.session.imagePaths;
+
+        if(!imagePaths) {
+            imagePaths = [];
+        }
+
+        imagePaths.push(imagePath);
+        req.session.imagePaths = imagePaths;
+        res.status(200).json({ success : true });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error uploading images.' });
+    }
+
+}
+
 module.exports = {
     productManagementGet,
     productCategories,
@@ -307,4 +340,5 @@ module.exports = {
     editProductPost,
     productManagementPublish,
     productImageUpload,
+    removeImage
 }

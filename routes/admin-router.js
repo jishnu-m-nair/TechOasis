@@ -38,6 +38,7 @@ router.get('/admin/product-management/editProduct/:Id',isAdmin,product.editProdu
 router.post('/admin/product-management/editProduct/:Id', isAdmin,product.editProductPost);
 router.post('/upload-product-images', isAdmin, productUpload.array('images', 5),product.productImageUpload);
 router.post('/admin/product-management/featuredProduct', isAdmin,product.productManagementPublish);
+router.post('/api/product/remove-image', isAdmin,product.removeImage);
 
 
 // admin categories 
