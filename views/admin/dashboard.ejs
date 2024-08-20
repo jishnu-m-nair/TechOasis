@@ -1,0 +1,471 @@
+<%- include('admin-partials/header.ejs') %>
+
+    <style>
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .radio-default {
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .radio-default input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1px solid #b19361;
+            border-radius: 50%;
+            background-clip: content-box;
+            padding: 3px;
+            position: relative;
+        }
+
+        .radio-default input[type="radio"]:checked {
+            background-color: #b19361;
+        }
+
+        .radio-default input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #b19361;
+        }
+
+        .radio-default>span {
+            margin-left: 10px;
+            text-transform: capitalize;
+            color: #777;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .chart-container,
+        .pie-chart-container {
+            position: relative;
+        }
+
+        .flexside {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+
+    <div class="screen-overlay"></div>
+
+    <%- include('admin-partials/sidebar.ejs') %>
+
+        <main class="main-wrap">
+            <header class="main-header navbar">
+                <div class="col-nav ms-auto">
+                    <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside">
+                        <i class="material-icons md-apps"></i>
+                    </button>
+                    <ul class="nav">
+                        <li class="dropdown nav-item">
+                            <a class="dropdown-item text-danger" href="/admin/logout">
+                                <i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </header>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Dashboard </h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="card card-body mb-4">
+                            <article class="icontext">
+                                <span class="icon icon-sm rounded-circle bg-primary-light"><i
+                                        class="text-primary material-icons md-monetization_on"></i></span>
+                                <div class="text">
+                                    <h6 class="mb-1 card-title">Revenue</h6>
+                                    <span><%= totalSalesAmount %></span>
+                                    <span class="text-sm">
+                                        Shipping fees are not included
+                                    </span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card card-body mb-4">
+                            <article class="icontext">
+                                <span class="icon icon-sm rounded-circle bg-success-light"><i
+                                        class="text-success material-icons md-local_shipping"></i></span>
+                                <div class="text">
+                                    <h6 class="mb-1 card-title">Orders</h6> <span><%= orderCount %></span>
+                                    <span class="text-sm">
+                                        Excluding orders in transit
+                                    </span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card card-body mb-4">
+                            <article class="icontext">
+                                <span class="icon icon-sm rounded-circle bg-warning-light"><i
+                                        class="text-warning material-icons md-qr_code"></i></span>
+                                <div class="text">
+                                    <h6 class="mb-1 card-title">Products</h6> <span><%= productCount %></span>
+                                    <span class="text-sm">
+                                        In <%= categoryCount %> Categories
+                                    </span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card card-body mb-4">
+                            <article class="icontext">
+                                <span class="icon icon-sm rounded-circle bg-warning-light"><i
+                                        class="text-warning material-icons md-qr_code"></i></span>
+                                <div class="text">
+                                    <h6 class="mb-1 card-title">Users</h6> <span><%= userCount %></span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-8 col-lg-12">
+                        <div class="card mb-4">
+                            <article class="card-body">
+                                <h5 class="card-title">Sales Statistics</h5>
+                                <div class="radio-group">
+                                    <label class="radio-default">
+                                        <input type="radio" id="monthChart" name="chartRange" value="month"
+                                            onclick="loadChartData('month')" checked>
+                                        <span>Month</span>
+                                    </label>
+
+                                    <label class="radio-default">
+                                        <input type="radio" id="weekChart" name="chartRange" value="week"
+                                            onclick="loadChartData('week')">
+                                        <span>Week</span>
+                                    </label>
+
+                                    <label class="radio-default">
+                                        <input type="radio" id="yearChart" name="chartRange" value="year"
+                                            onclick="loadChartData('year')">
+                                        <span>Year</span>
+                                    </label>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="ordersByDayChart"></canvas>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-12">
+                        <div class="card mb-4">
+                            <article class="card-body">
+                                <h5 class="card-title">Order Status</h5>
+                                <div class="radio-group">
+                                    <label class="radio-default">
+                                        <input type="radio" id="monthStatus" name="range" value="month"
+                                            onclick="loadOrderStatusData('month')" checked>
+                                        <span>Month</span>
+                                    </label>
+
+                                    <label class="radio-default">
+                                        <input type="radio" id="weekStatus" name="range" value="week"
+                                            onclick="loadOrderStatusData('week')">
+                                        <span>Week</span>
+                                    </label>
+
+                                    <label class="radio-default">
+                                        <input type="radio" id="yearStatus" name="range" value="year"
+                                            onclick="loadOrderStatusData('year')">
+                                        <span>Year</span>
+                                    </label>
+                                </div>
+                                <div class="pie-chart-container">
+                                    <canvas id="orderStatusChart"></canvas>
+                                </div>
+                            </article>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="col-md-9">
+                        <div class="card mb-4">
+                            <header class="card-header">
+                                <h4 class="card-title">Best Selling Products (Top 10)</h4>
+                            </header>
+    
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-nowrap mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="align-middle" scope="col">Product Name</th>
+                                                    <th class="align-middle" scope="col">Image</th>
+                                                    <th class="align-middle" scope="col">Price(Rs)</th>
+                                                    <th class="align-middle" scope="col">Total Sold</th>
+                                                    <th class="align-middle" scope="col">Stock</th>
+                                                    <th class="align-middle" scope="col">Brand</th>
+                                                    <th class="align-middle" scope="col">Category</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% bestSellingProducts.forEach(product=> { %>
+                                                    <tr>
+                                                        <td class="align-middle">
+                                                            <%= product.productName %>
+                                                        </td>
+                                                        <td class="align-middle"><img src="/<%= product.image %>" alt="image"
+                                                                style="max-width: 60px; max-height: 60px;"></td>
+                                                        <td class="align-middle">
+                                                            <%= product.price %>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <span class="badge badge-pill badge-soft-success">
+                                                                <%= product.totalSold %>
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <%= product.countInStock %>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <%= product.brand %>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <%= product.categoryName %>
+                                                        </td>
+                                                    </tr>
+                                                    <% }); %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="flexside">
+                            <div class="col-md-12">
+                                <div class="card mb-4">
+                                    <header class="card-header">
+                                        <h4 class="card-title">Best Selling Brands (Top 5)</h4>
+                                    </header>
+        
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="70%">Brand</th>
+                                                        <th width="30%">Units Sold</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% for(const item of bestSellingBrands) { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%=item.brandName %>
+                                                            </td>
+                                                            <td> <%=item.totalSold %> </td>
+                                                            
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="card mb-4">
+                                    <header class="card-header">
+                                        <h4 class="card-title">Best Selling Categories (Top 5)</h4>
+                                    </header>
+        
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="70%">Category</th>
+                                                        <th width="30%">Units Sold</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% for(const item of bestSellingCategories) { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%=item.categoryName %>
+                                                            </td>
+                                                            <td> <%=item.totalSold %> </td>
+                                                            
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <!-- <div class="col-md-3">
+                        
+                    </div> --><div class="col-md-3">
+                        
+                    </div>
+                </div>
+            </section>
+
+            <%- include('admin-partials/footer.ejs') %>
+        </main>
+
+        <%- include('admin-partials/scripts.ejs') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                let ordersChart;
+                let statusChart;
+
+                const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ];
+                const weekDayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+                function getDaySuffix(day) {
+                    if (day > 3 && day < 21) return 'th';
+                    switch (day % 10) {
+                        case 1: return "st";
+                        case 2: return "nd";
+                        case 3: return "rd";
+                        default: return "th";
+                    }
+                }
+
+                async function loadChartData(range) {
+                    const response = await fetch(`/api/admin/chart-data/order-count?range=${range}`);
+                    const { barChartData, monthYear } = await response.json();
+
+                    if (ordersChart) {
+                        ordersChart.destroy();
+                    }
+
+                    const ctxBar = document.getElementById('ordersByDayChart').getContext('2d');
+                    ordersChart = new Chart(ctxBar, {
+                        type: 'bar',
+                        data: barChartData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Orders'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: `Day/Month of ${monthYear}`
+                                    },
+                                    ticks: {
+                                        callback: function (value, index, values) {
+                                            if (range === 'year') {
+                                                return monthNamesShort[index];
+                                            } else if (range === 'week') {
+                                                return weekDayNamesShort[index];
+                                            } else {
+                                                return value + 1;
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Orders per ${range.charAt(0).toUpperCase() + range.slice(1)} - ${monthYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function (context) {
+                                            const day = context[0].label;
+                                            if (range === 'month') {
+                                                const monthIndex = new Date().getMonth();
+                                                return `${day}${getDaySuffix(day)} ${monthNamesShort[monthIndex]}`;
+                                            } else if (range === 'year') {
+                                                const monthIndex = context[0].dataIndex;
+                                                return `${monthNamesShort[monthIndex]}`;
+                                            } else if (range === 'week') {
+                                                return `${weekDayNamesShort[context[0].dataIndex]}`;
+                                            }
+                                            return day;
+                                        },
+                                        label: function (context) {
+                                            return `Orders: ${context.parsed.y}`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                async function loadOrderStatusData(range) {
+                    const response = await fetch(`/api/admin/chart-data/order-status?range=${range}`);
+                    const chartData = await response.json();
+
+                    if (statusChart) {
+                        statusChart.destroy();
+                    }
+
+                    const ctxPie = document.getElementById('orderStatusChart').getContext('2d');
+                    statusChart = new Chart(ctxPie, {
+                        type: 'pie',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Order Status Distribution'
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Load initial data (This Month)
+                loadChartData('month');
+                loadOrderStatusData('month');
+            </script>
+            </body>
+
+
+            <!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:57 GMT -->
+
+            </html>

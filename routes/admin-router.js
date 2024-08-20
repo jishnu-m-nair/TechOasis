@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const admin = require('../controller/admin/admin-controller')
+const dashboard = require('../controller/admin/dashboard-controller')
 const product = require('../controller/admin/product-controller')
 const category = require('../controller/admin/category-controller')
 const order = require('../controller/admin/order-controller')
@@ -8,28 +9,31 @@ const coupon = require('../controller/admin/coupon-controller')
 const { isAdmin } = require('../middlewares/auth')
 const { productUpload, categoryUpload } = require('../config/multerConfig')
 
-router.get('/admin',isAdmin,(req,res) => {
-    res.render('admin/admin-index')
-})
+// dashboard
+router.get('/admin', isAdmin, dashboard.getAdminDashboard)
+router.get('/admin/dashboard', isAdmin, dashboard.getAdminDashboard)
+router.get('/api/admin/chart-data/order-count', isAdmin, dashboard.getOrdersByRange)
+router.get('/api/admin/chart-data/order-status', isAdmin, dashboard.getOrdersStatus)
 
+// admin register
 // router.get('/admin/signup',(req,res)=> {
 //     res.render('admin-register')
 // })
-router.post('/admin/signup',admin.postAdminRegister)
+// router.post('/admin/signup',admin.postAdminRegister)
 
-//admin login
+// admin login
 router.get('/admin/login',admin.adminLogin)
 router.post('/admin/login',admin.adminLoginPost)
 
-//admin logout
+// admin logout
 router.get('/admin/logout',admin.adminLogout)
 
-//admin user management
+// user management
 router.get('/admin/usermanagement',isAdmin,admin.userManagement)
 router.post('/api/block-user',isAdmin,admin.blockUser)
 router.post('/api/user-filter',isAdmin, admin.filterUsers);
 
-//admin product management
+// product management
 router.get('/admin/product-management',isAdmin,product.productManagementGet)
 router.get('/admin/product-management/getCategories',isAdmin,product.productCategories);
 router.get('/admin/product-management/newProduct', isAdmin,product.addProduct)
@@ -41,7 +45,7 @@ router.post('/admin/product-management/featuredProduct', isAdmin,product.product
 router.post('/api/product/remove-image', isAdmin,product.removeImage);
 
 
-// admin categories 
+// categories 
 router.get('/admin/category-management',isAdmin,category.categoryManagementGet);
 router.post('/admin/category-management/newCategory',isAdmin, categoryUpload.single('image'),category.categoryManagementCreate)
 router.post('/admin/category-management/edit-category/:categoryId',isAdmin,categoryUpload.single('editImage'),category.categoryManagementEdit)
@@ -53,18 +57,21 @@ router.get('/admin/order-management',isAdmin,order.orderManagement);
 router.get('/admin/order-management/order-detailed/:orderId',isAdmin,order.orderDetailed);
 router.post('/api/update-order-status',isAdmin,order.updateOrderStatus);
 
+// coupons
+router.get("/admin/coupon-management", isAdmin,coupon.couponManagement);
+router.post('/api/admin/add-coupon', isAdmin, coupon.addCoupon);
+router.delete('/api/admin/delete-coupon/:id', coupon.deleteCoupon);
+
+// sales report
+router.get("/admin/sales-report", isAdmin,admin.getSalesReportPage);
+router.post('/api/admin/generate-sales-report',isAdmin, admin.generateSalesReport);
+
+// error routes
 router.get('/error',(req,res)=>{
     res.render('admin-error')
 })
 router.get('/admin-404',(req,res)=>{
     res.render('admin-404')
 })
-
-router.get("/admin/coupon-management", isAdmin,coupon.couponManagement);
-router.post('/api/admin/add-coupon', isAdmin, coupon.addCoupon);
-router.delete('/api/admin/delete-coupon/:id', coupon.deleteCoupon);
-
-router.get("/admin/sales-report", isAdmin,admin.getSalesReportPage);
-router.post('/api/admin/generate-sales-report',isAdmin, admin.generateSalesReport);
 
 module.exports = router;

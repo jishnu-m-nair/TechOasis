@@ -80,10 +80,17 @@ async function generateReferralCode(length) {
     return referralCode;
 }
 
+const formatToIndianCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+        maximumFractionDigits: 2,
+    }).format(amount);
+};
+
 module.exports = {
     securePassword,
     generateUniqueOrderID,
     updateExpiredCoupons,
     formatDate,
-    generateReferralCode
+    generateReferralCode,
+    formatToIndianCurrency
 }
