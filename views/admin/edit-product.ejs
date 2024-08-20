@@ -3,29 +3,26 @@
         .text-red {
             color: red;
         }
-        /* Set a fixed height for the cropper container */
+
         #showimage, #imagePreviews img {
-            max-height: 300px; /* Set your desired height */
-            width: auto; /* Maintain aspect ratio */
+            max-height: 300px;
+            width: auto;
             display: block;
-            object-fit: cover; /* Ensures image fits within the defined area */
-            margin: 10px 0; /* Adds some margin for spacing */
+            object-fit: cover;
+            margin: 10px 0;
         }
     
-        /* Ensure the container div does not exceed a certain height */
         #imagePreviews {
-            max-height: 300px; /* Set a maximum height */
-            overflow-y: auto; /* Enable vertical scrolling if content overflows */
+            max-height: 300px;
+            overflow-y: auto;
         }
     
-        /* This CSS will explicitly set the text alignment of the labels to the left */
         .modal-body label {
             text-align: left;
             display: block;
             width: 100%;
         }
     
-        /* Additional styling for better visual alignment */
         .modal-body .form-group {
             text-align: left;
         }
@@ -108,40 +105,22 @@
                         <input list="search_terms" name="search" type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="submit"> <i class="material-icons md-search"></i></button>
                     </div>
-                    <!-- <datalist id="search_terms">
-                        <option value="Products">
-                        <option value="New orders">
-                        <option value="Apple iphone">
-                        <option value="Ahmed Hassan">
-                    </datalist> -->
                 </form>
             </div>
             <div class="col-nav ms-auto">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
                         class="material-icons md-apps"></i> </button>
                 <ul class="nav">
-                    <!-- <li class="nav-item">
-                        <a class="nav-link btn-icon" href="#">
-                            <i class="material-icons md-notifications animation-shake"></i>
-                            <span class="badge rounded-pill">3</span>
-                        </a>
-                    </li> -->
-                    <li class="nav-item">
-                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
-                    </li> -->
                     <li class="dropdown nav-item">
-                        <a class="dropdown-item text-danger" href="/admin/logout"><i
-                                class="material-icons md-exit_to_app"></i>Logout</a>
+                        <a class="dropdown-item text-danger" href="/admin/logout">
+                            <i class="material-icons md-exit_to_app"></i>Logout
+                        </a>
                     </li>
                 </ul>
             </div>
         </header>
         <section class="content-main">
             <div class="row">
-                <!-- <div class="col-lg-2"></div> -->
                 <div class="col-8">
                     <div class="content-header">
                         <h2 class="content-title">Edit Product</h2>
@@ -246,13 +225,12 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary" id="skipButton">Skip</button> -->
                             <button type="button" class="btn btn-primary" id="cropButton">Apply Crop</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </section> <!-- content-main end// -->
+        </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -332,7 +310,6 @@
             const imagePreviews = document.getElementById('imagePreviews');
             const cropperImage = document.getElementById('cropperImage');
             const cropButton = document.getElementById('cropButton');
-            // const skipButton = document.getElementById('skipButton');
             const cropModal = new bootstrap.Modal(document.getElementById('cropModal'), {
                 backdrop: 'static',
                 keyboard: false
@@ -358,7 +335,6 @@
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 if (isFormValid()) {
-                    console.log("all passed");
                     handleFormSubmit();
                 }
             });
@@ -394,12 +370,6 @@
                     }, 'image/jpeg');
                 }
             });
-        
-            // skipButton.addEventListener('click', function() {
-            //     croppedFiles.push(files[currentFileIndex]);
-            //     addImageToPreview(URL.createObjectURL(files[currentFileIndex]));
-            //     moveToNextImage();
-            // });
         
             function validateField(field) {
                 switch (field.id) {
@@ -439,7 +409,6 @@
                 }
                 productNameError.textContent = "";
                 productName.style.borderColor = 'green';
-                console.log("name passed");
                 return true;
             }
         
@@ -452,64 +421,41 @@
                 }
                 descriptionError.textContent = "";
                 productDescription.style.borderColor = 'green';
-                console.log("description passed");
                 return true;
             }
         
             function validateAdditionalImages() {
                 try {
                     const files = images.files;
-                    console.log("Number of additional images:", files.length);
                     if (files.length === 0) {
-                        console.log("Error: No additional images uploaded");
                         imagesError.textContent = "Please upload at least one additional image";
                         images.style.borderColor = 'red';
                         return false;
                     }
                     
                     if (files.length > 5) {
-                        console.log("Error: Too many additional images");
                         imagesError.textContent = "Maximum 5 Additional Images allowed";
                         images.style.borderColor = 'red';
                         return false;
                     }
                     
                     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-                    // const maxSize = 5 * 1024 * 1024; // 5MB in bytes
                     
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
-                        // console.log(`File ${i + 1} details:`, {
-                        //     name: file.name,
-                        //     type: file.type,
-                        //     size: file.size,
-                        //     sizeInMB: (file.size / (1024 * 1024)).toFixed(2) + " MB"
-                        // });
                         
                         if (!allowedTypes.includes(file.type)) {
-                            console.log(`Error: Invalid file type for image ${i + 1}`);
                             imagesError.textContent = "All Additional Images must be in JPEG, PNG, or GIF format";
                             images.style.borderColor = 'red';
                             return false;
                         }
                         
-                        // if (file.size > maxSize) {
-                        //     console.log("filesize: "+file.size)
-                        //     console.log(`Error: File size exceeds limit for image ${i + 1}`);
-                        //     console.log(`File size: ${file.size} bytes, Max size: ${maxSize} bytes`);
-                        //     imagesError.textContent = "Each Additional Image must not exceed 5MB";
-                        //     images.style.borderColor = 'red';
-                        //     return false;
-                        // }
                     }
-                    console.log("Additional images validation passed");
                     imagesError.textContent = "";
                     images.style.borderColor = 'green';
-                    console.log("all images passed");
                     return true;
                 }
                 catch (error) {
-                    console.error("Error in validateAdditionalImages:", error);
                     imagesError.textContent = "An error occurred while validating additional images";
                     images.style.borderColor = 'red';
                     return false;
@@ -525,7 +471,6 @@
                 }
                 brandError.textContent = "";
                 productBrand.style.borderColor = 'green';
-                console.log("brand passed");
                 return true;
             }
         
@@ -539,7 +484,6 @@
                 }
                 stockError.textContent = "";
                 productCountInStock.style.borderColor = 'green';
-                console.log("stock passed");
                 return true;
             }
         
@@ -552,7 +496,6 @@
                 }
                 categoryError.textContent = "";
                 productCategory.style.borderColor = 'green';
-                console.log("category passed");
                 return true;
             }
         
@@ -566,7 +509,6 @@
                 }
                 priceError.textContent = "";
                 productPrice.style.borderColor = 'green';
-                console.log("price passed");
                 return true;
             }
         
@@ -580,7 +522,6 @@
                 }
                 discountPriceError.textContent = "";
                 productDiscountPrice.style.borderColor = 'green';
-                console.log("discount passed");
                 return true;
             }
         
@@ -692,7 +633,6 @@
                         alert("Error updating product: " + result.error);
                     }
                 } catch (error) {
-                    console.error("Error:", error);
                     alert("An error occurred while updating the product.");
                 }
             }

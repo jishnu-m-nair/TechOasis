@@ -36,7 +36,7 @@
         margin-bottom: 10px;
     }
     .product-item {
-        padding-left: 20px; /* Adjust as needed */
+        padding-left: 20px;
     }
     .btn-danger{
         background-color: red;
@@ -105,19 +105,7 @@
                                     </ul>
                                 </form>
                             </div>
-                        </div> <!-- End Single Sidebar Widget -->
-
-                        <!-- Start Single Sidebar Widget -->
-                        <!-- <div class="sidebar-single-widget">
-                            <h6 class="sidebar-title">FILTER BY PRICE</h6>
-                            <div class="sidebar-content">
-                                <div id="slider-range"></div>
-                                <div class="filter-type-price">
-                                    <label for="amount">Price range:</label>
-                                    <input type="text" id="amount">
-                                </div>
-                            </div>
-                        </div> -->
+                        </div>
                         <!-- End Single Sidebar Widget -->
 
                         <!-- Start Single Sidebar Widget -->
@@ -546,7 +534,6 @@
                 $paginationContainer.find('a').on('click', function(e) {
                     e.preventDefault();
                     currentPage = parseInt($(this).data('page'));
-                    console.log(currentPage)
                     updateProducts(currentPage);
                 });
             }
@@ -569,7 +556,6 @@
             if ($selectElement.length) {
                 $selectElement.on('change', function(e) {
                     e.preventDefault();
-                    console.log("event listener called");
                     currentSort = $(this).val();
                     currentPage = 1;
                     updateProducts(currentPage);

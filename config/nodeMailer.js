@@ -53,14 +53,12 @@ function sentOtp(email) {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.error("Error sending email:", error);
             res.status(500).send("Error sending OTP");
         } else {
             console.log("Email sent:", info.response);
             console.log("OTP:", otp);
         }
     });
-    console.log("email:", email);
     return otp;
 }
 

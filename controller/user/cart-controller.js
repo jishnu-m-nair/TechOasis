@@ -62,8 +62,7 @@ const addTocart = async (req, res) => {
 
         
     } catch (err) {
-        console.log('Error adding to cart:', err.message);
-        return res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -84,8 +83,7 @@ const showcart = async (req, res) => {
             });
         }
     } catch (err) {
-        console.log('Error displaying cart:', err.message);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -119,8 +117,7 @@ const deleteCart = async (req, res) => {
             return res.status(404).json({ message: 'Item not found in cart' });
         }
     } catch (err) {
-        console.log('Error deleting from cart:', err.message);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -164,8 +161,7 @@ const updateCart = async (req, res) => {
         await cart.save();
         return res.status(200).json({ success: true, cart });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -181,8 +177,7 @@ const latestCart =  async (req, res) => {
         // Return the cart data
         res.status(200).json(cart);
     } catch (error) {
-        console.error('Error fetching latest cart data:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 

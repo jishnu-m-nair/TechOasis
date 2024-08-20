@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
 const UserModel = require("../../model/user-model");
-const ProductModel = require("../../model/product-model");
-const CategoryModel = require("../../model/category-model");
 const AddressModel = require("../../model/address-model");
 const OrderModel = require("../../model/order-model");
 const WalletModel = require("../../model/wallet-model");
 const bcrypt = require("bcryptjs");
-// require("dotenv").config();
-// const { sentOtp } = require("../../config/nodeMailer");
-// const { isBlockedUser } = require("../../middlewares/auth");
 
 // Password Hashing
 const securePassword = async (password) => {
@@ -16,7 +11,7 @@ const securePassword = async (password) => {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
-        console.log(error.message);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -29,7 +24,6 @@ const profile = async (req, res) => {
         const orderDetails = await OrderModel.find({ user: userId }).sort({ createdAt: -1 });
         const wallet = await WalletModel.findOne({ owner: userId });
         if(!wallet) {
-            console.log("userid",userId);
             const userWallet = new WalletModel({
                 owner: userId,
                 balance: 0,
@@ -42,7 +36,7 @@ const profile = async (req, res) => {
 
         res.render('user/profile', { userInfo, addresses, userId, orderDetails, wallet, pageTitle: "Profile Page" });
     } catch (error) {
-        console.log(error);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -54,7 +48,7 @@ const editProfile = async (req, res) => {
 
         res.render("user/edit-profile", { userInfo, pageTitle: "Edit Profile Page" });
     } catch (error) {
-        console.log(error);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -78,18 +72,16 @@ const editProfilePatch = async (req, res) => {
             redirectUrl: "/profile",
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
 // Change Password
 const changePassword = async (req, res) => {
     try {
-        const userId = req.session.userId;
         res.render("user/change-password", { pageTitle: "Change Password Page" });
     } catch (error) {
-        console.error(error);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -139,7 +131,6 @@ const changePasswordPost = async (req, res) => {
             redirectUrl: "/profile"
         });
     } catch (error) {
-        console.error(error);
         return res.status(500).json({ message: "An error occurred while changing the password." });
     }
 };
@@ -150,8 +141,7 @@ const addAddress = (req, res) => {
         const userId = req.session.userId;
         res.render("user/add-address", { userId, pageTitle: "Add Address Page" });
     } catch (error) {
-        console.error(error);
-        res.status(500).json("Internal Server Error");
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -188,7 +178,6 @@ const addAddressPost = async (req, res) => {
 
         res.status(200).json({ message: 'Address added successfully', redirectUrl });
     } catch (error) {
-        console.error('Error adding address:', error);
         res.status(500).json({ message: 'An error occurred while adding the address.' });
     }
 };
@@ -213,7 +202,6 @@ const editAddress = async (req, res) => {
 
         res.render('user/edit-address', { address, userId, addressId, pageTitle: "Edit Address Page" });
     } catch (error) {
-        console.error('Error fetching address:', error);
         res.status(500).render('error', { message: 'An error occurred while fetching the address.', pageTitle: "Edit Address Page" });
     }
 };
@@ -249,8 +237,7 @@ const editAddressPatch = async (req, res) => {
         const redirectUrl = source === 'checkout' ? '/checkout' : '/profile?tab=address';
         res.status(200).json({ message: 'Address updated successfully', redirectUrl });
     } catch (error) {
-        console.error('Error updating address:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -275,7 +262,6 @@ const deleteAddress = async (req, res) => {
 
         res.status(200).json({ success: true, message: 'Address deleted successfully' });
     } catch (error) {
-        console.error('Error deleting address:', error);
         res.status(500).json({ success: false, message: 'An error occurred while deleting the address.' });
     }
 };

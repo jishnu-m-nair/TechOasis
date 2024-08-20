@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
 const CategoryModel = require("../../model/category-model");
-const OrderModel = require("../../model/order-model");
 const WalletModel = require("../../model/wallet-model");
 const { securePassword, generateReferralCode } = require("../../utils/helpers");
 
@@ -106,10 +105,7 @@ const home = async (req, res) => {
             pageTitle: "Home Page"
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({
-            message: "Internal Server Error",
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -148,8 +144,7 @@ const login = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json("Internal Server Error");
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -183,8 +178,7 @@ const loginPost = async (req, res) => {
             res.redirect("/login");
         }
     } catch (error) {
-        console.error("Error during login:", error);
-        res.status(500).json("Internal Server error");
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -211,7 +205,7 @@ const signupPost = async (req, res, next) => {
         }
         let referralCode = req.body.referralCode;
         referralCode = referralCode.toUpperCase();
-        console.log(referralCode,"referal")
+        
         let referrer = null;
         if (referralCode) {
             referrer = await UserModel.findOne({ referralCode });
@@ -231,7 +225,6 @@ const signupPost = async (req, res, next) => {
 
         const newReferralCode = await generateReferralCode(8);
 
-        console.log(newReferralCode,"newreferral")
         let user = {
             fullname,
             email,
@@ -248,7 +241,6 @@ const signupPost = async (req, res, next) => {
         req.session.otpExpiry = Date.now() + 60000;
         res.redirect("/signup-otp");
     } catch (e) {
-        console.error(e);
         res.redirect("/signup");
     }
 };
@@ -326,7 +318,6 @@ const signupOtpPost = async (req, res) => {
 
         res.status(200).json({ message: "",redirectUrl:"/home" });
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             message: "An error occurred during verification.",
         });
@@ -354,7 +345,6 @@ const resendOtp = async (req, res) => {
 
         res.status(200).json({ message: "OTP resent successfully." });
     } catch (error) {
-        console.error("Error resending OTP:", error);
         res.status(500).json({
             message: "Failed to resend OTP. Please try again.",
         });
@@ -387,7 +377,6 @@ const forgotPasswordPost = async (req, res) => {
 
         res.status(200).json({ message: 'OTP sent to your email.' });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred. Please try again later.' });
     }
 };
@@ -443,7 +432,6 @@ const resetPasswordPost = async (req, res) => {
 
         res.status(200).json({ message: 'Password has been reset successfully.' });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred. Please try again later.' });
     }
 };
@@ -454,10 +442,8 @@ const userLogout = (req, res) => {
     if(req.session.userId=="" && adminId==""){
         req.session.destroy((err) => {
             if (err) {
-                console.error("Error destroying session:", err);
                 return res.status(500).send("Error logging out");
             }
-            console.log("Session destroyed");
         });
     }
     res.redirect("/login");
@@ -560,10 +546,7 @@ const userShop = async (req, res) => {
             pageTitle: "Shop Page"
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: "Some error caused while rendering shop page",
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -597,11 +580,7 @@ const productDetails = async (req, res) => {
             pageTitle: "Product Detailed Page"
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: "Internal Server Error",
-            errorMessage: error.message,
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -610,7 +589,6 @@ module.exports = {
     googleAuthCallback,
     googleAuthFailure,
     home,
-    // securePassword,
     login,
     loginPost,
     signup,

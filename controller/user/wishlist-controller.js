@@ -38,8 +38,7 @@ const addToWishlist = async (req, res) => {
         return res.status(200).json({ message: 'Item added to wishlist successfully' });
         
     } catch (err) {
-        console.log('Error adding to wishlist:', err.message);
-        return res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 

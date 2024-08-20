@@ -387,11 +387,9 @@
                                 categoryContainer.innerHTML = '<tr><td colspan="5" class="text-center">No categories found.</td></tr>';
                             }
                         } else {
-                            console.error('Failed to fetch categories:', response.statusText);
                             document.getElementById('categoryContainer').innerHTML = '<tr><td colspan="5" class="text-center">An error occurred while fetching categories.</td></tr>';
                         }
                     } catch (error) {
-                        console.error('Error:', error);
                         document.getElementById('categoryContainer').innerHTML = '<tr><td colspan="5" class="text-center">An error occurred while fetching categories.</td></tr>';
                     }
                 }

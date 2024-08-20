@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const CategoryModel = require("../../model/category-model");
-const UserModel = require("../../model/user-model");
 const ProductModel = require("../../model/product-model");
-const { categoryUpload } = require("../../config/multerConfig");
 const path = require("path");
 
 const categoryManagementGet = async (req, res) => {
@@ -14,8 +12,7 @@ const categoryManagementGet = async (req, res) => {
             page: "category-management"
         });
     } catch (error) {
-        console.error("Error fetching categories:", error);
-        res.status(500).send("Internal Server Error");
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -49,8 +46,7 @@ const categoryManagementCreate = async (req, res) => {
 
         res.status(201).json({ message: "Category added successfully" });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -89,8 +85,7 @@ const categoryManagementEdit = async (req, res) => {
         await category.save();
         res.status(200).json({ message: 'Category updated successfully' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -112,8 +107,7 @@ const categoryManagementFeatured = async (req, res) => {
             message: `Category ${category.isFeatured ? 'published' : 'unpublished'} successfully`
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -135,7 +129,6 @@ const getCategoryList = async (req, res) => {
 
         res.status(200).json(categories);
     } catch (error) {
-        console.error('Error fetching categories:', error);
         res.status(500).json({ message: 'An error occurred while fetching categories. Please try again later.' });
     }
 };

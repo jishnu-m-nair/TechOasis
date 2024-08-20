@@ -12,7 +12,6 @@ const isLoggedOut = (req, res, next) => {
     if (req.session.userId == "" || req.session.userId == undefined) {
         next();
     } else {
-        console.error("User already logged in:");
         res.redirect("/home");
     }
 };
@@ -44,7 +43,6 @@ const isBlockedUser = async (req, res, next) => {
             errorMessage,
             pageTitle: "Login Page",
         });
-        console.error("Error checking user block status:", error);
         return res.status(500).send("Error checking user block status");
     }
 };

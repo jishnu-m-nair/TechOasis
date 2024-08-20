@@ -5,29 +5,26 @@
     .text-red {
         color: red;
     }
-    /* Set a fixed height for the cropper container */
+
     #showimage, #imagePreviews img {
-        max-height: 300px; /* Set your desired height */
-        width: auto; /* Maintain aspect ratio */
+        max-height: 300px;
+        width: auto;
         display: block;
-        object-fit: cover; /* Ensures image fits within the defined area */
-        margin: 10px 0; /* Adds some margin for spacing */
+        object-fit: cover;
+        margin: 10px 0;
     }
 
-    /* Ensure the container div does not exceed a certain height */
     #imagePreviews {
-        max-height: 300px; /* Set a maximum height */
-        overflow-y: auto; /* Enable vertical scrolling if content overflows */
+        max-height: 300px;
+        overflow-y: auto;
     }
 
-    /* This CSS will explicitly set the text alignment of the labels to the left */
     .modal-body label {
         text-align: left;
         display: block;
         width: 100%;
     }
 
-    /* Additional styling for better visual alignment */
     .modal-body .form-group {
         text-align: left;
     }
@@ -103,34 +100,12 @@
     </nav>
 </aside>
 
-<!-- <div class="main-container"> -->
 <main class="main-wrap">
     <header class="main-header navbar">
-        <!-- <div class="col-search">
-            <form method="get" class="searchform" action="/admin/product-search">
-                <div class="input-group">
-                    <input list="search_terms" name="search" type="text" class="form-control" placeholder="Search term">
-                    <button class="btn btn-light bg" type="submit"> <i class="material-icons md-search"></i></button>
-                </div>
-                
-            </form>
-        </div> -->
         <div class="col-nav ms-auto">
             <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
                     class="material-icons md-apps"></i> </button>
             <ul class="nav">
-                <!-- <li class="nav-item">
-                    <a class="nav-link btn-icon" href="#">
-                        <i class="material-icons md-notifications animation-shake"></i>
-                        <span class="badge rounded-pill">3</span>
-                    </a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
-                </li> -->
                 <li class="dropdown nav-item">
                     <a class="dropdown-item text-danger" href="/admin/logout"><i
                             class="material-icons md-exit_to_app"></i>Logout</a>
@@ -146,7 +121,6 @@
             <div>
                 <h2 class="content-title card-title">Product Management</h2>
             </div>
-            <!-- Dropdown to select a category for sorting -->
             <div class="btn-group me-2">
                 <form action="product-management" method="GET">
                     <div class="input-group">
@@ -159,8 +133,6 @@
                             </option>
                             <% }) %>
                         </select>
-                        <!-- <button type="submit" class="btn btn-primary btn-sm rounded me-2"
-                            id="filter-button">Filter</button> -->
                     </div>
                 </form>
 
@@ -169,7 +141,6 @@
         </div>
 
         <div class="content-wrapper">
-            <!-- Modal for adding new products -->
             <div id="successMessage" class="alert alert-success" style="display: none;"></div>
             <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
@@ -180,7 +151,6 @@
                             <th>Sl No</th>
                             <th>Image</th>
                             <th>Product Name</th>
-                            <!-- <th>Description</th> -->
                             <th>Brand</th>
                             <th>Price</th>
                             <th>Discount(%)</th>
@@ -195,12 +165,10 @@
                         <tr>
                             <td class="align-middle"><%= (currentPage - 1) * perPage + index + 1 %></td>
                             <td class="align-middle">
-                                <!-- Add class "align-middle" to vertically center content -->
                                 <img src="/<%= item.image %>" alt="<%= item.productName %> Image"
                                     style="max-width: 60px; max-height: 60px;">
                             </td>
                             <td class="align-middle" style="width: 250px;"><%= item.productName %></td>
-                            <!-- <td class="align-middle"><%= item.description %></td> -->
                             <td class="align-middle"><%= item.brand %></td>
                             <td class="align-middle">₹<%= item.price %></td>
                             <td class="align-middle"><%= item.discountPrice %>%</td>
@@ -217,7 +185,6 @@
                                 </span>
                             </td>
                             <td class="d-flex justify-content-center mt-3">
-                                <!-- Add "align-middle" here as well -->
                                 <div class="pe-2">
                                     <button onclick="listUser('<%= item._id %>')" id="listButton_<%= item._id %>"
                                         data-product-id="<%= item._id %>" data-is-featured="<%= item.isFeatured %>"
@@ -228,11 +195,6 @@
                                 </div>
                                 <div>
                                     <a class="btn btn-sm text-light" style="background-color: #088178;" href="/admin/product-management/editProduct/<%= item._id %>">Edit</a>
-                                    <!-- <button class="btn btn-sm text-light" style="background-color: #088178;"
-                                        data-bs-toggle="modal" data-bs-target="#editModal<%= item._id %>" type="button"
-                                        
-                                        data-category-id="<%= item._id %>">Edit
-                                    </button> -->
 
                                     <!-- Modal for editing product details -->
                                     <div class="modal fade" id="editModal<%= item._id %>" tabindex="-1" role="dialog"
@@ -348,15 +310,12 @@
 
                                 </div>
                             </td>
-                        </tr>
-
-
-                        
-                        
+                        </tr>          
             </div>
             <% }) %>
             </tbody>
             </table>
+
             <!-- pagination -->
             <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
                 <nav aria-label="Page navigation example">
@@ -471,82 +430,7 @@
     </script>
     
     <script>
-// async function removeImage(index, prodId) {
-//     console.log('Removing image:', 'for product:', prodId); // Debug log
-//     const result = await Swal.fire({
-//         title: 'Are you sure?',
-//         text: "Do you really want to remove this image?",
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonText: 'Yes, delete it!',
-//         cancelButtonText: 'No, keep it'
-//     });
-
-//     if (result.isConfirmed) {
-
-//         try {
-//             const response = await fetch(`/admin/product-management/removeimg?index=${index}&updateproductId=${prodId}`);
-//             // const response = await fetch(`/admin/product-management/removeimg`, {
-//             //     method: 'POST',
-//             //     headers: {
-//             //         'Content-Type': 'application/json',
-//             //     },
-//             //     body: JSON.stringify({ productId: prodId })
-//             // });
-//             const data = await response.json();
-
-//             // Debugging logs
-//             console.log('Response status:', response.status);
-//             console.log('Response OK:', response.ok);
-//             console.log('Response data:', data);
-
-                
-//                 // console.log('Response data:', data);
-
-//             if (response.ok && data.success) {
-//                 // Immediately remove the image visually
-//                 updateImageSection(prodId, data.images);
-
-
-//                 // Show success message
-//                 Swal.fire(
-//                     'Deleted!',
-//                     'Your image has been removed.',
-//                     'success'
-//                 );
-//             } else {
-//                 // Show error message
-//                 // const errorData = await response.json();
-//                 Swal.fire(
-//                     'Error!',
-//                     `Something went wrong: ${data.error}`,
-//                     'error'
-//                 );
-//             }
-//         } catch (error) {
-//             // Log and show error
-//             console.error('Fetch error:', error);
-//             Swal.fire(
-//                 'Error!',
-//                 'An error occurred while removing the image.',
-//                 'error'
-//             );
-//         }
-//     } else {
-//         Swal.fire(
-//             'Cancelled',
-//             'Your image is safe :)',
-//             'info'
-//         );
-//     }
-// }
-
 async function removeImage(index, prodId) {
-            // Immediately remove the image container visually
-            // const imageContainer = document.querySelector(`#editModal${prodId} img[src="/${index}"]`).closest('.col-md-3'); // Assuming image path is the index
-            // if (imageContainer) {
-            //     imageContainer.remove();
-            // }
 
             const result = await Swal.fire({
                 title: 'Are you sure?',

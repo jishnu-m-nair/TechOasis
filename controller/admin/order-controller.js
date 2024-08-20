@@ -25,8 +25,7 @@ const orderManagement = async (req,res) =>{
             pagetitle:"Order Management",
         });
     } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -46,8 +45,7 @@ const orderDetailed = async (req,res) =>{
 
         res.render("admin/order-detailed",{pagetitle:"Order Detailed",orderDetail,orderAddress})
     } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -84,8 +82,7 @@ const updateOrderStatus = async (req, res) => {
             } 
         });
     } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 

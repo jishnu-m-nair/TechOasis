@@ -286,16 +286,13 @@
                                         <td class="font-weight-bold">Quantity</td>
                                         <td class="font-weight-bold">Total Price</td>
                                     </tr>
-                                    <% console.log(orderDetails.items) %>
                                     <% for(const item of orderDetails.items) { %>
                                     <tr>
-                                        <% console.log(item) %>
                                         <td class="product_thumb">
                                             <a href="/product-details/<%=item.productId%>">
                                                 <img src="/<%=item.image%>" alt="product image" style="width: 60px"/>
                                             </a>
                                         </td>
-                                        <% console.log(item.productName) %>
                                         <td class="product_name">
                                             <a href="/product-details/<%=item.productId%>">
                                                 <%=item.productName%>
@@ -322,18 +319,6 @@
                             <div class="col-md-5">
                                 <table class="table ">
                                     <tbody class="totals">
-                                        <!-- <tr>
-                                            <td>
-                                                <div class="text-left">
-                                                    <span class="text-muted">Subtotal</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="text-right">
-                                                    <span>Rs.<%= orderDetails.billTotal %>.00</span>
-                                                </div>
-                                            </td>
-                                        </tr> -->
 
                                         <tr class="border-top border-bottom">
                                             <td>
@@ -500,7 +485,6 @@
                                 });
                             })
                             .catch(error => {
-                                console.error('Error:', error);
                                 Swal.fire({
                                     title: 'Payment Failed',
                                     text: 'An error occurred while confirming the payment. Please contact support.',
@@ -536,7 +520,6 @@
                     })
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     alert('Failed to initiate payment. Please try again.');
                 });
             });

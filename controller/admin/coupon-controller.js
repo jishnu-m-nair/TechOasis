@@ -7,12 +7,11 @@ const couponManagement = async (req,res) => {
         const coupons = await CouponModel.find({isDeleted:false}) || null;
         res.render("admin/coupon",{page:"coupon-management",pagetitle:"coupon page",coupons})
     } catch (error) {
-        console.log("error",error);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
 const addCoupon = async (req, res) => {
-    console.log("heyyy")
     try {
         const { couponCode, description, discountAmount, minimumAmount, maximumAmount, expirationDate, maxUsers } = req.body;
         const newCoupon = new CouponModel({
@@ -28,7 +27,6 @@ const addCoupon = async (req, res) => {
         await newCoupon.save();
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ success: false, message: 'An error occurred while adding the coupon' });
     }
 };
@@ -39,7 +37,6 @@ const deleteCoupon = async (req, res) => {
         await CouponModel.findByIdAndUpdate(id,{ isActive: false, isDeleted:true });
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ success: false, message: 'An error occurred while deleting the coupon' });
     }
 };

@@ -72,8 +72,7 @@ const totalSalesAmount = async () => {
 
         return totalSales.length > 0 ? totalSales[0].totalSalesAmount : 0;
     } catch (error) {
-        console.error("Error calculating total sales amount:", error);
-        throw error;
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -134,8 +133,7 @@ const getBestSellingProducts = async (limit = 10) => {
 
         return bestSellingProducts;
     } catch (error) {
-        console.error("Error fetching best-selling products:", error);
-        throw error;
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -190,8 +188,7 @@ const getBestSellingCategories = async (limit = 5) => {
 
         return bestSellingCategories;
     } catch (error) {
-        console.error("Error fetching best-selling categories:", error);
-        throw error;
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -234,8 +231,7 @@ const getBestSellingBrands = async (limit = 5) => {
 
         return bestSellingBrands;
     } catch (error) {
-        console.error("Error fetching best-selling brands:", error);
-        throw error;
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 

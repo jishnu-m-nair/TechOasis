@@ -331,7 +331,6 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         alert('An error occurred while adding the coupon');
                     });
                 });
@@ -340,7 +339,6 @@
                 couponContainer.addEventListener('click', function(e) {
                     if (e.target.classList.contains('btn-danger')) {
                         const couponId = e.target.getAttribute('data-coupon-id');
-                        console.log(couponId,"couponiddd")
                         if (confirm('Are you sure you want to delete this coupon?')) {
                             fetch(`/api/admin/delete-coupon/${couponId}`, { method: 'DELETE' })
                             .then(response => response.json())
@@ -353,7 +351,6 @@
                                 }
                             })
                             .catch(error => {
-                                console.error('Error:', error);
                                 alert('An error occurred while deleting the coupon');
                             });
                         }

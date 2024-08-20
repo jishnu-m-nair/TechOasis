@@ -1,10 +1,5 @@
-// const express = require('express');
-// const fs = require('fs');
-// const path = require('path');
-
 const ProductModel = require('../../model/product-model');
 const CategoryModel = require('../../model/category-model')
-// const UserModel = require('../../model/user-model');
 
 const productManagementGet = async (req, res) => {
     try {
@@ -43,8 +38,7 @@ const productManagementGet = async (req, res) => {
             perPage
         });
     } catch (error) {
-        console.error(error);
-        return res.render('500');
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -53,10 +47,7 @@ const productCategories = async (req, res) => {
         const categories = await CategoryModel.find({}, 'name');
         res.status(200).json(categories);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: 'Internal Server Error'
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -65,10 +56,7 @@ const addProduct = async (req, res) => {
         const categories = await CategoryModel.find().lean();
         res.render('admin/add-product', { categories, pagetitle: "Add Product Page" });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: 'Internal Server Error'
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -90,20 +78,6 @@ const addProductPost = async (req, res) => {
         });
 
         if (existingProduct) {
-            // Path to be used for deleting files
-            // const basePath = path.join(__dirname, '..',);
-
-            // // Delete uploaded images if product already exists
-            // await Promise.all(allImages.map(async file => {
-            //     const filePath = path.join(basePath, file.path);
-            //     try {
-            //         await fs.promises.unlink(filePath);
-            //         console.log(`Deleted file: ${filePath}`);
-            //     } catch (unlinkError) {
-            //         console.error(`Error deleting file ${filePath}:`, unlinkError);
-            //     }
-            // }));
-
             return res.status(400).json({
                 error: 'Bad Request',
                 errorMessage: 'Product name already exists'
@@ -123,36 +97,13 @@ const addProductPost = async (req, res) => {
             discountPrice: 0,
             afterDiscount: Math.floor(parsedPrice)
         });
-        console.log(product.images);
-        console.log(product);
 
         await product.save();
-        console.log('Product saved successfully.');
+
         return res.status(201).json({ success: true, message: 'Product added successfully', redirectUrl: "/admin/product-management" });
 
     } catch (error) {
-        console.error('Error adding product:', error);
-        // Delete uploaded images if an error occurs
-        // if (req.files['images']) {
-        //     // Path to be used for deleting files
-        //     const basePath = path.join(__dirname, '..',);
-
-        //     // Delete uploaded images if product already exists
-        //     await Promise.all(allImages.map(async file => {
-        //         const filePath = path.join(basePath, file.path);
-        //         try {
-        //             await fs.promises.unlink(filePath);
-        //             console.log(`Deleted file: ${filePath}`);
-        //         } catch (unlinkError) {
-        //             console.error(`Error deleting file ${filePath}:`, unlinkError);
-        //         }
-        //     }));
-        // }
-
-        return res.status(500).json({
-            error: 'Internal Server Error',
-            errorMessage: error.message
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -168,12 +119,7 @@ const editProduct = async (req, res) => {
         delete req.session.imagePaths;
         res.render('admin/edit-product', { categories, product, pagetitle: "Edit Product Page" });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            error: 'Internal Server Error',
-            errorMessage: error.message
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -259,12 +205,7 @@ const editProductPost = async (req, res) => {
             redirectUrl: '/admin/product-management'
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            error: 'Internal Server Error',
-            errorMessage: error.message
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -289,10 +230,7 @@ const productManagementPublish = async (req, res) => {
         }
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            error: 'Internal Server Error'
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -307,7 +245,6 @@ const productImageUpload = (req, res) => {
 
         res.json({ success: true, imagePaths: filePaths });
     } catch (error) {
-        console.error('Error uploading product images:', error);
         res.status(500).json({ success: false, message: 'Error uploading images.' });
     }
 }

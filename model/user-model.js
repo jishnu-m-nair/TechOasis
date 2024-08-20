@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-// const bcrypt = require('bcrypt')
 
 const userSchema = new mongoose.Schema({
    //signup format//
@@ -50,10 +49,6 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false
    },
-   token:{
-      type:String,
-      default:null
-  }
 
 });
 

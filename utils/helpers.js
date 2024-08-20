@@ -7,7 +7,7 @@ const securePassword = async (password) => {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
-        console.log(error.message);
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -47,8 +47,7 @@ async function updateExpiredCoupons() {
         );
         return result;
     } catch (error) {
-        console.error('Error updating coupon statuses:', error);
-        throw new Error('Could not update coupon statuses');
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 

@@ -131,7 +131,7 @@
                             </div>
                             <!-- Start  Product Details Meta Area-->
                             <div class="product-details-meta mb-20">
-                                <a href="#" class="icon-space-right">
+                                <a href="#" class="icon-space-right" onclick="addToWishlist('<%=product._id%>')">
                                     <i class="icon-heart"></i>Add to wishlist
                                 </a>
                                 <a href="#" class="icon-space-right"><i class="icon-refresh"></i>Compare</a>
@@ -174,13 +174,10 @@
                             <li><a class="nav-link active" data-bs-toggle="tab" href="#description">
                                     Description
                                 </a></li>
-                            <!-- <li><a class="nav-link" data-bs-toggle="tab" href="#specification">
-                                    Specification
-                                </a></li>-->
                             <li><a class="nav-link" data-bs-toggle="tab" href="#review">
                                     Reviews
                                 </a></li> 
-                        </ul> <!-- End Product Details Tab Button -->
+                        </ul>
 
                         <!-- Start Product Details Tab Content -->
                         <div class="product-details-content-tab">
@@ -190,163 +187,16 @@
                                     <div class="single-tab-content-item">
                                         <p><%= product.description %></p>
                                     </div>
-                                </div> <!-- End Product Details Tab Content Singel -->
-                                <!-- Start Product Details Tab Content Singel -->
-                                <!-- <div class="tab-pane" id="specification">
-                                    <div class="single-tab-content-item">
-                                        <table class="table table-bordered mb-20">
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row">Compositions</th>
-                                                    <td>Polyester</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Styles</th>
-                                                    <td>Girly</td>
-                                                <tr>
-                                                    <th scope="row">Properties</th>
-                                                    <td>Short Dress</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <p>Fashion has been creating well-designed collections since 2010. The brand
-                                            offers feminine designs delivering stylish separates and statement dresses
-                                            which have since evolved into a full ready-to-wear collection in which every
-                                            item is a vital part of a woman's wardrobe. The result? Cool, easy, chic
-                                            looks with youthful elegance and unmistakable signature style. All the
-                                            beautiful pieces are made in Italy and manufactured with the greatest
-                                            attention. Now Fashion extends to a range of accessories including shoes,
-                                            hats, belts and more!</p>
-                                    </div> 
-                                </div> -->
+                                </div>
                                 <!-- End Product Details Tab Content Singel -->
+                                
                                 <!-- Start Product Details Tab Content Singel -->
                                 <div class="tab-pane" id="review">
                                     <div class="single-tab-content-item">
                                         <!-- Start - Review Comment -->
                                         <ul class="comment text-center">
                                             <h3>No Reviews....</h3>
-                                            <!-- Start - Review Comment list-->
-                                            <!-- <li class="comment-list">
-                                                <div class="comment-wrapper">
-                                                    <div class="comment-img">
-                                                        <img src="/userassets/images/user/image-1.png" alt="">
-                                                    </div>
-                                                    <div class="comment-content">
-                                                        <div class="comment-content-top">
-                                                            <div class="comment-content-left">
-                                                                <h6 class="comment-name">Kaedyn Fraser</h6>
-                                                                <ul class="review-star">
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="empty"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="comment-content-right">
-                                                                <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="para-content">
-                                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                                                Tempora inventore dolorem a unde modi iste odio amet,
-                                                                fugit fuga aliquam, voluptatem maiores animi dolor nulla
-                                                                magnam ea! Dignissimos aspernatur cumque nam quod sint
-                                                                provident modi alias culpa, inventore deserunt
-                                                                accusantium amet earum soluta consequatur quasi eum eius
-                                                                laboriosam, maiores praesentium explicabo enim dolores
-                                                                quaerat! Voluptas ad ullam quia odio sint sunt. Ipsam
-                                                                officia, saepe repellat. </p>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
-                                                <!-- Start - Review Comment Reply-->
-                                                <!-- <ul class="comment-reply">
-                                                    <li class="comment-reply-list">
-                                                        <div class="comment-wrapper">
-                                                            <div class="comment-img">
-                                                                <img src="/userassets/images/user/image-2.png" alt="">
-                                                            </div>
-                                                            <div class="comment-content">
-                                                                <div class="comment-content-top">
-                                                                    <div class="comment-content-left">
-                                                                        <h6 class="comment-name">Oaklee Odom</h6>
-                                                                    </div>
-                                                                    <div class="comment-content-right">
-                                                                        <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="para-content">
-                                                                    <p>Lorem ipsum dolor sit amet, consectetur
-                                                                        adipisicing elit. Tempora inventore dolorem a
-                                                                        unde modi iste odio amet, fugit fuga aliquam,
-                                                                        voluptatem maiores animi dolor nulla magnam ea!
-                                                                        Dignissimos aspernatur cumque nam quod sint
-                                                                        provident modi alias culpa, inventore deserunt
-                                                                        accusantium amet earum soluta consequatur quasi
-                                                                        eum eius laboriosam, maiores praesentium
-                                                                        explicabo enim dolores quaerat! Voluptas ad
-                                                                        ullam quia odio sint sunt. Ipsam officia, saepe
-                                                                        repellat. </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>  -->
-                                                <!-- End - Review Comment Reply-->
-                                            <!-- </li>  -->
-                                            <!-- End - Review Comment list-->
-                                            <!-- Start - Review Comment list-->
-                                            <!-- <li class="comment-list">
-                                                <div class="comment-wrapper">
-                                                    <div class="comment-img">
-                                                        <img src="/userassets/images/user/image-3.png" alt="">
-                                                    </div>
-                                                    <div class="comment-content">
-                                                        <div class="comment-content-top">
-                                                            <div class="comment-content-left">
-                                                                <h6 class="comment-name">Jaydin Jones</h6>
-                                                                <ul class="review-star">
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="fill"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                    <li class="empty"><i class="ion-android-star"></i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="comment-content-right">
-                                                                <a href="#"><i class="fa fa-reply"></i>Reply</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="para-content">
-                                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                                                Tempora inventore dolorem a unde modi iste odio amet,
-                                                                fugit fuga aliquam, voluptatem maiores animi dolor nulla
-                                                                magnam ea! Dignissimos aspernatur cumque nam quod sint
-                                                                provident modi alias culpa, inventore deserunt
-                                                                accusantium amet earum soluta consequatur quasi eum eius
-                                                                laboriosam, maiores praesentium explicabo enim dolores
-                                                                quaerat! Voluptas ad ullam quia odio sint sunt. Ipsam
-                                                                officia, saepe repellat. </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>  -->
-                                            <!-- End - Review Comment list-->
+                                            
                                         </ul> <!-- End - Review Comment -->
                                         <div class="review-form">
                                             <div class="review-form-text-top">
@@ -443,7 +293,7 @@
                                                     <a href="#" data-bs-toggle="modal"
                                                         data-bs-target="#"><i
                                                             class="icon-magnifier"></i></a>
-                                                    <a href="#"><i class="icon-heart"></i></a>
+                                                    <a href="#" onclick="addToWishlist('<%=product._id%>')"><i class="icon-heart"></i></a>
                                                     <a href="#"><i class="icon-shuffle"></i></a>
                                                 </div>
                                             </div>
@@ -537,6 +387,51 @@
                 }
             } catch (error) {
                 console.error('Error adding product to cart:', error);
+            }
+        }
+
+        async function addToWishlist(productId) {
+            event.preventDefault();
+            try {
+                let res = await fetch("/api/add-to-wishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+    
+                if (res.status === 400) {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Product already in the Wishlist",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else if (res.status === 200) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "bottom",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: "black",
+                        color: "white",
+                        didOpen: (toast) => {
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
+    
+                    Toast.fire({
+                        icon: "success",
+                        title: "Added to Wishlist",
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
             }
         }
 

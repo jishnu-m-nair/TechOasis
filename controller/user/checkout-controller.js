@@ -57,7 +57,6 @@ const orderCheckout = async (req, res) => {
                             selectedItems[i].productId + ""
                         ) {
                             cartCheckout.items[i].quantity = stock.countInStock;
-                            console.log("before saving    ==");
                             await cartCheckout.save();
                         }
                     });
@@ -93,8 +92,7 @@ const orderCheckout = async (req, res) => {
             }
         });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -225,7 +223,7 @@ const orderCheckoutPost = async (req, res, next) => {
         try {
             await CartModel.deleteOne({ owner: req.session.userId });
         } catch (error) {
-            console.log("error in cart clear" + error);
+            res.render('500', { errorMessage: 'Internal Server Error' })
         }
 
         if (paymentOption === "COD") {
@@ -257,7 +255,6 @@ const orderCheckoutPost = async (req, res, next) => {
                         currency: razorpayOrder.currency,
                     });
                 } else {
-                    console.error("Error creating Razorpay order:", err);
                     res.status(400).json({
                         success: false,
                         message: "Error in razorpay!",
@@ -271,7 +268,6 @@ const orderCheckoutPost = async (req, res, next) => {
                 .json({ success: false, error: "Invalid payment option" });
         }
     } catch (err) {
-        console.error(err);
         next(err);
     }
 };
@@ -301,7 +297,6 @@ const handlePaymentSuccess = async (req, res, next) => {
 
         return res.status(200).json({ success: true, message: "Payment successful", orderId: order._id });
     } catch (err) {
-        console.error(err);
         next(err);
     }
 };
@@ -318,7 +313,6 @@ const handlePaymentFailure = async (req, res, next) => {
         await order.save();
         return res.status(200).json({ success: true, message: "Payment failure recorded", orderId: order._id });
     } catch (err) {
-        console.error(err);
         next(err);
     }
 };
@@ -349,9 +343,7 @@ const orderDetailsGet = async (req, res) => {
             res.send("no orders available in this id");
         }
     } catch (err) {
-        console.log('Error displaying orders:', err.message);
-        console.log("erroororor")
-        res.status(500).json({ "err.message": 'Internal server error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -378,7 +370,6 @@ const retryPayment = async (req, res) => {
             oId: order.oId
         });
     } catch (error) {
-        console.error('Error retrying payment:', error);
         res.status(500).json({ error: 'Failed to create new payment order' });
     }
 };
@@ -401,7 +392,6 @@ const successRetryPayment = async (req, res) => {
 
             res.status(200).json({ message: 'Payment successful and order updated', orderId });
     } catch (error) {
-        console.error('Error in successRetryPayment:', error);
         res.status(500).json({ error: 'Failed to process successful payment' });
     }
 };
@@ -516,7 +506,6 @@ const availableCoupons = async (req, res) => {
 
         res.json(coupons);
     } catch (error) {
-        console.error('Error fetching available coupons:', error);
         res.status(500).json({ message: 'Failed to fetch available coupons' });
     }
 };
@@ -554,7 +543,6 @@ const applyCoupon = async (req, res) => {
 
         res.json({ success: true, message: 'Coupon applied successfully', newTotal: discountedTotal, discountAmount: coupon.discountAmount });
     } catch (error) {
-        console.error('Error applying coupon:', error);
         res.status(500).json({ success: false, message: 'Failed to apply coupon' });
     }
 };
@@ -576,7 +564,6 @@ const removeCoupon = async (req, res) => {
 
         res.json({ success: true, message: 'Coupon removed successfully', newTotal: originalTotal });
     } catch (error) {
-        console.error('Error removing coupon:', error);
         res.status(500).json({ success: false, message: 'Failed to remove coupon' });
     }
 };

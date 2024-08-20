@@ -52,7 +52,6 @@ passport.use(
                     return done(null, user);
                 }
             } catch (err) {
-                console.error("Error during Google authentication:", err);
                 return done(err, null);
             }
         }

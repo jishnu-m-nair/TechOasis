@@ -27,10 +27,7 @@ const adminLogin = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Error in adminlogin:", error);
-        res.status(500).json({
-            message: "Server error",
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -65,12 +62,7 @@ const adminLoginPost = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Error during login:", error);
-        if (error.code === 500) {
-            return res.status(500).json({ message: "Server error" });
-        } else {
-            return res.status(400).json({ message: "Bad request" });
-        }
+        res.render('500', { errorMessage: error })
     }
 };
 
@@ -81,10 +73,8 @@ const adminLogout = (req, res) => {
     if (userId == "" && req.session.admin == "") {
         req.session.destroy((err) => {
             if (err) {
-                console.error("Error destroying session:", err);
                 return res.status(500).send("Error logging out");
             }
-            console.log("Session destroyed");
         });
     }
     res.redirect("/admin/login");
@@ -110,7 +100,6 @@ const postAdminRegister = async (req, res, next) => {
             res.redirect("/admin/login");
         }
     } catch (e) {
-        console.error(e);
         // res.redirect("/admin/signup");
         res.send("catch error");
     }
@@ -124,10 +113,7 @@ const userManagement = async (req, res) => {
             page: "user-management"
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: error.message || "Internal Server Error",
-        });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -190,8 +176,7 @@ const filterUsers = async (req, res) => {
 
         res.status(200).json({ success: true, users, currentPage: page, totalPages, perPage });
     } catch (error) {
-        console.error('Error fetching filtered users:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 };
 
@@ -206,8 +191,7 @@ const getSalesReportPage = async (req, res) => {
             order
         });
     } catch (error) {
-        console.error('Error in getSalesReportPage:', error);
-        res.status(500).send('Internal Server Error');
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 
@@ -230,12 +214,6 @@ const generateSalesReport = async (req, res) => {
                 reportEndDate = new Date();
                 query.orderDate = { $gte: reportStartDate };
                 break;
-            // case 'monthly':
-            //     reportStartDate = new Date();
-            //     reportStartDate.setMonth(reportStartDate.getMonth() - 1);
-            //     reportEndDate = new Date();
-            //     query.orderDate = { $gte: reportStartDate };
-            //     break;
             case 'yearly':
                 reportStartDate = new Date();
                 reportStartDate.setFullYear(reportStartDate.getFullYear() - 1);
@@ -281,8 +259,7 @@ const generateSalesReport = async (req, res) => {
             
         });
     } catch (error) {
-        console.error('Error in generateSalesReport:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
+        res.render('500', { errorMessage: 'Internal Server Error' })
     }
 }
 

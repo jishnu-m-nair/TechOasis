@@ -248,7 +248,6 @@
                     displayCoupons(coupons);
                     availableCouponsModal.show();
                 } catch (error) {
-                    console.error('Error fetching coupons:', error);
                     alert('Failed to fetch available coupons. Please try again.');
                 }
             });
@@ -284,7 +283,6 @@
                             couponInput.value = code;
                             availableCouponsModal.hide();
                         }).catch(err => {
-                            console.error('Failed to copy code: ', err);
                             couponInput.value = code;
                             availableCouponsModal.hide();
                         });
@@ -315,7 +313,6 @@
                             alert(result.message || 'Failed to apply coupon. Please try again.');
                         }
                     } catch (error) {
-                        console.error('Error applying coupon:', error);
                         alert('An error occurred while applying the coupon. Please try again.');
                     }
                 } else {
@@ -344,7 +341,6 @@
                         alert(result.message || 'Failed to remove coupon. Please try again.');
                     }
                 } catch (error) {
-                    console.error('Error removing coupon:', error);
                     alert('An error occurred while removing the coupon. Please try again.');
                 }
             });
@@ -448,7 +444,6 @@
                                             });
                                         }
                                     } catch (error) {
-                                        console.error("Payment verification error:", error);
                                         Swal.fire({
                                             title: 'Error!',
                                             text: 'Something went wrong during payment verification!',
@@ -497,7 +492,6 @@
                                         window.location.href = `/order-details/${orderId}`;
                                     });
                                 } catch (error) {
-                                    console.error("Payment failure recording error:", error);
                                     Swal.fire({
                                         title: 'Error!',
                                         text: 'Something went wrong while recording payment failure!',
@@ -516,7 +510,6 @@
                         });
                     }
                 } catch (error) {
-                    console.error("Fetch error:", error);
                     Swal.fire({
                         title: "Error",
                         text: "An error occurred while processing your order.",

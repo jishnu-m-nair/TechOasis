@@ -15,42 +15,42 @@
         .instagram-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px; /* Adjust spacing between images */
+            gap: 10px;
         }
 
         .instagram-image-link {
-            flex: 1 0 calc(33.333% - 10px); /* Each image takes up roughly a third of the width */
-            max-width: calc(33.333% - 10px); /* Prevent images from exceeding a third of the container */
+            flex: 1 0 calc(33.333% - 10px);
+            max-width: calc(33.333% - 10px);
             position: relative;
         }
 
         .instagram-image-link img {
             width: 100%;
-            height: 200px; /* Set a fixed height */
-            object-fit: cover; /* Ensures the image covers the container without distortion */
+            height: 200px;
+            object-fit: cover;
             display: block;
-            border-radius: 5px; /* Optional: for rounded corners */
+            border-radius: 5px;
         }
 
         @media (max-width: 768px) {
             .instagram-image-link {
-                flex: 1 0 calc(50% - 10px); /* Two images per row on smaller screens */
+                flex: 1 0 calc(50% - 10px);
                 max-width: calc(50% - 10px);
             }
 
             .instagram-image-link img {
-                height: 150px; /* Adjust height for smaller screens */
+                height: 150px;
             }
         }
 
         @media (max-width: 480px) {
             .instagram-image-link {
-                flex: 1 0 calc(100% - 10px); /* One image per row on the smallest screens */
+                flex: 1 0 calc(100% - 10px);
                 max-width: calc(100% - 10px);
             }
 
             .instagram-image-link img {
-                height: 120px; /* Adjust height for the smallest screens */
+                height: 120px;
             }
         }
     </style>
@@ -245,7 +245,7 @@
                                                     </div>
                                                     <div class="action-link-right">
                                                         <a href="#" data-bs-toggle="modal" data-bs-target="#modalQuickview"><i class="icon-magnifier"></i></a>
-                                                        <a href="#"><i class="icon-heart"></i></a>
+                                                        <a href="#" onclick="addToWishlist('<%=product._id%>')"><i class="icon-heart"></i></a>
                                                         <a href="#"><i class="icon-shuffle"></i></a>
                                                     </div>
                                                 </div>
@@ -342,7 +342,7 @@
                                                         </div>
                                                         <div class="action-link-right">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#modalQuickview"><i class="icon-magnifier"></i></a>
-                                                            <a href="#"><i class="icon-heart"></i></a>
+                                                            <a href="#" onclick="addToWishlist('<%=product._id%>')"><i class="icon-heart"></i></a>
                                                             <a href="#"><i class="icon-shuffle"></i></a>
                                                         </div>
                                                     </div>
@@ -484,6 +484,51 @@
                     Toast.fire({
                         icon: "success",
                         title: "Added to cart",
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+            }
+        }
+
+        async function addToWishlist(productId) {
+            event.preventDefault();
+            try {
+                let res = await fetch("/api/add-to-wishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+    
+                if (res.status === 400) {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Product already in the Wishlist",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else if (res.status === 200) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "bottom",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: "black",
+                        color: "white",
+                        didOpen: (toast) => {
+                            toast.addEventListener("mouseenter", Swal.stopTimer);
+                            toast.addEventListener("mouseleave", Swal.resumeTimer);
+                        },
+                    });
+    
+                    Toast.fire({
+                        icon: "success",
+                        title: "Added to Wishlist",
                     });
                 }
             } catch (error) {

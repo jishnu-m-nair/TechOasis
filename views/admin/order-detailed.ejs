@@ -101,19 +101,14 @@
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <select id="statusDropdown" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                <!-- <option value="Pending">Pending</option>
-                                <option value="Processing">Processing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option> -->
+                                <!-- dynamically form scripts -->
                             </select>
                             <% if( orderDetail.status !== "Cancelled" && orderDetail.status !== "Returned" && orderDetail.status !== "Delivered") { %>
                                 <a class="btn btn-primary" id="saveStatusBtn" href="#">Save</a>
                             <% } %>
-                            <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
                         </div>
                     </div>
-                </header> <!-- card-header end// -->
+                </header>
                 <div class="card-body">
                     <div class="row mb-50 mt-20 order-info-wrap">
                         <% if(orderDetail.user) { %>
@@ -143,10 +138,9 @@
                                     <p class="mb-1">
                                         Pay method: <%= orderDetail.paymentMethod %> <br> Payment Status: <%= orderDetail.paymentStatus %> <br> Status: <%= orderDetail.status %>
                                     </p>
-                                    <!-- <a href="#">Download info</a> -->
                                 </div>
                             </article>
-                        </div> <!-- col// -->
+                        </div>
                         <div class="col-md-4">
                             <article class="icontext align-items-start">
                                 <span class="icon icon-sm rounded-circle bg-primary-light">
@@ -157,11 +151,10 @@
                                     <p class="mb-1">
                                         City: <%= orderDetail.deliveryAddress.city %>, <%= orderDetail.deliveryAddress.country %> <br><%=orderAddress%>
                                     </p>
-                                    <!-- <a href="#">View profile</a> -->
                                 </div>
                             </article>
-                        </div> <!-- col// -->
-                    </div> <!-- row // -->
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-lg-7">
                             <div class="table-responsive">
@@ -192,8 +185,8 @@
                                         <% } %>
                                     </tbody>
                                 </table>
-                            </div> <!-- table-responsive// -->
-                        </div> <!-- col// -->
+                            </div>
+                        </div>
                         <div class="col-lg-1"></div>
                         <div class="col-lg-4">
                             <div class="box shadow-sm bg-light">
@@ -204,11 +197,10 @@
                                 </p>
                             </div>
                         </div>
-                        <!-- col// -->
                     </div>
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-        </section> <!-- content-main end// -->
+                </div>
+            </div>
+        </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -303,7 +295,6 @@
                         text: 'Order status updated successfully',
                     });
                 } catch (error) {
-                    console.error('Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
