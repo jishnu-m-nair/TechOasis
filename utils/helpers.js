@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const CouponModel = require("../model/coupon-model");
 const UserModel = require("../model/user-model");
+const CartModel = require("../model/cart-model");
+const WishlistModel = require("../model/wishlist-model");
 
 const securePassword = async (password) => {
     try {
@@ -85,11 +87,28 @@ const formatToIndianCurrency = (amount) => {
     }).format(amount);
 };
 
+const cartWishlistCount = async (req,res) => {
+    const userId = req.session.userId || null;
+    let cartCount = 0;
+    let wishlistCount = 0;
+    if(!userId) {
+        return res.json({ cartCount, wishlistCount })
+    }
+    const cart = await CartModel.findOne({owner:userId}) || null;
+    const wishlist = await WishlistModel.findOne({user:userId}) || null;
+
+    cart ? cartCount = cart.items.length : 0;
+    wishlist ? wishlistCount = wishlist.products.length : 0;
+
+    return res.json({ cartCount, wishlistCount })
+}
+
 module.exports = {
     securePassword,
     generateUniqueOrderID,
     updateExpiredCoupons,
     formatDate,
     generateReferralCode,
-    formatToIndianCurrency
+    formatToIndianCurrency,
+    cartWishlistCount
 }

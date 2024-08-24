@@ -384,6 +384,7 @@
                         icon: 'success',
                         showConfirmButton: true
                     });
+                    cartWishlistCount();
                 }
             } catch (error) {
                 console.error('Error adding product to cart:', error);
@@ -429,6 +430,7 @@
                         icon: "success",
                         title: "Added to Wishlist",
                     });
+                    cartWishlistCount();
                 }
             } catch (error) {
                 console.error("Error adding product to cart:", error);

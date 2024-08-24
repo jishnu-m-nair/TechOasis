@@ -8,6 +8,7 @@ const wishlist = require('../controller/user/wishlist-controller');
 const passport = require('passport');
 const Razorpay = require('razorpay');
 const { isLoggedIn, isLoggedOut, isBlockedUser } = require('../middlewares/auth')
+const { cartWishlistCount } = require('../utils/helpers')
 require('dotenv').config()
 require('../middlewares/authenticate');
 
@@ -50,6 +51,9 @@ router.get('/logout', user.userLogout)
 router.get('/signup-otp', isLoggedOut, user.signupOtp);
 router.post('/signup-otp', user.signupOtpPost);
 router.post('/resend-otp', isLoggedOut, user.resendOtp);
+
+// wishlist & cart count
+router.get('/cart-wishlist-count', cartWishlistCount);
 
 //product routers
 router.get('/shop', isLoggedIn, isBlockedUser, user.userShop)
