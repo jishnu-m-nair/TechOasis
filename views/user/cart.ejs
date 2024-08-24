@@ -81,7 +81,7 @@
                                         </td>
                                         <td class="product-price">
                                             <span>
-                                                Rs.<%= cart.items[i].productId.price.toFixed(2) %>
+                                                Rs.<%= cart.items[i].productId.afterDiscount.toFixed(2) %>
                                             </span>
                                         </td>
                                         <td>
@@ -96,14 +96,14 @@
                                                 class="detail-qty radius m-auto">
                                                 <button class="qty-down" id="qty-down<%= cart.items[i].productId._id %>"
                                                     onclick="updateQuantity('<%= cart.items[i].productId._id %>', '<%= cart.items[i].productId.countInStock %>', '<%= cart.items[i].quantity %>', 'sub')">
-                                                    <i class="fa-solid fa-angle-down"></i>
+                                                    <strong>-</strong>
                                                 </button>
                                                 <span class="qty-val me-3" id="qty-<%= cart.items[i].productId._id %>" data-stock="<%= cart.items[i].productId.countInStock %>">
                                                     <%= cart.items[i].quantity %>
                                                 </span>
                                                 <button class="qty-up" id="qty-up<%= cart.items[i].productId._id %>"
                                                     onclick="updateQuantity('<%= cart.items[i].productId._id %>', '<%= cart.items[i].productId.countInStock %>', '<%= cart.items[i].quantity %>', 'sum')">
-                                                    <i class="fa-solid fa-angle-up"></i>
+                                                    <strong>+</strong>
                                                 </button>
                                             </div>
                                         </td>
@@ -369,9 +369,9 @@
             });
 
             // Update totals
-            document.getElementById(
-                "carttotal2"
-            ).innerHTML = `Rs.${data.cart.billTotal}.00`;
+            // document.getElementById(
+            //     "carttotal2"
+            // ).innerHTML = `Rs.${data.cart.billTotal}.00`;
             document.getElementById(
                 "carttotal3"
             ).innerHTML = `Rs.${data.cart.billTotal}.00`;
