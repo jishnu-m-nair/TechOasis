@@ -479,10 +479,10 @@ const filterProducts = async (req, res) => {
         let sortOption = {};
         switch (sort) {
             case 'priceHighToLow':
-                sortOption = { price: -1 };
+                sortOption = { afterDiscount: -1 };
                 break;
             case 'priceLowToHigh':
-                sortOption = { price: 1 };
+                sortOption = { afterDiscount: 1 };
                 break;
             case 'nameAZ':
                 sortOption = { productName: 1 };
@@ -495,6 +495,7 @@ const filterProducts = async (req, res) => {
         }
 
         let products = await ProductModel.find(query)
+            .collation({ locale: 'en', strength: 2 })
             .sort(sortOption)
             .skip(skip)
             .limit(limit);
