@@ -235,6 +235,7 @@ const signupPost = async (req, res, next) => {
         };
         req.session.userDetails = {};
         req.session.userDetails = user;
+        req.session.email = user.email;
         req.session.referralCode = referralCode;
         req.session.otp = sentOtp(email);
         req.session.otpExpiry = Date.now() + 60000;
@@ -326,17 +327,13 @@ const signupOtpPost = async (req, res) => {
 
 const resendOtp = async (req, res) => {
     try {
-        const user = req.session.userDetails || {};
-        const { email } = user;
+        const { email } = req.session;
 
         if (!email) {
             return res
                 .status(400)
                 .json({ message: "User details not found in session." });
         }
-
-        req.session.otp = null;
-        req.session.otpExpiry = null;
 
         const newOtp = sentOtp(email);
         req.session.otp = newOtp;
@@ -370,8 +367,8 @@ const forgotPasswordPost = async (req, res) => {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        req.session.forgotOtp = sentOtp(email);
-        req.session.forgotOtpExpiry = Date.now() + 60000;
+        req.session.otp = sentOtp(email);
+        req.session.otpExpiry = Date.now() + 60000;
         req.session.email = email;
 
         res.status(200).json({ message: 'OTP sent to your email.' });
@@ -401,13 +398,13 @@ const resetPasswordPost = async (req, res) => {
         return res.status(400).json({ message: 'Email is required.' });
     }
 
-    if (!req.session.forgotOtp || !req.session.forgotOtpExpiry) {
+    if (!req.session.otp || !req.session.otpExpiry) {
         return res.status(400).json({ message: 'OTP session expired. Please request a new OTP.' });
     }
-    if (req.session.forgotOtp !== otp) {
+    if (req.session.otp !== otp) {
         return res.status(400).json({ message: 'Invalid OTP.' });
     }
-    if (Date.now() > req.session.forgotOtpExpiry) {
+    if (Date.now() > req.session.otpExpiry) {
         return res.status(400).json({ message: 'OTP expired. Please request a new OTP.' });
     }
 
@@ -426,8 +423,8 @@ const resetPasswordPost = async (req, res) => {
         user.password = hashedPassword;
         await user.save();
 
-        req.session.forgotOtp = null;
-        req.session.forgotOtpExpiry = null;
+        req.session.otp = null;
+        req.session.otpExpiry = null;
 
         res.status(200).json({ message: 'Password has been reset successfully.' });
     } catch (error) {
