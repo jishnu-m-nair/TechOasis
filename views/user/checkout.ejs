@@ -197,9 +197,13 @@
                                         <input type="radio" style="width: 15px;" name="paymentOption" id="COD" value="COD" required>
                                         <span class="pl-2">Cash on Delivery (COD)</span>
                                     </label>
-                                    <label class="radio d-flex" for="online">
-                                        <input type="radio" style="width: 15px;" name="paymentOption" id="online" value="Razorpay" required>
+                                    <label class="radio d-flex" for="Razorpay">
+                                        <input type="radio" style="width: 15px;" name="paymentOption" id="Razorpay" value="Razorpay" required>
                                         <span class="pl-2">Online Payment</span>
+                                    </label>
+                                    <label class="radio d-flex" for="Wallet">
+                                        <input type="radio" style="width: 15px;" name="paymentOption" id="Wallet" value="Wallet" required>
+                                        <span class="pl-2">Wallet Payment</span>
                                     </label>
                                 </div>
                                 <div class="order_button pt-3">
@@ -402,6 +406,15 @@
                             }).then(() => {
                                 window.location.href = `/order-confirmation/${responseData.orderId}`;
                             });
+                        } else if (paymentOption === "Wallet") {
+                            Swal.fire({
+                                title: "Order Placed!",
+                                text: responseData.message || "Your order has been placed successfully.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                window.location.href = `/order-confirmation/${responseData.orderId}`;
+                            });
                         } else if (paymentOption === "Razorpay") {
                             const options = {
                                 key: "rzp_test_3kT5huAqqRlFe6", // Replace with your Razorpay key
@@ -501,10 +514,17 @@
                                 }
                             });
                         }
+                    } else if(paymentOption == "Wallet") {
+                        
+                        Swal.fire({
+                            title: "Error",
+                            html: `<p>${responseData.message}</p><p>Current Balance: ${responseData.balance}</p>`,                            icon: "error",
+                            confirmButtonText: "OK",
+                        });
                     } else {
                         Swal.fire({
                             title: "Error",
-                            text: "An error occurred while processing your order.",
+                            text: responseData.error || "An error occurred while processing your order.",
                             icon: "error",
                             confirmButtonText: "OK",
                         });

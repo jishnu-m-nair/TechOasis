@@ -146,6 +146,16 @@ const orderCheckoutPost = async (req, res, next) => {
             const price = item.productId.discountPrice > 0 ? item.productId.afterDiscount : item.productId.price;
             return total + (parseFloat(price) * parseInt(item.quantity));
         }, 0);
+        const wallet = await WalletModel.findOne({ owner:req.session.userId });
+        if(paymentOption == "Wallet") {
+            if(wallet.balance < billTotal) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Insufficient balance in wallet",
+                    balance: wallet.balance
+                });
+            }
+        }
 
         // Apply coupon if provided
         let couponDiscount = 0;
@@ -226,8 +236,10 @@ const orderCheckoutPost = async (req, res, next) => {
             res.render('500', { errorMessage: 'Internal Server Error' })
         }
 
+        const orderId = order._id;
+
         if (paymentOption === "COD") {
-            const orderId = order._id;
+            await OrderModel.findByIdAndUpdate(orderId,{status: "Processing"})
 
             return res.status(201).json({
                 success: true,
@@ -249,7 +261,7 @@ const orderCheckoutPost = async (req, res, next) => {
                     return res.status(201).json({
                         success: true,
                         message: "Order placed successfully.",
-                        orderId: order._id,
+                        orderId,
                         razorpayOrderId: razorpayOrder.id,
                         amount: razorpayOrder.amount,
                         currency: razorpayOrder.currency,
@@ -261,6 +273,23 @@ const orderCheckoutPost = async (req, res, next) => {
                         error: err.message, 
                     });
                 }
+            });
+        } else if (paymentOption === "Wallet") {
+            
+            wallet.balance -= billTotal;
+            wallet.transactions.push({ 
+                amount: order.billTotal, 
+                type: "debit",
+                reason: `Purchase for orderId: ${order.oId}`
+            });
+            wallet.save();
+
+            await OrderModel.findByIdAndUpdate(orderId,{status: "Processing",paymentStatus: "Success"})
+            
+            return res.status(201).json({
+                success: true,
+                message: "Order placed successfully",
+                orderId,
             });
         } else {
             return res
@@ -293,6 +322,7 @@ const handlePaymentSuccess = async (req, res, next) => {
 
         // Update order status
         order.paymentStatus = "Success";
+        order.status = "Processing";
         await order.save();
 
         return res.status(200).json({ success: true, message: "Payment successful", orderId: order._id });
@@ -425,7 +455,7 @@ const cancelOrder = async (req, res) => {
             );
         }
 
-        if(order.paymentMethod === "Razorpay") {
+        if(order.paymentMethod === "Razorpay" || order.paymentMethod === "Wallet") {
             const wallet = await WalletModel.findOne({owner:order.user});
             wallet.balance += order.billTotal;
             wallet.transactions.push({ 
