@@ -6,8 +6,7 @@ const cart = require('../controller/user/cart-controller')
 const checkout = require('../controller/user/checkout-controller')
 const wishlist = require('../controller/user/wishlist-controller');
 const passport = require('passport');
-const Razorpay = require('razorpay');
-const { isLoggedIn, isLoggedOut, isBlockedUser } = require('../middlewares/auth')
+const { isLoggedIn, isLoggedOut } = require('../middlewares/auth')
 const { cartWishlistCount } = require('../utils/helpers')
 require('dotenv').config()
 require('../middlewares/authenticate');
@@ -27,80 +26,79 @@ router.get('/auth/google/callback', isLoggedOut,
 // Define a route for handling Google authentication failures
 router.get('/auth/google/failure', isLoggedOut, user.googleAuthFailure);
 
-router.get('/home', isLoggedIn, isBlockedUser, user.home);
+router.get('/home', isLoggedIn, user.home);
 
-router.get('/', user.login);
+router.get('/', isLoggedOut, user.login);
 
 // user login/signup/logout management
 router.get('/login', isLoggedOut, user.login);
-router.post('/login', user.loginPost);
+router.post('/login', isLoggedOut, user.loginPost);
 
 router.get('/signup', isLoggedOut, user.signup);
-router.post('/signup', user.signupPost);
-
-// forgot-password
-router.get('/forgot-password', user.forgotPassword);
-router.post('/forgot-password', user.forgotPasswordPost);
-router.get('/reset-password', user.resetPassword);
-router.post('/reset-password', user.resetPasswordPost);
-
+router.post('/signup', isLoggedOut, user.signupPost);
 
 router.get('/logout', user.userLogout)
 
+// forgot-password
+router.get('/forgot-password', isLoggedOut, user.forgotPassword);
+router.post('/forgot-password', isLoggedOut, user.forgotPasswordPost);
+router.get('/reset-password', isLoggedOut, user.resetPassword);
+router.post('/reset-password', isLoggedOut, user.resetPasswordPost);
+
 //OTP routers
 router.get('/signup-otp', isLoggedOut, user.signupOtp);
-router.post('/signup-otp', user.signupOtpPost);
+router.post('/signup-otp', isLoggedOut, user.signupOtpPost);
 router.post('/resend-otp', isLoggedOut, user.resendOtp);
 
 // wishlist & cart count
 router.get('/cart-wishlist-count', cartWishlistCount);
 
 //product routers
-router.get('/shop', isLoggedIn, isBlockedUser, user.userShop)
-router.get('/product-details/:productId', isLoggedIn, isBlockedUser, user.productDetails)
+router.get('/shop', isLoggedIn, user.userShop)
+router.get('/product-details/:productId', isLoggedIn, user.productDetails)
 router.post('/api/products', user.filterProducts);
 
 // Cart Routers
-router.post('/add-to-cart', isLoggedIn, isBlockedUser, cart.addTocart);
-router.get('/cart', isLoggedIn, isBlockedUser, cart.showcart);
-router.post('/cart-delete', isLoggedIn, isBlockedUser, cart.deleteCart);
-router.post('/update-cart-quantity', isLoggedIn, isBlockedUser, cart.updateCart);
-router.get('/latest-cart', isLoggedIn, isBlockedUser, cart.latestCart);
+router.post('/add-to-cart', isLoggedIn, cart.addTocart);
+router.get('/cart', isLoggedIn, cart.showcart);
+router.post('/cart-delete', isLoggedIn, cart.deleteCart);
+router.post('/update-cart-quantity', isLoggedIn, cart.updateCart);
+router.get('/latest-cart', isLoggedIn, cart.latestCart);
 
 // Profile
-router.get('/profile', isLoggedIn, isBlockedUser, profile.profile)
-router.get('/edit-profile', isLoggedIn, isBlockedUser, profile.editProfile)
-router.patch('/edit-profile', isLoggedIn, isBlockedUser, profile.editProfilePatch);
-router.get('/change-password', isLoggedIn, isBlockedUser, profile.changePassword);
-router.post('/change-password', isLoggedIn, isBlockedUser, profile.changePasswordPost);
-router.get('/add-address', isLoggedIn, isBlockedUser, profile.addAddress);
-router.post('/add-address', isLoggedIn, isBlockedUser, profile.addAddressPost);
-router.get('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddress)
-router.patch('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddressPatch);
-router.get('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddress)
-router.patch('/edit-address/:addressId', isLoggedIn, isBlockedUser, profile.editAddressPatch);
-router.delete('/delete-address/:addressId', isLoggedIn, isBlockedUser, profile.deleteAddress);
+router.get('/profile', isLoggedIn, profile.profile)
+router.get('/edit-profile', isLoggedIn, profile.editProfile)
+router.patch('/edit-profile', isLoggedIn, profile.editProfilePatch);
+router.get('/change-password', isLoggedIn, profile.changePassword);
+router.post('/change-password', isLoggedIn, profile.changePasswordPost);
+router.get('/add-address', isLoggedIn, profile.addAddress);
+router.post('/add-address', isLoggedIn, profile.addAddressPost);
+router.get('/edit-address/:addressId', isLoggedIn, profile.editAddress)
+router.patch('/edit-address/:addressId', isLoggedIn, profile.editAddressPatch);
+router.get('/edit-address/:addressId', isLoggedIn, profile.editAddress)
+router.patch('/edit-address/:addressId', isLoggedIn, profile.editAddressPatch);
+router.delete('/delete-address/:addressId', isLoggedIn, profile.deleteAddress);
 
 //checkout
-router.get('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckout)
-router.post('/checkout', isLoggedIn, isBlockedUser, checkout.orderCheckoutPost)
-router.post('/payment-success',isLoggedIn, isBlockedUser,checkout.handlePaymentSuccess)
-router.post('/payment-failure',isLoggedIn, isBlockedUser,checkout.handlePaymentFailure)
-router.get('/api/available-coupons', checkout.availableCoupons);
-router.post('/api/apply-coupon', checkout.applyCoupon);
-router.post('/api/remove-coupon', checkout.removeCoupon);
+router.get('/checkout', isLoggedIn, checkout.orderCheckout)
+router.post('/checkout', isLoggedIn, checkout.orderCheckoutPost)
+router.post('/payment-success',isLoggedIn, checkout.handlePaymentSuccess)
+router.post('/payment-failure',isLoggedIn, checkout.handlePaymentFailure)
+router.get('/api/available-coupons', isLoggedIn, checkout.availableCoupons);
+router.post('/api/apply-coupon', isLoggedIn, checkout.applyCoupon);
+router.post('/api/remove-coupon', isLoggedIn, checkout.removeCoupon);
 
 // order
-router.get('/order-details/:orderId', isLoggedIn, isBlockedUser, checkout.orderDetailsGet)
-router.post('/retry-payment/:orderId',isLoggedIn, isBlockedUser,checkout.retryPayment)
-router.post('/success-retry-payment', isLoggedIn, isBlockedUser, checkout.successRetryPayment);
-router.post('/api/cancel-order', isLoggedIn, isBlockedUser, checkout.cancelOrder);
-router.post('/api/return-order', isLoggedIn, isBlockedUser, checkout.returnOrder);
-router.get('/order-confirmation/:orderId', isLoggedIn, isBlockedUser, checkout.orderConfirmGet)
+router.get('/order-details/:orderId', isLoggedIn, checkout.orderDetailsGet)
+router.post('/retry-payment/:orderId',isLoggedIn,checkout.retryPayment)
+router.post('/success-retry-payment', isLoggedIn, checkout.successRetryPayment);
+router.post('/api/cancel-order', isLoggedIn, checkout.cancelOrder);
+router.post('/api/return-order', isLoggedIn, checkout.returnOrder);
+router.get('/order-confirmation/:orderId', isLoggedIn, checkout.orderConfirmGet)
 
 // wishlist
-router.get('/wishlist', isLoggedIn, isBlockedUser, wishlist.loadWishlist);
-router.post('/api/add-to-wishlist', isLoggedIn, isBlockedUser, wishlist.addToWishlist);
-router.post('/api/remove-from-wishlist', isLoggedIn, isBlockedUser, wishlist.removeWishlist);
+router.get('/wishlist', isLoggedIn, wishlist.loadWishlist);
+router.post('/api/add-to-wishlist', isLoggedIn, wishlist.addToWishlist);
+router.post('/api/remove-from-wishlist', isLoggedIn, wishlist.removeWishlist);
 
 module.exports = router;

@@ -1,10 +1,15 @@
 const user = require("../model/user-model");
 
-const isLoggedIn = (req, res, next) => {
+const isLoggedIn = async (req, res, next) => {
     if (!req.session.userId || req.session.userId === "") {
         res.redirect("/login");
     } else {
-        next();
+        const foundUser = await user.findById(req.session.userId);
+        if (foundUser.isBlocked) {
+            return res.redirect("/logout");
+        } else {
+            next();
+        }
     }
 };
 
@@ -24,32 +29,8 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-const isBlockedUser = async (req, res, next) => {
-    let errorMessage = "";
-    let data = {};
-    try {
-        const userId = req.session.userId;
-        const foundUser = await user.findById(userId);
-        if (foundUser.isBlocked) {
-            return res.redirect("/logout");
-        } else {
-            next();
-        }
-    } catch (error) {
-        errorMessage = "Error checking user block status";
-        res.render("user/login", {
-            err: errorMessage,
-            data,
-            errorMessage,
-            pageTitle: "Login Page",
-        });
-        return res.status(500).send("Error checking user block status");
-    }
-};
-
 module.exports = {
     isLoggedIn,
     isLoggedOut,
     isAdmin,
-    isBlockedUser,
 };

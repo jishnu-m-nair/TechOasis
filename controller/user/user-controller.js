@@ -8,7 +8,6 @@ const { securePassword, generateReferralCode } = require("../../utils/helpers");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { sentOtp } = require("../../config/nodeMailer");
-const { isBlockedUser } = require("../../middlewares/auth");
 const passport = require("passport");
 const categoryModel = require("../../model/category-model");
 
