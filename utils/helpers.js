@@ -103,6 +103,14 @@ const cartWishlistCount = async (req,res) => {
     return res.json({ cartCount, wishlistCount })
 }
 
+const clearCart = async (userId) => {
+    try {
+        await CartModel.deleteOne({ owner: userId });
+    } catch (error) {
+        throw new Error("Error clearing the cart");
+    }
+};
+
 module.exports = {
     securePassword,
     generateUniqueOrderID,
@@ -110,5 +118,6 @@ module.exports = {
     formatDate,
     generateReferralCode,
     formatToIndianCurrency,
-    cartWishlistCount
+    cartWishlistCount,
+    clearCart
 }

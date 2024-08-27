@@ -258,7 +258,6 @@
 
             function calculateCartTotal() {
                 // Implement this function to calculate the current cart total
-                // For example:
                 return parseFloat(document.getElementById('subTotal').textContent.replace('Rs.', '').trim());
             }
 
@@ -308,6 +307,7 @@
                         const result = await response.json();
                         if (result.success) {
                             alert('Coupon applied successfully!');
+                            couponInput.disabled = true;
                             applyCouponBtn.style.display = 'none';
                             removeCouponBtn.style.display = 'inline-block';
                             discountBoxAmount.innerHTML = `<strong>- Rs.${result.discountAmount}.00</strong>`;
@@ -336,6 +336,7 @@
                     if (result.success) {
                         alert('Coupon removed successfully!');
                         couponInput.value = '';
+                        couponInput.disabled = false;
                         applyCouponBtn.style.display = 'inline-block';
                         removeCouponBtn.style.display = 'none';
                         discountBoxAmount.innerHTML = `<strong>Rs.0.00</strong>`;
@@ -521,6 +522,24 @@
                             html: `<p>${responseData.message}</p><p>Current Balance: ${responseData.balance}</p>`,                            icon: "error",
                             confirmButtonText: "OK",
                         });
+                    } else if (responseData.blockedProducts) {
+                        const itemsList = responseData.nonFeaturedItemsList.join("<br>");
+                        await Swal.fire({
+                            title: "Product Removed",
+                            html: `The following products have been removed from your cart as they are no longer available:<br><br>${itemsList}`,
+                            icon: "warning",
+                            confirmButtonText: "Update Cart",
+                        });
+                        window.location.reload();
+                    } else if (responseData.lowStock) {
+                        const itemsList = responseData.lowQuantityItemsList.join("<br>");
+                        await Swal.fire({
+                            title: "Stock Update",
+                            html: `Some items in your cart have limited stock, and their quantities have been updated:<br><br>${itemsList}`,
+                            icon: "warning",
+                            confirmButtonText: "Update Cart",
+                        });
+                        window.location.reload();
                     } else {
                         Swal.fire({
                             title: "Error",

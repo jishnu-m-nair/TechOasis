@@ -33,6 +33,9 @@ const orderSchema = new Schema(
                     type: Number,
                     required: true,
                 },
+                productMRP: {
+                    type: Number,
+                },
                 quantity: {
                     type: Number,
                     required: true,
@@ -43,11 +46,17 @@ const orderSchema = new Schema(
                     type: Number,
                     required: true,
                 },
+                totalMRP: {
+                    type: Number,
+                },
             },
         ],
         billTotal: {
             type: Number,
             required: true,
+        },
+        totalAmount: {
+            type: Number,
         },
         paymentMethod: {
             type: String,
@@ -81,9 +90,6 @@ const orderSchema = new Schema(
             enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled","Returned"],
             default: "Pending",
         },
-        reason: {
-            type: String,
-        },
 
         requests: [
             {
@@ -101,7 +107,11 @@ const orderSchema = new Schema(
                 },
             },
         ],
-        discountPrice: {
+        offerDiscount: {
+            type: Number,
+            default: 0,
+        },
+        couponDiscount: {
             type: Number,
             default: 0,
         },
