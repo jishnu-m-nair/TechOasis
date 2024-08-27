@@ -18,45 +18,42 @@ function sentOtp(email) {
 
     const mailOptions = {
         from: {
-            name: "TechOasis International",
+            name: "TechOasis",
             address: process.env.USER_EMAIL,
         },
         to: email,
-        subject: "TechOasis International: Verify Your Account",
+        subject: "TechOasis: Verify Your Account",
         text: `
-    Hello,
-  
-    Thank you for using TechOasis International. To verify your account, please enter the following One-Time Password (OTP):
-  
-    **${otp}**  This code is valid for 2 minutes. Please do not share this code with anyone.
-  
-    If you did not request this verification code, please ignore this email.
-  
-    Sincerely,
-  
-    The TechOasis International Team
-    `,
+                Hello,
+            
+                Thank you for using TechOasis. To verify your account, please enter the following One-Time Password (OTP):
+            
+                **${otp}**  This code is valid for 2 minutes. Please do not share this code with anyone.
+            
+                If you did not request this verification code, please ignore this email.
+            
+                Sincerely,
+            
+                The TechOasis Team
+            `,
         html: `
-    <p>Hello,</p>
-  
-    <p>Thank you for using TechOasis International. To verify your account, please enter the following One-Time Password (OTP):</p>
-  
-    <p><strong>${otp}</strong></p> <p>This code is valid for 2 minutes. Please do not share this code with anyone.</p>
-  
-    <p>If you did not request this verification code, please ignore this email.</p>
-  
-    <p>Sincerely,</p>
-  
-    <p>The TechOasis International Team</p>
-    `,
+                <p>Hello,</p>
+            
+                <p>Thank you for using TechOasis. To verify your account, please enter the following One-Time Password (OTP):</p>
+            
+                <p><strong>${otp}</strong></p> <p>This code is valid for 2 minutes. Please do not share this code with anyone.</p>
+            
+                <p>If you did not request this verification code, please ignore this email.</p>
+            
+                <p>Sincerely,</p>
+            
+                <p>The TechOasis Team</p>
+            `,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             res.status(500).send("Error sending OTP");
-        } else {
-            console.log("Email sent:", info.response);
-            console.log("OTP:", otp);
         }
     });
     return otp;

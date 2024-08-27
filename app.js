@@ -45,9 +45,6 @@ app.use((req, res, next) => {
 // Initialize Passport and session
 app.use(passport.initialize());
 app.use(passport.session());
-// require('./authenticate');
-
-
 
 // Set view engine
 app.set('views', path.join(__dirname, 'views'));
@@ -61,34 +58,15 @@ app.use(express.static(path.join(__dirname, 'public', 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
-
-
 // Route handlers
 app.use('/', userRouter);
 app.use('/', adminRouter);
 app.use("*",(req,res,next)=>{
     res.render("404");
 })
-// // Google OAuth routes
-// app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-//   // Access user data from req.user
-//   const user = req.user;
-
-//   // Store specific data in session if needed
-//   req.session.userId = user._id;
-//   req.session.email = user.email;
-
-//   // Redirect to the protected route
-//   res.redirect('/dashboard'); // Redirect to dashboard after successful login
-// });
-
 
 // Start server
 const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
+  console.log(`Server started on PORT: ${PORT}`);
 });
