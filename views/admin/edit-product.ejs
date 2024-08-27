@@ -278,7 +278,12 @@
                 if (data.success) {
                     document.getElementById('imagesUpdate' + index).parentElement.remove();
                 } else {
-                    alert('Failed to mark image for removal.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Failed to mark image for removal.',
+                        confirmButtonText: 'OK'
+                    });
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -627,13 +632,29 @@
                     const result = await response.json();
         
                     if (result.success) {
-                        alert("Product updated successfully");
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Product updated successfully',
+                            confirmButtonText: 'OK'
+                        });
                         window.location.href = result.redirectUrl;
                     } else {
-                        alert("Error updating product: " + result.error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error updating product: ' + result.error,
+                            confirmButtonText: 'Try Again'
+                        });
                     }
+
                 } catch (error) {
-                    alert("An error occurred while updating the product.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "An error occurred while updating the product.",
+                        confirmButtonText: 'Try Again'
+                    });
                 }
             }
         });

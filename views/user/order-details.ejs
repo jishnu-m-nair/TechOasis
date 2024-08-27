@@ -396,7 +396,13 @@
                     });
                 }
             } catch (error) {
-                alert('An error occurred. Please try again later.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again later.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
             }
         });
         document.getElementById('returnOrderForm').addEventListener('submit', async function(event) {
@@ -434,7 +440,13 @@
                     });
                 }
             } catch (error) {
-                alert('An error occurred. Please try again later.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again later.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
             }
         });
 
@@ -520,7 +532,13 @@
                     })
                 })
                 .catch(error => {
-                    alert('Failed to initiate payment. Please try again.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to initiate payment. Please try again.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
                 });
             });
         </script>

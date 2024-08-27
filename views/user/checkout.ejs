@@ -252,7 +252,12 @@
                     displayCoupons(coupons);
                     availableCouponsModal.show();
                 } catch (error) {
-                    alert('Failed to fetch available coupons. Please try again.');
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Fetch Failed',
+                        text: 'Failed to fetch available coupons. Please try again.',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
 
@@ -282,9 +287,16 @@
                     button.addEventListener('click', function() {
                         const code = this.getAttribute('data-code');
                         navigator.clipboard.writeText(code).then(() => {
-                            alert('Coupon code copied to clipboard!');
                             couponInput.value = code;
                             availableCouponsModal.hide();
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Copied!',
+                                text: 'Coupon code copied to clipboard!',
+                                timer: 3000,
+                                showConfirmButton: false
+                            })
                         }).catch(err => {
                             couponInput.value = code;
                             availableCouponsModal.hide();
@@ -306,7 +318,13 @@
                         });
                         const result = await response.json();
                         if (result.success) {
-                            alert('Coupon applied successfully!');
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Coupon Applied',
+                                text: 'Coupon applied successfully!',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
                             couponInput.disabled = true;
                             applyCouponBtn.style.display = 'none';
                             removeCouponBtn.style.display = 'inline-block';
@@ -314,13 +332,32 @@
                             updateCartTotal(result.newTotal);
                             appliedCouponCode = code; // Store the applied coupon code
                         } else {
-                            alert(result.message || 'Failed to apply coupon. Please try again.');
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Failed',
+                                text: result.message || 'Failed to apply coupon. Please try again.',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
                         }
+
                     } catch (error) {
-                        alert('An error occurred while applying the coupon. Please try again.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while applying the coupon. Please try again.',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
                     }
                 } else {
-                    alert('Please enter a coupon code.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Coupon Code',
+                        text: 'Please enter a coupon code.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
                 }
             });
 
@@ -333,8 +370,15 @@
                         },
                     });
                     const result = await response.json();
+
                     if (result.success) {
-                        alert('Coupon removed successfully!');
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Coupon Removed',
+                            text: 'Coupon removed successfully!',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
                         couponInput.value = '';
                         couponInput.disabled = false;
                         applyCouponBtn.style.display = 'inline-block';
@@ -343,12 +387,25 @@
                         updateCartTotal(result.newTotal);
                         appliedCouponCode = ''; // Clear the applied coupon code
                     } else {
-                        alert(result.message || 'Failed to remove coupon. Please try again.');
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Failed',
+                            text: result.message || 'Failed to remove coupon. Please try again.',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
                     }
                 } catch (error) {
-                    alert('An error occurred while removing the coupon. Please try again.');
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while removing the coupon. Please try again.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
                 }
             });
+
 
             function updateCartTotal(newTotal) {
                 // Update the cart total displayed on the page

@@ -577,13 +577,29 @@
                     const result = await response.json();
         
                     if (result.success) {
-                        alert("Product Added successfully");
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Product Added',
+                            text: 'Product added successfully',
+                            confirmButtonText: 'OK'
+                        })
                         window.location.href = result.redirectUrl;
                     } else {
-                        alert("Error updating product: " + result.errorMessage);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error updating product: ' + result.errorMessage,
+                            confirmButtonText: 'Try Again'
+                        });
                     }
+
                 } catch (error) {
-                    alert("An error occurred while updating the product.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "An error occurred while updating the product.",
+                        confirmButtonText: 'Try Again'
+                    });
                 }
             }
         });
