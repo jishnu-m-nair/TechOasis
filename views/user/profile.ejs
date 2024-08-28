@@ -351,6 +351,11 @@
 			  <div class="wallet-header">
 				<h2>My Wallet</h2>
 			  </div>
+        <% if (wallet) { %>
+          <div class="wallet-balance">
+            <h3>Balance: ₹<%= wallet.balance %></h3>
+          </div>
+          <% } %>
 			  <div class="table_page table-responsive">
 				<table>
 				  <thead>
