@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const UserModel = require("../model/user-model");
+const WalletModel = require("../model/wallet-model");
 require("dotenv").config();
 
 passport.serializeUser((user, done) => {
@@ -49,6 +50,12 @@ passport.use(
                     });
 
                     await user.save();
+                    const userWallet = new WalletModel({
+                        owner: user._id,
+                        balance: 0,
+                        transactions: []
+                    })
+                    await userWallet.save();
                     return done(null, user);
                 }
             } catch (err) {

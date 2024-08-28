@@ -277,7 +277,7 @@ const signupOtpPost = async (req, res) => {
 
         const referralCode = req.session.referralCode
         if (referralCode) {
-            const referringUser = await UserModel.findOne({ referralCode });
+            const referringUser = await UserModel.findOne({ referralCode }) || null;
             if (referringUser) {
                 const userWallet = new WalletModel({
                     owner: user._id,
@@ -300,6 +300,13 @@ const signupOtpPost = async (req, res) => {
                     });
                     await referrerWallet.save();
                 }
+            } else {
+                const userWallet = new WalletModel({
+                    owner: user._id,
+                    balance: 0,
+                    transactions: []
+                })
+                await userWallet.save();
             }
         } else {
             const userWallet = new WalletModel({
