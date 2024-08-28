@@ -2,6 +2,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const UserModel = require("../model/user-model");
 const WalletModel = require("../model/wallet-model");
+const { generateReferralCode } = require('../utils/helpers');
 require("dotenv").config();
 
 passport.serializeUser((user, done) => {
@@ -40,13 +41,17 @@ passport.use(
                     return done(null, user);
                 } else {
                     // User does not exist, create a new user
+                    const newReferralCode = await generateReferralCode(8);
+                    
                     user = new UserModel({
                         email: profile.emails[0].value,
                         fullname: profile.displayName,
                         isVerified: true,
                         password: "",
                         googleId: profile.id,
-                        phone: null
+                        phone: null,
+                        referralCode: newReferralCode,
+                        referredBy: ''
                     });
 
                     await user.save();
