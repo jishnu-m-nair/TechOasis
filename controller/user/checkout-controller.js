@@ -92,6 +92,27 @@ const orderCheckoutPost = async (req, res, next) => {
             });
         }
 
+        // Check for items in the cart that are out of stock (countInStock = 0)
+        const outOfStockItems = cart.items.filter(item => item.productId.countInStock === 0);
+
+        if (outOfStockItems.length > 0) {
+            const outOfStockItemsList = outOfStockItems
+                .map(item => `${item.productId.productName}`);
+
+            // Remove out-of-stock items from the cart
+            cart.items = cart.items.filter(item => item.productId.countInStock > 0);
+
+            // Save the updated cart
+            await cart.save();
+
+            return res.status(400).json({
+                success: false,
+                error: "out of stock products",
+                outOfStockItemsList,
+                outOfStock: true
+            });
+        }
+
         // Check for items in the cart that exceed available stock
         const lowQuantityItems = cart.items.filter(item => item.productId.countInStock < item.quantity);
 

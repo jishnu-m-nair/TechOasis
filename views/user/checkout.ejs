@@ -588,6 +588,15 @@
                             confirmButtonText: "Update Cart",
                         });
                         window.location.reload();
+                    } else if (responseData.outOfStock) {
+                        const itemsList = responseData.outOfStockItemsList.join("<br>");
+                        await Swal.fire({
+                            title: "Product Removed",
+                            html: `Some items in your cart are out of stock, and the product is removed from the cart:<br><br>${itemsList}`,
+                            icon: "warning",
+                            confirmButtonText: "Update Cart",
+                        });
+                        window.location.reload();
                     } else if (responseData.lowStock) {
                         const itemsList = responseData.lowQuantityItemsList.join("<br>");
                         await Swal.fire({
