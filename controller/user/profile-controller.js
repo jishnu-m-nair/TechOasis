@@ -266,6 +266,65 @@ const deleteAddress = async (req, res) => {
     }
 };
 
+const filterOrders = async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const { page = 1 } = req.query;
+        const limit = 10
+        let query = { user: userId };
+
+        const orders = await OrderModel.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
+
+        const totalOrders = await OrderModel.countDocuments(query);
+
+        res.json({
+            success: true,
+            orders,
+            totalPages: Math.ceil(totalOrders / limit),
+            currentPage: parseInt(page),
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to fetch orders' });
+    }
+};
+
+const filterTransactions = async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const { page = 1 } = req.query;
+        const limit = 10;
+
+        const wallet = await WalletModel.findOne({ owner: userId });
+        if (!wallet) {
+            return res.json({
+                success: true,
+                transactions: [],
+                totalPages: 0,
+                currentPage: 1,
+            });
+        }
+
+        let filteredTransactions = wallet.transactions;
+
+        const totalTransactions = filteredTransactions.length;
+
+        const paginatedTransactions = filteredTransactions
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice((page - 1) * limit, page * limit);
+
+        res.json({
+            success: true,
+            transactions: paginatedTransactions,
+            totalPages: Math.ceil(totalTransactions / limit),
+            currentPage: parseInt(page),
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to fetch transactions' });
+    }
+};
 
 module.exports = {
     profile,
@@ -277,5 +336,7 @@ module.exports = {
     addAddressPost,
     editAddress,
     editAddressPatch,
-    deleteAddress
+    deleteAddress,
+    filterOrders,
+    filterTransactions
 }

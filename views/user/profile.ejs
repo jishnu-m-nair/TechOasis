@@ -127,6 +127,37 @@
     display: inline-block;
     padding-left: 6px;
   }
+
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Add some space above the pagination */
+}
+
+.pagination-container .page-item {
+    margin: 0 5px; /* Add horizontal margin between page buttons */
+}
+
+.pagination-container .page-link {
+    padding: 8px 12px; /* Adjust padding inside the buttons */
+    border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+    border: 1px solid #ddd; /* Optional: Border around each button */
+    text-decoration: none; /* Remove underline */
+    color: #333; /* Button text color */
+}
+
+.pagination-container .page-item.active .page-link {
+    background-color: #007bff; /* Active button background color */
+    color: #fff; /* Active button text color */
+    border-color: #007bff; /* Active button border color */
+}
+
+.pagination-container .page-link:hover {
+    background-color: #f8f9fa; /* Background color on hover */
+    color: #007bff; /* Text color on hover */
+}
+
 </style>
 
 <!-- Start Navbar Area -->
@@ -240,92 +271,28 @@
           </div>
 
           <div class="tab-pane fade" id="orders">
-            <% if(orderDetails && orderDetails.length>0) { %>
-            <h4>Orders</h4>
-            <div class="table_page table-responsive">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Order</th>
-                    <th>Order Status</th>
-                    <th>Payment Status</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% for(const [i,order] of orderDetails.entries()) { %>
-                  <tr>
-                    <td>
-                      <%=i + 1%>
-                    </td>
-                    <td>
-                      <%- new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
-                    </td>
-                    <% if(order.status==="Delivered" ) { %>
-                    <td><span class="text-success">
-                        <%= order.status%>
-                      </span>
-                    </td>
-                    <% } else if(order.status==="Cancelled" || order.status==="Returned" ) { %>
-                    <td><span class="text-danger">
-                        <%= order.status%>
-                      </span>
-                    </td>
-                    <% } else { %>
-                    <td><span class="text-warning">
-                        <%= order.status%>
-                      </span>
-                    </td>
-                    <% } %>
+			<h4>Orders</h4>
+			<div class="table_page table-responsive">
+			  <table>
+				<thead>
+				  <tr>
+					<th>Date</th>
+					<th>Order</th>
+					<th>Order Status</th>
+					<th>Payment Status</th>
+					<th>Total</th>
+					<th>Actions</th>
+				  </tr>
+				</thead>
+				<tbody>
+				  <!-- Orders will be dynamically loaded here -->
+				</tbody>
+			  </table>
+			  <ul class="pagination-container pagination text-center"></ul>
+			  <br>
+			</div>
+		  </div>
 
-                    <% if(order.paymentStatus==="Success" ) { %>
-                    <td><span class="text-success">
-                        <%= order.paymentStatus%>
-                      </span>
-                    </td>
-                    <% } else if(order.paymentStatus==="Failed" ) { %>
-                    <td><span class="text-danger">
-                        <%= order.paymentStatus%>
-                      </span>
-                    </td>
-                    <% } else { %>
-                    <td><span class="text-warning">
-                        <%= order.paymentStatus%>
-                      </span>
-                    </td>
-                    <% } %>
-                    <td>
-                      <%= order.billTotal %>
-                    </td>
-                    <td><a href="/order-details/<%=order._id %>" class="view">view</a>
-                    </td>
-                  </tr>
-                  <% } %>
-                </tbody>
-              </table>
-            </div>
-            <% } else { %>
-            <div class="empty-cart-section section-fluid">
-              <div class="emptycart-wrapper">
-                <div class="container">
-                  <div class="row">
-                    <div class="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-3">
-                      <div class="emptycart-content text-center">
-                        <h4 class="title">No Orders</h4>
-                        <h6 class="sub-title">Sorry Mate... You haven't ordered
-                          any products!</h6>
-                        <a href="/shop" class="btn btn-lg btn-golden">Continue
-                          Shopping</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <% } %>
-          </div>
           <div class="tab-pane" id="address">
             <div class="address-container">
               <div class="d-flex justify-content-between">
@@ -379,67 +346,31 @@
             </div>
           </div>
 
-          <div class="tab-pane" id="wallet">
-            <div class="wallet-container">
-              <div class="wallet-header">
-                <h2>My Wallet</h2>
-              </div>
-              <% if (wallet) { %>
-              <div class="wallet-balance">
-                <h3>Balance: ₹<%= wallet.balance %>
-                </h3>
-              </div>
-
-              <% if (wallet.transactions && wallet.transactions.length> 0) { %>
-              <div class="table_page table-responsive">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>S.No</th>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Type</th>
-                      <th>Reason</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% wallet.transactions.forEach((transaction, index)=> { %>
-                    <tr>
-                      <td>
-                        <%= index + 1 %>
-                      </td>
-                      <td>
-                        <%- new Date(transaction.createdAt).toLocaleDateString('en-US', { day: '2-digit' , month: '2-digit' , year: 'numeric' }) %>
-                      <td>
-                        <%= transaction.amount %>
-                      </td>
-                      <td>
-                        <% if(transaction.type==="credit" ) { %>
-                        <span style="color: green;">
-                          <%= transaction.type %>
-                        </span>
-                        <% } else { %>
-                        <span style="color: red;">
-                          <%= transaction.type %>
-                        </span>
-                        <% } %>
-                      </td>
-                      <td>
-                        <%= transaction.reason || 'N/A' %>
-                      </td>
-                    </tr>
-                    <% }) %>
-                  </tbody>
-                </table>
-              </div>
-              <% } else { %>
-              <p>No transactions available.</p>
-              <% } %>
-              <% } else { %>
-              <p>Wallet information is not available.</p>
-              <% } %>
-            </div>
-          </div>
+          <div class="tab-pane fade" id="wallet">
+			<div class="wallet-container">
+			  <div class="wallet-header">
+				<h2>My Wallet</h2>
+			  </div>
+			  <div class="table_page table-responsive">
+				<table>
+				  <thead>
+					<tr>
+					  <th>S.No</th>
+					  <th>Date</th>
+					  <th>Amount</th>
+					  <th>Type</th>
+					  <th>Reason</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<!-- Transactions will be dynamically loaded here -->
+				  </tbody>
+				</table>
+				<ul class="pagination-container pagination text-center"></ul>
+				<br>
+			  </div>
+			</div>
+		  </div>
 
         </div>
       </div>
@@ -485,6 +416,11 @@
     if (getQueryParam('tab') !== tabId) {
       history.pushState(null, '', `/profile?tab=${tabId}`);
     }
+    if (tabId === 'orders') {
+      fetchFilteredOrders(1);
+    } else if (tabId === 'wallet') {
+      fetchFilteredTransactions(1);
+    }
   }
 
   let activeTab = getQueryParam('tab') || 'dashboard';
@@ -502,6 +438,147 @@
     const newActiveTab = getQueryParam('tab') || 'dashboard';
     setActiveTab(newActiveTab);
   });
+
+   // Function to fetch and render filtered orders
+   async function fetchFilteredOrders(page = 1) {
+    try {
+      const response = await fetch(`/api/filter/orders?page=${page}`);
+      const data = await response.json();
+
+      if (data.success) {
+        renderOrders(data.orders,data.currentPage);
+        updatePaginationUI(data.currentPage, data.totalPages, 'orders');
+      } else {
+        alert('Failed to fetch orders.');
+      }
+    } catch (error) {
+      console.error('Error fetching filtered orders:', error);
+    }
+  }
+
+  // Function to fetch and render filtered transactions
+  async function fetchFilteredTransactions(page = 1) {
+    try {
+      const response = await fetch(`/api/filter/transactions?page=${page}`);
+      const data = await response.json();
+
+      if (data.success) {
+        renderTransactions(data.transactions,data.currentPage);
+        updatePaginationUI(data.currentPage, data.totalPages, 'wallet');
+      } else {
+        alert('Failed to fetch transactions.');
+      }
+    } catch (error) {
+      console.error('Error fetching filtered transactions:', error);
+    }
+  }
+
+  // Function to render orders (implement your rendering logic)
+  function renderOrders(orders,currentPage) {
+    const ordersTableBody = document.querySelector('#orders tbody');
+    ordersTableBody.innerHTML = ''; // Clear the table body
+
+    if (orders.length === 0) {
+      ordersTableBody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+      return;
+    }
+
+	const itemsPerPage = 10;
+	const startingIndex = (currentPage - 1) * itemsPerPage;
+
+    orders.forEach((order, index) => {
+      const orderRow = `
+        <tr>
+          <td>${startingIndex + index + 1}</td>
+          <td>${new Date(order.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+          <td><span class="${order.status === 'Delivered' ? 'text-success' : (order.status === 'Cancelled' || order.status === 'Returned' ? 'text-danger' : 'text-warning')}">${order.status}</span></td>
+          <td><span class="${order.paymentStatus === 'Success' ? 'text-success' : (order.paymentStatus === 'Failed' ? 'text-danger' : 'text-warning')}">${order.paymentStatus}</span></td>
+          <td>${order.billTotal}</td>
+          <td><a href="/order-details/${order._id}" class="view">view</a></td>
+        </tr>
+      `;
+      ordersTableBody.insertAdjacentHTML('beforeend', orderRow);
+    });
+  }
+
+  // Function to render transactions (implement your rendering logic)
+  function renderTransactions(transactions,currentPage) {
+    const transactionsTableBody = document.querySelector('#wallet tbody');
+    transactionsTableBody.innerHTML = ''; // Clear the table body
+
+    if (transactions.length === 0) {
+      transactionsTableBody.innerHTML = '<tr><td colspan="5">No transactions found.</td></tr>';
+      return;
+    }
+
+    transactions.forEach((transaction, index) => {
+      const transactionRow = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${new Date(transaction.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+          <td>${transaction.amount}</td>
+          <td><span style="color: ${transaction.type === 'credit' ? 'green' : 'red'};">${transaction.type}</span></td>
+          <td>${transaction.reason || 'N/A'}</td>
+        </tr>
+      `;
+      transactionsTableBody.insertAdjacentHTML('beforeend', transactionRow);
+    });
+  }
+
+  // Function to update pagination UI (implement your pagination logic)
+  function updatePaginationUI(currentPage, totalPages, tabId) {
+    const paginationContainer = document.querySelector(`#${tabId} .pagination-container`);
+    paginationContainer.innerHTML = '';
+
+    // Add Previous Page button if not on the first page
+    if (currentPage > 1) {
+        const prevPageItem = document.createElement('li');
+        prevPageItem.classList.add('page-item');
+        prevPageItem.innerHTML = `
+            <a class="page-link" data-page="${currentPage - 1}" href="#"><i class="ion-ios-skipbackward"></i></a>
+        `;
+        paginationContainer.appendChild(prevPageItem);
+    }
+
+    // Add page numbers
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(currentPage + 2, totalPages); i++) {
+        const pageItem = document.createElement('li');
+        pageItem.classList.add('page-item');
+        if (currentPage === i) {
+            pageItem.classList.add('active');
+        }
+        pageItem.innerHTML = `
+            <a class="page-link" data-page="${i}" href="#">${i}</a>
+        `;
+        paginationContainer.appendChild(pageItem);
+    }
+
+    // Add Next Page button if not on the last page
+    if (currentPage < totalPages) {
+        const nextPageItem = document.createElement('li');
+        nextPageItem.classList.add('page-item');
+        nextPageItem.innerHTML = `
+            <a class="page-link" data-page="${currentPage + 1}" href="#"><i class="ion-ios-skipforward"></i></a>
+        `;
+        paginationContainer.appendChild(nextPageItem);
+    }
+
+    // Attach event listeners to pagination links
+    const pageLinks = paginationContainer.querySelectorAll('.page-link');
+    pageLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const newPage = parseInt(this.dataset.page);
+
+            if (tabId === 'orders') {
+                fetchFilteredOrders(newPage);
+            } else if (tabId === 'wallet') {
+                fetchFilteredTransactions(newPage);
+            }
+        });
+    });
+}
+
 
   document.querySelectorAll('.delete-address-button').forEach(button => {
     button.addEventListener('click', async function() {

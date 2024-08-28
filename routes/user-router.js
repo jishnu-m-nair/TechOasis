@@ -78,6 +78,8 @@ router.patch('/edit-address/:addressId', isLoggedIn, profile.editAddressPatch);
 router.get('/edit-address/:addressId', isLoggedIn, profile.editAddress)
 router.patch('/edit-address/:addressId', isLoggedIn, profile.editAddressPatch);
 router.delete('/delete-address/:addressId', isLoggedIn, profile.deleteAddress);
+router.get('/api/filter/orders', isLoggedIn, profile.filterOrders);
+router.get('/api/filter/transactions', isLoggedIn, profile.filterTransactions);
 
 //checkout
 router.get('/checkout', isLoggedIn, checkout.orderCheckout)
