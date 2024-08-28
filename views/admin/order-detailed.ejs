@@ -289,11 +289,12 @@
                     }
 
                     const result = await response.json();
-                    Swal.fire({
+                    await Swal.fire({
                         icon: 'success',
                         title: 'Success',
                         text: 'Order status updated successfully',
                     });
+                    window.location.reload();
                 } catch (error) {
                     Swal.fire({
                         icon: 'error',
